@@ -9,7 +9,7 @@ import useApiDocumentation from '../hooks/useApiDocumentation';
 const ApiContext = React.createContext(undefined);
 export const useApiContext = () => {
   const documentation = useContext(ApiContext);
-  
+
   if (documentation === undefined) {
     throw new Error('useApiContext must be used within App');
   }
