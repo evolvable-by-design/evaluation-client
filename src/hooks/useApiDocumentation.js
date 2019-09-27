@@ -9,6 +9,13 @@ function useApiDocumentation() {
   return useFetch(fetchDocumentationOptions, toDocumentationBrowser);
 };
 
-const toDocumentationBrowser = data => new DocumentationBrowser(data)
+const toDocumentationBrowser = result => new DocumentationBrowser(
+  JSON.parse(
+    JSON.stringify(result.data)
+      .replace(new RegExp('x-@id', 'g'), '@id')
+      .replace(new RegExp('x-@type', 'g'), '@type')
+      .replace(new RegExp('x-@context', 'g'), '@context')
+  )
+)
 
 export default useApiDocumentation;

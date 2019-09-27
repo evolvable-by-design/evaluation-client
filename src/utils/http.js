@@ -12,12 +12,12 @@ function buildUrlWithDefaultParams(operation) {
 
   if (operation.parameters) {
     operation.parameters
-      .filter(param => param.in === 'path' && param.schema.default)
-      .foreach(param => url.replace(param.name, param.schema.default));
+      .filter(param => param.in === 'path' && param.schema.default !== undefined)
+      .forEach(param => url.replace(param.name, param.schema.default));
 
     operation.parameters
-      .filter(param => param.in === 'query' && param.schema.default)
-      .foreach((param, i) => {
+      .filter(param => param.in === 'query' && param.schema.default !== undefined)
+      .forEach((param, i) => {
         if (i === 0) {
           url += `?${param.name}=${param.schema.default}`
         } else {
@@ -43,7 +43,7 @@ function buildBodyWithDefaultParams(operationId, requestBodySchema) {
     const body = {};
     Object.keys(requestBodySchema.properties)
       .filter(key => requestBodySchema.properties[key].default)
-      .foreach(key => body[key] = requestBodySchema.properties[key].default)
+      .forEach(key => body[key] = requestBodySchema.properties[key].default)
 
     return body;
   }
@@ -53,8 +53,8 @@ function buildHeadersWithDefaultParams(operation) {
   if (operation.parameters) {
     const headers = {};
     operation.parameters
-      .filter(param => param.in === 'header' && param.schema.default)
-      .foreach(param => headers[param.name] = param.schema.default);
+      .filter(param => param.in === 'header' && param.schema.default !== undefined)
+      .forEach(param => headers[param.name] = param.schema.default);
     return headers;
   } else {
     return undefined;

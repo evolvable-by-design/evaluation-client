@@ -73,7 +73,9 @@ const vocabularies = {
       TaskStatusFreeToMove: vndJeeraUrl + 'TaskStatusFreeToMove',
       isArchived: vndJeeraUrl + 'isArchived',
       updatesCount: vndJeeraUrl + 'updatesCount',
-      EmailOwnershipConfirmation: vndJeeraUrl + 'EmailOwnershipConfirmation'
+      EmailOwnershipConfirmation: vndJeeraUrl + 'EmailOwnershipConfirmation',
+      getProjectDetails: vndJeeraUrl + 'getProjectDetails',
+      listProjects: vndJeeraUrl + 'listProjects'
     }
   }
 };
