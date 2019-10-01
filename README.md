@@ -4,6 +4,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 - https://www.robinwieruch.de/react-hooks-fetch-data
 - https://kentcdodds.com/blog/how-to-use-react-context-effectively 
+- https://reacttraining.com/blog/react-router-v5-1/
 
 ## Available Scripts
 

@@ -21,12 +21,22 @@ class DocumentationBrowser {
   }
 
   resolveParameters(operation) {
+    const [route, path] = this._findPath(operation.id);
+
+    if ()
     // TODO
     return undefined;
   }
 
-  findSchema(operationId) {
-    // TODO
+  findRequestBodySchema(operationId) {
+    const operation = this._findOperationWithId(operationId)
+    
+    if (operation && operation.requestBody) {
+      const contents = operation.requestBody.content;
+      const content = contents['application/json'] || contents[Object.keys(contents)[0]]
+      return content.schema;
+    }
+
     return undefined;
   }
 
@@ -36,6 +46,12 @@ class DocumentationBrowser {
     return true;
   }
 
+  /**
+   * Refine a given element of the documentation by resolving 
+   * all references and semantics of the element and its children
+   * 
+   * @param {*} value an element of the documentation
+   */
   _refine(value) {
     if (value instanceof Array) {
       return value.map(this._refine.bind(this))
@@ -55,6 +71,12 @@ class DocumentationBrowser {
     } else {
       return value;
     }
+  }
+
+  _findPath(operationId) {
+    return Object.entries(this.documentation.paths)
+      .find(([route, pathObject]) => Object.values(pathObject).find(operation => operation.id === operationId) !== undefined)
+      .map(([route, pathObject]) => [ route, this._refine(pathObject) ]);
   }
 
   _withSemanticsToProperties(properties) {

@@ -4,7 +4,7 @@ import { buildRequestWithDefaultParams, buildRequest } from '../utils/http';
 
 export const useRequestBodySchema = (apiDocumentation, operation) => useMemo(
   () => operation && operation.requestBody
-    ? apiDocumentation.findSchema(operation.operationId)
+    ? apiDocumentation.findRequestBodySchema(operation.operationId)
     : undefined,
   [apiDocumentation, operation]
 );
