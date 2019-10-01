@@ -7,6 +7,8 @@ class DocumentationBrowser {
     this.documentation = JsonLDParser.replaceAllId(documentation);
     console.log(this.documentation);
     this.semanticKeyMapping = JsonLDParser.findSemanticWithKeyMappings(documentation);
+
+    console.log(this._findOperationThatReturns('https://github.com/loosely-coupled-API/jeera_vocabulary/blob/master/vocab.ttl#Task'));
   }
 
   findOperation(target) {
@@ -15,17 +17,8 @@ class DocumentationBrowser {
       return operationFromId;
     }
 
-    // const operationReturningTarget = this._findOperationThatReturns(target);
-    // return operationReturningTarget;
-    return undefined;
-  }
-
-  resolveParameters(operation) {
-    const [route, path] = this._findPath(operation.id);
-
-    if ()
-    // TODO
-    return undefined;
+    const operationReturningTarget = this._findOperationThatReturns(target);
+    return operationReturningTarget;
   }
 
   findRequestBodySchema(operationId) {
@@ -41,9 +34,23 @@ class DocumentationBrowser {
   }
 
   notContainsRequiredParametersWithoutDefaultValue(operation) {
-    // TODO
-    // return undefined;
-    return true;
+    const foundRequiredParamWithoutDefaultValue = operation.parameters && operation.parameters
+      .find(parameter => parameter.required && parameter.schema.default === undefined);
+
+    const bodySchema = this.findRequestBodySchema(operation.operationId);
+    const requiredArgs = bodySchema && bodySchema.required ? bodySchema.required : [];
+
+    if (bodySchema === undefined || requiredArgs.length === 0) {
+      return foundRequiredParamWithoutDefaultValue === undefined;
+    }
+
+    const foundRequiredBodyParamsWithoutDefaultValue =
+      Object.entries(bodySchema.properties)
+        .filter(([key, value]) => requiredArgs.includes(key))
+        .find(([key, value]) => value.default === undefined);
+
+    return foundRequiredParamWithoutDefaultValue === undefined
+      && foundRequiredBodyParamsWithoutDefaultValue === undefined;
   }
 
   /**
@@ -94,16 +101,20 @@ class DocumentationBrowser {
   }
 
   _findOperationWithId(target) {
+    return this._findOperation(operation => operation['@id'] === target);   
+  }
+
+  _findOperation(predicate) {
     // should be optimized
     const pathFound = Object.entries(this.documentation.paths)
       .find(([path, operations]) => Object.values(operations)
-        .find(operation => operation['@id'] === target)
+        .find(predicate)
       );
 
     if (pathFound) {
       const [path, operations] = pathFound;
       const parametersOfPath = this._refine(operations['parameters']);
-      const [verb, operation] = Object.entries(operations).find(([v, op]) => op['@id'] === target)
+      const [verb, operation] = Object.entries(operations).find(([v, op]) => predicate(op))
 
       let parameters = this._mergeOptionalArrays(parametersOfPath, operation.parameters);
 
@@ -119,27 +130,19 @@ class DocumentationBrowser {
   }
 
   _findOperationThatReturns(target) {
-    return Object.values(this.documentation.paths)
-      .filter(path => Object.values(path)
-        .filter(operation => operation.responses)
-        .find(operation => Object.values(operation.responses)
-            .filter(response => response.content)
-            .filter(response => response.content['application/json'])
-            .map(response => response.content['application/json'])
-            .filter(content => content.schema)
-            .filter(content => {
-              if (content.schema['$ref']) {
-                const schemaName = this._resolveReferenceName(content.schema['$ref']);
-                if (this.semanticKeyMapping[target] === schemaName) {
-                  return true;
-                }
-              }
-
-              const schema = content.schema['$ref'] ? this._resolveReference(content.schema['$ref']) : content.schema;
-              return schema['@id'] === target
-            })
-        )
-      )
+    return this._findOperation(operation => {
+      
+      if (operation.responses) {
+        const maybeKey = Object.keys(operation.responses).find(key => key === '200' || key === '201');
+        if (maybeKey) {
+          const refinedOperation = this._refine(operation);
+          const schema = this._selectContent(refinedOperation.responses[maybeKey].content).schema;
+          return schema['@id'] === target || (schema.oneOf && schema.oneOf.find(s => s['@id'] === target) !== undefined)
+        }
+        return false;
+      }
+      return false;
+    });
   }
 
   _resolveComponent(component) {
@@ -170,6 +173,10 @@ class DocumentationBrowser {
 
     const fragments = ref.substring(1).split('/');
     return fragments[fragments.length-2];
+  }
+
+  _selectContent(contents) {
+    return contents['application/json'] || contents[Object.keys(contents)[0]];
   }
 
   _mergeOptionalArrays(arr1, arr2) {

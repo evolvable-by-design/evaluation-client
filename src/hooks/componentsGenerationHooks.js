@@ -1,12 +1,13 @@
 import { useMemo } from 'react'; 
 
-export const useFiltersToRender = (apiDocumentation, operation, setParameters) => useMemo(
+export const useFiltersToRender = (operation, setParameters) => useMemo(
   () => operation && operation.parameters
-    ? generateFilters(apiDocumentation.resolveParameters(operation), setParameters)
+    ? generateFilters(operation.parameters, setParameters)
     : undefined,
-  [apiDocumentation, operation, setParameters]
+  [operation, setParameters]
 );
   
+// TODO
 const generateFilters = (parameters, setParameters) => undefined;
 
 export const useFormToRender = (operation, requestBodySchema, setForm) => useMemo(
@@ -16,4 +17,5 @@ export const useFormToRender = (operation, requestBodySchema, setForm) => useMem
   [operation, requestBodySchema, setForm]
 );
 
+// TODO
 const generateForm = (bodySchema, setForm) => undefined;

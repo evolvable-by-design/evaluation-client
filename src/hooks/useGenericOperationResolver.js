@@ -20,7 +20,7 @@ function useGenericOperationResolver(target) {
 
   const operation = useMemo(() => apiDocumentation.findOperation(target), [target, apiDocumentation]);
 
-  const filtersToDisplay = useFiltersToRender(apiDocumentation, operation, setParameters);
+  const filtersToDisplay = useFiltersToRender(operation, setParameters);
   const requestBodySchema = useRequestBodySchema(apiDocumentation, operation);
   const formToDisplay = useFormToRender(operation, requestBodySchema, setForm);
 
