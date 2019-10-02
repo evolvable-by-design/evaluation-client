@@ -4,8 +4,6 @@ import { useApiContext } from './App';
 
 const FromApi = ({ target }) => {
   const apiDocumentation = useApiContext();
-
-  
   
 };
 

@@ -1,6 +1,6 @@
 export function buildRequestWithDefaultParams(operation, requestBodySchema) {
   return {
-    method: operation.method,
+    method: operation.verb,
     url: buildUrlWithDefaultParams(operation),
     data: buildBodyWithDefaultParams(operation.operationId, requestBodySchema),
     headers: buildHeadersWithDefaultParams(operation)

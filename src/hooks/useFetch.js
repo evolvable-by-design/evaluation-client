@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 
 import Config from '../config';
+import SemanticData from '../services/SemanticData';
 
 const axiosInstance = axios.create({
   baseURL: Config.serverUrl
@@ -49,18 +50,14 @@ export const useFetchWithContext = (axiosConfig, operation, resultMapper) => {
   );
 
   return data !== undefined
-    ? [ data.data, data.type, data.schema, isLoading, error ]
-    : [ undefined, undefined, undefined, isLoading, error ];
+    ? [ new SemanticData(data.data, data.schema), isLoading, error ]
+    : [ undefined, isLoading, error ];
 };
 
 const getDataAndItsDescription = (operation, resultMapper) => (result) => {
-  const schema = operation ? operation.responses[result.status].content[result.headers['content-type'].split(';')[0]].schema : operation;
+  const schema = operation ? operation.responses[result.status].content[result.headers['content-type'].split(';')[0]].schema : undefined;
   const data = resultMapper ? resultMapper(result) : result.data;
-  return {
-    data,
-    type: schema['@id'],
-    schema
-  }
+  return { data, schema }
 };
 
 export default useFetch;

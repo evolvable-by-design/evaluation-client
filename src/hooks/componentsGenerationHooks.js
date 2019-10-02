@@ -1,21 +1,18 @@
 import { useMemo } from 'react'; 
 
-export const useFiltersToRender = (operation, setParameters) => useMemo(
+import GenericFilters from '../components/GenericFilters';
+import GenericForm from '../components/GenericForm';
+
+export const useFiltersToRender = (operation, values, setValues) => useMemo(
   () => operation && operation.parameters
-    ? generateFilters(operation.parameters, setParameters)
+    ? GenericFilters({parameters: operation.parameters, values, setValues})
     : undefined,
-  [operation, setParameters]
+  [operation, values, setValues]
 );
-  
-// TODO
-const generateFilters = (parameters, setParameters) => undefined;
 
-export const useFormToRender = (operation, requestBodySchema, setForm) => useMemo(
+export const useFormToRender = (operation, requestBodySchema, values, setValues) => useMemo(
   () => operation && operation.requestBody
-    ? generateForm(requestBodySchema, setForm)
+    ? GenericForm({bodySchema: requestBodySchema, values, setValues})
     : undefined,
-  [operation, requestBodySchema, setForm]
+  [operation, requestBodySchema, values, setValues]
 );
-
-// TODO
-const generateForm = (bodySchema, setForm) => undefined;

@@ -15,8 +15,8 @@ const vocabularies = {
       Project: schemaUrl + 'Project',
       name: schemaUrl + 'name',
       description: schemaUrl + 'description',
-      lastUpdatedOn: schemaUrl + 'lastUpdatedOn',
-      lastUpdate: schemaUrl + 'lastUpdate',
+      lastUpdatedOn: schemaUrl + 'dateModified',
+      lastUpdate: schemaUrl + 'dateModified',
       Error: schemaUrl + 'Error'
     }
   },
@@ -56,6 +56,9 @@ const vocabularies = {
       previousPassword: vndJeeraUrl + 'previousPassword',
       newPassword: vndJeeraUrl + 'newPassword',
       ProjectsList: vndJeeraUrl + 'ProjectsList',
+      listProjects: vndJeeraUrl + 'listProjects',
+      projects: vndJeeraUrl + 'projects',
+      collaborators: vndJeeraUrl + 'collaborators',
       UserStory: vndJeeraUrl + 'UserStory',
       UserStoryUpdateRequest: vndJeeraUrl + 'UserStoryUpdateRequest',
       UserStoryCreationRequest: vndJeeraUrl + 'UserStoryCreationRequest',
@@ -75,7 +78,7 @@ const vocabularies = {
       updatesCount: vndJeeraUrl + 'updatesCount',
       EmailOwnershipConfirmation: vndJeeraUrl + 'EmailOwnershipConfirmation',
       getProjectDetails: vndJeeraUrl + 'getProjectDetails',
-      listProjects: vndJeeraUrl + 'listProjects'
+      isPublic: vndJeeraUrl + 'isPublic'
     }
   }
 };

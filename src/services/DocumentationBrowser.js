@@ -7,8 +7,6 @@ class DocumentationBrowser {
     this.documentation = JsonLDParser.replaceAllId(documentation);
     console.log(this.documentation);
     this.semanticKeyMapping = JsonLDParser.findSemanticWithKeyMappings(documentation);
-
-    console.log(this._findOperationThatReturns('https://github.com/loosely-coupled-API/jeera_vocabulary/blob/master/vocab.ttl#Task'));
   }
 
   findOperation(target) {
