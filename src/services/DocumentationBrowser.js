@@ -19,9 +19,11 @@ class DocumentationBrowser {
     return operationReturningTarget;
   }
 
-  findRequestBodySchema(operationId) {
-    const operation = this._findOperationWithId(operationId)
-    
+  findOperationById(openApiId) {
+    return this._findOperation(operation => operation.operationId === openApiId);
+  }
+
+  requestBodySchema(operation) {
     if (operation && operation.requestBody) {
       const contents = operation.requestBody.content;
       const content = contents['application/json'] || contents[Object.keys(contents)[0]]
@@ -35,7 +37,7 @@ class DocumentationBrowser {
     const foundRequiredParamWithoutDefaultValue = operation.parameters && operation.parameters
       .find(parameter => parameter.required && parameter.schema.default === undefined);
 
-    const bodySchema = this.findRequestBodySchema(operation.operationId);
+    const bodySchema = this.requestBodySchema(operation);
     const requiredArgs = bodySchema && bodySchema.required ? bodySchema.required : [];
 
     if (bodySchema === undefined || requiredArgs.length === 0) {

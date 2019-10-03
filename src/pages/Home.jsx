@@ -6,12 +6,12 @@ import Projects from '../components/Projects';
 import majorScale from 'evergreen-ui/commonjs/scales/src/majorScale';
 
 const Home = () =>
-  <Pane display="flex" flexDirection="row" height="100vh" width="100vw">
+  <Pane display="flex" flexDirection="row" height="100vh" width="100vw" overflow="hidden">
     <Header/>
-    <Pane width="100%"
+    <Pane width="100%" height="100%" overflow="scroll"
       elevation={4}
       paddingX={majorScale(10)}
-      paddingTop={majorScale(5)}>
+      paddingY={majorScale(5)}>
       <Projects />
     </Pane>
   </Pane>

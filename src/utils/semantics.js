@@ -5,6 +5,7 @@ const mebUrl = "http://rdf.myexperiment.org/ontologies/base/";
 const ovUrl = "http://open.vocab.org/terms/";
 const moUrl = "http://purl.org/ontology/mo/";
 const vndJeeraUrl = "https://github.com/loosely-coupled-API/jeera_vocabulary/blob/master/vocab.ttl#";
+const vndJeeraUrlRel = vndJeeraUrl + "rel/";
 
 const vocabularies = {
   schema: {
@@ -78,7 +79,8 @@ const vocabularies = {
       updatesCount: vndJeeraUrl + 'updatesCount',
       EmailOwnershipConfirmation: vndJeeraUrl + 'EmailOwnershipConfirmation',
       getProjectDetails: vndJeeraUrl + 'getProjectDetails',
-      isPublic: vndJeeraUrl + 'isPublic'
+      isPublic: vndJeeraUrl + 'isPublic',
+      createRelation: vndJeeraUrlRel + 'create'
     }
   }
 };

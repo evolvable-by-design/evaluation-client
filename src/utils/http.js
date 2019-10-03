@@ -7,29 +7,36 @@ export function buildRequestWithDefaultParams(operation, requestBodySchema) {
   };
 }
 
-function buildUrlWithDefaultParams(operation) {
+const buildUrlWithDefaultParams = (operation) => buildUrl(operation, {})
+
+function buildUrl(operation, parameters) {
   let url = operation.url;
 
   if (operation.parameters) {
     operation.parameters
-      .filter(param => param.in === 'path' && param.schema.default !== undefined)
-      .forEach(param => url.replace(param.name, param.schema.default));
+      .filter(param =>
+        param.in === 'path'
+        && (param.schema.default !== undefined || parameters[param.name] !== undefined)
+      )
+      .forEach(param => url.replace(param.name, parameters[param.name] || param.schema.default));
 
-    operation.parameters
-      .filter(param => param.in === 'query' && param.schema.default !== undefined)
+      operation.parameters
+      .filter(param =>
+        param.in === 'query'
+        && (param.schema.default !== undefined || parameters[param.name] !== undefined)
+      )
       .forEach((param, i) => {
-        if (i === 0) {
-          url += `?${param.name}=${param.schema.default}`
-        } else {
-          url += `&${param.name}=${param.schema.default}`
-        }
+        url += (i === 0 ? '?' : '&') + `${param.name}=${parameters[param.name] || param.schema.default}`;
       });
   }
 
   return url;
 }
 
-function buildBodyWithDefaultParams(operationId, requestBodySchema) {
+const buildBodyWithDefaultParams = (operationId, requestBodySchema) =>
+  buildBody(operationId, requestBodySchema, {})
+
+function buildBody(operationId, requestBodySchema, values) {
   if (!requestBodySchema) {
     return undefined;
   } else if (!['object', 'array'].includes(requestBodySchema.type)) {
@@ -42,19 +49,21 @@ function buildBodyWithDefaultParams(operationId, requestBodySchema) {
   } else {
     const body = {};
     Object.keys(requestBodySchema.properties)
-      .filter(key => requestBodySchema.properties[key].default)
-      .forEach(key => body[key] = requestBodySchema.properties[key].default)
+      .filter(key => values[key] !== undefined || requestBodySchema.properties[key].default !== undefined)
+      .forEach(key => body[key] = values[key] || requestBodySchema.properties[key].default)
 
     return body;
   }
 }
 
-function buildHeadersWithDefaultParams(operation) {
+const buildHeadersWithDefaultParams = (operation) => buildHeaders(operation, {})
+
+function buildHeaders(operation, values) {
   if (operation.parameters) {
     const headers = {};
     operation.parameters
-      .filter(param => param.in === 'header' && param.schema.default !== undefined)
-      .forEach(param => headers[param.name] = param.schema.default);
+      .filter(param => param.in === 'header' && (values[param.name] !== undefined || param.schema.default !== undefined))
+      .forEach(param => headers[param.name] = values[param.name] || param.schema.default);
     return headers;
   } else {
     return undefined;
@@ -62,6 +71,16 @@ function buildHeadersWithDefaultParams(operation) {
 }
 
 export function buildRequest(operation, parameters, form) {
-  // TODO
-  return {};
+  if (operation.requestBody && !operation.requestBody.content['application/json']) {
+    return {};
+  }
+
+  const requestBodySchema = operation.requestBody.content['application/json'].schema;
+
+  return {
+    method: operation.verb,
+    url: buildUrl(operation, parameters),
+    data: buildBody(operation.operationId, requestBodySchema, form),
+    headers: buildHeaders(operation, parameters)
+  };
 }

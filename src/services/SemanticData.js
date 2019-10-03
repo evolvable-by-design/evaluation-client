@@ -7,22 +7,23 @@
  */
 class SemanticData {
 
-  constructor(data, schema) {
+  constructor(data, resourceSchema, responseSchema) {
     this.value = data;
-    this.type = schema['@id'] || schema.type;
-    this.schema = schema;
+    this.type = resourceSchema['@id'] || resourceSchema.type;
+    this.resourceSchema = resourceSchema;
+    this.responseSchema = responseSchema;
     this.alreadyReadData = [];
   }
 
-  isObject() { return this.schema.type === 'object'; }
-  isArray() { return this.schema.type === 'array'; }
+  isObject() { return this.resourceSchema.type === 'object'; }
+  isArray() { return this.resourceSchema.type === 'array'; }
   isPrimitive() { return !this.isArray() && ! this.isObject(); }
 
   get(semanticKey) {
     if (this.value === undefined) return undefined;
 
     if (this.isObject()) {
-      const result = Object.entries(this.schema.properties)
+      const result = Object.entries(this.resourceSchema.properties)
         .find(([key, value]) => value['@id'] !== undefined && value['@id'] === semanticKey);
       const [key, schema] = result || [undefined, undefined];
       if (key && schema) {
@@ -53,6 +54,43 @@ class SemanticData {
       return semanticData.value;
     } else {
       return undefined;
+    }
+  }
+
+  isRelationAvailable(semanticRelation) {
+    return this._findRelation(semanticRelation) !== [undefined, undefined];
+  }
+
+  getRelation(semanticRelation, apiDocumentation) {
+    const hypermediaControl = this._findRelation(semanticRelation);
+    const hypermediaControlKey = hypermediaControl[0];
+
+    if (hypermediaControlKey !== undefined) {
+      const schemaLinks = this.responseSchema.links || {};
+      const notResolvedOperation = schemaLinks[hypermediaControlKey];
+      
+      const operation = apiDocumentation.findOperationById(notResolvedOperation.operationId)
+      return [hypermediaControlKey, operation];
+    } else {
+      return [undefined, undefined];
+    }
+  }
+
+  _findRelation(semanticRelation) {
+    const schemaLinks = this.responseSchema.links || {};
+    const hypermediaControl = Object.entries(schemaLinks)
+      .find(([key, value]) => value['@relation'] === semanticRelation)
+
+      if (hypermediaControl === undefined)
+      return undefined;
+
+    const hypermediaControlKey = hypermediaControl[0];
+    const links = this.value._links || [];
+
+    if (hypermediaControlKey !== undefined && links.includes(hypermediaControlKey)) {
+      return hypermediaControl;
+    } else {
+      return [undefined, undefined];
     }
   }
 

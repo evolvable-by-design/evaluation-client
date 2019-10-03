@@ -4,17 +4,21 @@ import { buildRequestWithDefaultParams, buildRequest } from '../utils/http';
 
 export const useRequestBodySchema = (apiDocumentation, operation) => useMemo(
   () => operation && operation.requestBody
-    ? apiDocumentation.findRequestBodySchema(operation.operationId)
+    ? apiDocumentation.requestBodySchema(operation)
     : undefined,
   [apiDocumentation, operation]
 );
 
-export const useRequest = (apiDocumentation, operation, requestBodySchema, parameters, form) => useMemo(() => {
+export const buildRequestSync = (apiDocumentation, operation, requestBodySchema, parameters, form) => {
+  // TODO: function to rewrite
   if (!operation) {
     return undefined;
-  } else if (apiDocumentation.notContainsRequiredParametersWithoutDefaultValue(operation)) {
+  } else if (operation.verb === 'get' && apiDocumentation.notContainsRequiredParametersWithoutDefaultValue(operation)) {
     return buildRequestWithDefaultParams(operation, requestBodySchema);
+  } else if (parameters || form) {
+    return buildRequest(operation, parameters, form);
   } else {
-    buildRequest(operation, parameters, form);
+    return undefined;
   }
-}, [apiDocumentation, operation, requestBodySchema, parameters, form]);
+}
+

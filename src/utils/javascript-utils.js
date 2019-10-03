@@ -15,10 +15,36 @@ export const reduceObject = (res, [key, value]) => {
 export const onlyWhen = (values, toRender) => {
   if (
     values === undefined
-    || (values instanceof Array && values.filter(e => e === undefined).length === 0)
+    || (values instanceof Array && values.filter(e => e === undefined).length !== 0)
   ) {
     return <React.Fragment></React.Fragment>
   } else {
     return toRender();
   }
+}
+
+export const stateSetter = (setState, key) => {
+  return value => setState(state => {
+    state[key] = value;
+    return Object.assign({}, state);
+  })
+}
+
+export const capitalize = (str) => str.split(" ").map(firstLetterUppercase).join(" ");
+export const firstLetterUppercase = (str) => str[0].toUpperCase() + str.substr(1);
+export const isUpperCase = (character) => isNaN(character*1) && character === character.toUpperCase();
+export const spaceCamelCaseWord = (str) => {
+  if (str === undefined || str === '')
+    return str;
+
+  var result = str[0];
+  const s = str.slice(1);
+  for (const i in s) {
+    if (isUpperCase(s[i])) {
+      result += ' '
+    }
+
+    result += s[i];
+  }
+  return result;
 }

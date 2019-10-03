@@ -15,6 +15,7 @@ const toDocumentationBrowser = result => new DocumentationBrowser(
       .replace(new RegExp('x-@id', 'g'), '@id')
       .replace(new RegExp('x-@type', 'g'), '@type')
       .replace(new RegExp('x-@context', 'g'), '@context')
+      .replace(new RegExp('x-@relation', 'g'), '@relation')
   )
 )
 

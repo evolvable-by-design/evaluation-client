@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { Button, Icon, Pane, Paragraph, SelectField, TextInputField, Tooltip, majorScale } from 'evergreen-ui';
+import React from 'react';
+import { Icon, Pane, Paragraph, SelectField, TextInputField, Tooltip, majorScale } from 'evergreen-ui';
 
 import ajv from '../services/Ajv';
 import SwitchInputField from './SwitchInputField';
+import { stateSetter } from '../utils/javascript-utils';
 
-export function genericFilters({parameters, values, setValues}) {
+export function genericFilters({parameters, values, setValues, errors, setErrors}) {
   return parameters.length === 0
     ? <></>
     : <Pane width="100%" display="flex" flexDirection="row" flexWrap="wrap" alignItems="flex-start" justifyContent="flex-start">
@@ -14,28 +15,24 @@ export function genericFilters({parameters, values, setValues}) {
               <SelectInput
                 parameter={param}
                 value={values[param.name]}
-                setValue={value => setValues(state => {
-                  state[param.name] = value;
-                  return state;
-                })}
+                setValue={stateSetter(setValues, param.name)}
+                error={errors[param.name]}
+                setError={stateSetter(setErrors, param.name)}
               />
             </Pane>)
         }
-        <Button appearance="primary" onClick={() => alert('Will fetch the API very soon.')}>Update</Button>
       </Pane>;
 };
 
-function SelectInput({parameter, value, setValue}) {
+function SelectInput({parameter, value, setValue, error, setError}) {
   // TODO: resolve and use type from the semantic description
-  const [error, setError] = useState(undefined);
-
   const labelText = parameter.name.charAt(0).toUpperCase() + parameter.name.slice(1);
   const label = <Tooltip content={parameter.description}><Paragraph width="100%"><Icon size={11} icon="info-sign" /> {labelText}</Paragraph></Tooltip>;
   const onChange = (e) => {
-    const [value, error] = _validateValue(e.target.value, parameter);
+    const [value, error] = _validateValue(e.target.value, parameter.schema);
     setError(error);
     setValue(value);
-  };
+  }
 
   if (parameter.schema.type === 'boolean') {
     return <SwitchInputField label={label} checked={value} onChange={onChange}/>
@@ -70,11 +67,11 @@ function SelectInput({parameter, value, setValue}) {
   }
 }
 
-function _validateValue(value, parameter) {
-  const val = parameter.schema.type === 'number' ? parseFloat(value, 10)
-    : parameter.schema.type === 'integer' ? parseInt(value, 10)
+function _validateValue(value, schema) {
+  const val = schema.type === 'number' ? parseFloat(value, 10) || ''
+    : schema.type === 'integer' ? parseInt(value, 10) || ''
     : value;
-  const validate = ajv.compile(parameter.schema);
+  const validate = ajv.compile(schema);
   const valid = validate(val);
   
   return [val, valid ? undefined : ajv.errorsText(validate.errors)];

@@ -1,7 +1,9 @@
 import React from 'react';
 import SomethingWrongHappened from "./SomethingWrongHappened";
 
-const components = [];
+import { ProjectSemanticBuilder } from './Project';
+
+const components = [ProjectSemanticBuilder];
 
 function ComponentResolver(semanticData) {
   const maybeComponent = components

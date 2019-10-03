@@ -65,7 +65,7 @@ const searchForReplacement = (value, replacements) => {
 
 const replaceIdInObject = (object, replacements) =>
   mapObject(object, (key, value) =>
-    (key === '@id')
+    (key === '@id' || key === '@type' || key === '@relation')
       ? [key, replaceId(value, replacements)]
       : [key, searchForReplacement(value, replacements)]
   );

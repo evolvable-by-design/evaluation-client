@@ -3,31 +3,43 @@ import { useState, useMemo } from 'react';
 import { useApiContext } from '../components/App';
 import { useFetchWithContext } from '../hooks/useFetch'; 
 import { useFiltersToRender, useFormToRender } from './componentsGenerationHooks';
-import { useRequestBodySchema, useRequest } from '../hooks/documentationHooks';
-
-/*
-function useGenericOperationResolver(target) =
-  useGenericOperationResolver2(useMemo(() => apiDocumentation.findOperation(target), [target]))
-
-where useGenericOperationResolver2 takes an operation as input
-*/
+import { useRequestBodySchema, buildRequestSync } from '../hooks/documentationHooks';
 
 function useGenericOperationResolver(target) {
   const apiDocumentation = useApiContext();
 
   const operation = useMemo(() => apiDocumentation.findOperation(target), [target, apiDocumentation]);
+  return useGenericOperationResolverOperation(operation);
+}
+
+export function useGenericOperationResolverOperation(operation) {
+  const apiDocumentation = useApiContext();
   const requestBodySchema = useRequestBodySchema(apiDocumentation, operation);
 
   const [ parameters, setParameters ] = useState(defaultParamValues(operation.parameters));
+  const [ parameterErrors, setParamaterErrors ] = useState({});
+  const filtersToDisplay = useFiltersToRender(operation, parameters, setParameters, parameterErrors, setParamaterErrors);
+
   const [ form, setForm ] = useState(defaultBodyValues(requestBodySchema));
+  const [ formErrors, setFormErrors ] = useState({});
+  const formToDisplay = useFormToRender(operation, requestBodySchema, form, setForm, formErrors, setFormErrors);
 
-  const filtersToDisplay = useFiltersToRender(operation, parameters, setParameters);
-  const formToDisplay = useFormToRender(operation, requestBodySchema, form, setForm);
+  const [request, setRequest] = useState(buildDefaultRequest(apiDocumentation, operation, requestBodySchema));
 
-  const request = useRequest(apiDocumentation, operation, requestBodySchema, parameters, form);
-  
-  const [ data, isLoading, error ] = useFetchWithContext(request, operation);
-  return [ data, isLoading, error, filtersToDisplay, formToDisplay ];
+  const triggerCall = () => setRequest(buildRequestSync(apiDocumentation, operation, requestBodySchema, parameters, form));
+
+  const [ semanticData, isLoading, error ] = useFetchWithContext(request, operation);
+
+  return [ semanticData, isLoading, error, triggerCall, filtersToDisplay, formToDisplay ];
+}
+
+function buildDefaultRequest(apiDocumentation, operation, requestBodySchema) {
+  // TODO: function to rewrite
+  if (operation && operation.verb === 'get' && apiDocumentation.notContainsRequiredParametersWithoutDefaultValue(operation)) {
+    return buildRequestSync(apiDocumentation, operation, requestBodySchema);
+  } else {
+    return undefined;
+  }
 }
 
 function defaultParamValues(parameters) {
