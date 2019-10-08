@@ -1,7 +1,7 @@
 import React from 'react';
 import { Alert, Avatar, Badge, Card, Heading, Pane, Paragraph, majorScale } from 'evergreen-ui';
 
-import { onlyWhen } from '../utils/javascript-utils';
+import { onlyWhen } from '../utils/javascriptUtils';
 import { SemanticComponentBuilder } from '../services/SemanticComponentBuilder';
 import Semantics from '../utils/semantics';
 

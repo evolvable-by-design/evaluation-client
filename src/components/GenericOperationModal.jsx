@@ -3,7 +3,7 @@ import React, {useState} from 'react';
 import { Alert, Button, Dialog, Pane, majorScale } from 'evergreen-ui';
 
 import { useGenericOperationResolverOperation } from '../hooks/useGenericOperationResolver';
-import { capitalize, spaceCamelCaseWord, onlyWhen } from '../utils/javascript-utils';
+import { capitalize, spaceCamelCaseWord, onlyWhen } from '../utils/javascriptUtils';
 
 const GenericOperationModal = ({label, operation, buttonAppearance}) =>  {
   const [isShown, setIsShown] = useState(false);
@@ -11,8 +11,6 @@ const GenericOperationModal = ({label, operation, buttonAppearance}) =>  {
 
   const [ semanticData, isLoading, error, triggerCall, filtersToDisplay, formToDisplay ] =
     useGenericOperationResolverOperation(operationSchema);
-
-  console.log(semanticData);
 
   return (<Pane marginBottom={majorScale(3)}>
     <Dialog

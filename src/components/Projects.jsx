@@ -7,7 +7,7 @@ import GenericOperationModal from './GenericOperationModal';
 import { useApiContext } from '../components/App';
 import useGenericOperationResolver from '../hooks/useGenericOperationResolver';
 import Semantics from '../utils/semantics';
-import { onlyWhen } from '../utils/javascript-utils';
+import { onlyWhen } from '../utils/javascriptUtils';
 
 const Project = ProjectSemanticBuilder.build();
 

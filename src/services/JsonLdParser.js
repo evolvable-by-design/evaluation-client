@@ -1,4 +1,4 @@
-import { mapObject } from '../utils/javascript-utils'; 
+import { mapObject } from '../utils/javascriptUtils'; 
 
 export const findContext = (document) => document['@context'];
 

@@ -3,12 +3,13 @@ import { Alert, Heading, Pane, SelectField, Switch, TextInput, majorScale } from
 
 import ajv from '../services/Ajv';
 
-import { capitalize, spaceCamelCaseWord, stateSetter } from '../utils/javascript-utils';
+import { capitalize, spaceCamelCaseWord, stateSetter } from '../utils/javascriptUtils';
 
 // TODO: display an error message when required as TextInputField does
 // TODO: show required fields close to the label
 
 export function genericForm({bodySchema, values, setValues, errors, setErrors}) {
+  console.log(values)
   if (bodySchema === undefined)
     return <></>;
 

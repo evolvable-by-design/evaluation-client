@@ -3,7 +3,7 @@ import { Icon, Pane, Paragraph, SelectField, TextInputField, Tooltip, majorScale
 
 import ajv from '../services/Ajv';
 import SwitchInputField from './SwitchInputField';
-import { stateSetter } from '../utils/javascript-utils';
+import { stateSetter } from '../utils/javascriptUtils';
 
 export function genericFilters({parameters, values, setValues, errors, setErrors}) {
   return parameters.length === 0

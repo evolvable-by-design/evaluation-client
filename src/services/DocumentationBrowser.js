@@ -1,5 +1,5 @@
 import * as JsonLDParser from './JsonLdParser';
-import { mapObject } from '../utils/javascript-utils';
+import { mapObject } from '../utils/javascriptUtils';
 
 class DocumentationBrowser {
 
@@ -51,6 +51,29 @@ class DocumentationBrowser {
 
     return foundRequiredParamWithoutDefaultValue === undefined
       && foundRequiredBodyParamsWithoutDefaultValue === undefined;
+  }
+
+  noRequiredParametersWithoutValue(operation, parameters, body) {
+    // Check path, query and header params
+    const requiredParams = operation.parameters ? operation.parameters
+      .filter(parameter => parameter.required).map(param => param.name) : [];
+
+    const parametersKey = Object.keys(parameters);
+    const foundMissingParams = requiredParams
+      .find(param => !parametersKey.includes(param)) !== undefined;
+
+    if (foundMissingParams) return false;
+
+    // Check body params
+    const bodySchema = this.requestBodySchema(operation);
+    const requiredArgs = bodySchema && bodySchema.required ? bodySchema.required : [];
+
+    if (bodySchema === undefined || requiredArgs.length === 0) return true;
+
+    const bodyKeys = Object.keys(body);
+    const foundMissingBodyParams = requiredArgs.find(param => !bodyKeys.includes(param)) !== undefined;
+
+    return !foundMissingBodyParams;
   }
 
   /**
