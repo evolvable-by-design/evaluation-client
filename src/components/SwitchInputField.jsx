@@ -6,7 +6,7 @@ const SwitchInputField = ({label, onChange, checked}) => (
   <Pane display="flex" flexDirection="column" flexWrap="wrap" >
     <Label marginBottom={minorScale(1)}>{label}</Label>
     <Pane height={majorScale(4)} marginBottom={majorScale(3)} display="flex" alignItems="center">
-      <Switch checked={checked} onChange={onChange} height={majorScale(3)}/>
+      <Switch checked={checked} onChange={(e) => onChange(e.target.checked)} height={majorScale(3)}/>
     </Pane>
   </Pane>)
 

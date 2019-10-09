@@ -6,7 +6,7 @@ import { SemanticComponentBuilder } from '../services/SemanticComponentBuilder';
 import Semantics from '../utils/semantics';
 
 const Project = ({title, isPublic, lastUpdate, collaborators}) =>
-  <Card display="flex" flexDirection="column" elevation={1} hoverElevation={3} width={majorScale(40)} padding={majorScale(2)} minHeight="100px" >
+  <Card display="flex" flexDirection="column" elevation={1} hoverElevation={3} width={majorScale(40)} padding={majorScale(2)} marginRight={majorScale(3)} marginBottom={majorScale(3)} minHeight="100px" >
     <Pane display="flex" flexDirection="row" marginBottom={majorScale(2)}>
       <Heading flexGrow="10">{title}</Heading>
       { onlyWhen(isPublic, () => <IsPublicBadge isPublic={isPublic} />) }

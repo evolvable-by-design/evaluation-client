@@ -1,11 +1,12 @@
 import React from 'react';
 
-import { Pane, Spinner } from 'evergreen-ui';
+import { Spinner } from 'evergreen-ui';
+
+import FullscreenCenterContainer from './FullscreenCenterContainer';
 
 const FullscreenLoader = () => (
-  <Pane display="flex" alignItems="center" justifyContent="center" height="100vh" width="100vw">
+  <FullscreenCenterContainer>
     <Spinner />
-  </Pane>
-) 
+  </FullscreenCenterContainer>) 
 
 export default FullscreenLoader;

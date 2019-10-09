@@ -28,8 +28,8 @@ function SelectInput({parameter, value, setValue, error, setError}) {
   // TODO: resolve and use type from the semantic description
   const labelText = parameter.name.charAt(0).toUpperCase() + parameter.name.slice(1);
   const label = <Tooltip content={parameter.description}><Paragraph width="100%"><Icon size={11} icon="info-sign" /> {labelText}</Paragraph></Tooltip>;
-  const onChange = (e) => {
-    const [value, error] = _validateValue(e.target.value, parameter.schema);
+  const onChange = (val) => {
+    const [value, error] = _validateValue(val, parameter.schema);
     setError(error);
     setValue(value);
   }
@@ -46,7 +46,7 @@ function SelectInput({parameter, value, setValue, error, setError}) {
         placeholder={'Please select an option...'}
         validationMessage={error}
         width="100%"
-        onChange={onChange}
+        onChange={e => onChange(e.target.value)}
       >
         { parameter.schema.enum.map(option => <option value="option" selected={parameter.schema.default === option} >{option}</option>) }
       </SelectField>
@@ -61,7 +61,7 @@ function SelectInput({parameter, value, setValue, error, setError}) {
         placeholder={parameter.schema.format}
         validationMessage={error}
         width="100%"
-        onChange={onChange}
+        onChange={e => onChange(e.target.value)}
       />
     </Pane>
   }

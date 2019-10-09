@@ -1,7 +1,7 @@
 import * as JsonLDParser from './JsonLdParser';
 import AuthService from './AuthenticationService';
+import { AuthenticationRequiredError } from '../utils/Errors'
 import { mapObject } from '../utils/javascriptUtils';
-import { AuthenticationRequiredError } from '../utils/Errors'; 
 
 class DocumentationBrowser {
 
@@ -10,6 +10,8 @@ class DocumentationBrowser {
     console.log(this.documentation);
     this.semanticKeyMapping = JsonLDParser.findSemanticWithKeyMappings(documentation);
   }
+
+  hasOperation = (target) => this.findOperation(target) !== undefined
 
   findOperation(target) {
     const operationFromId = this._findOperationWithId(target);

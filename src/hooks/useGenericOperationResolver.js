@@ -1,20 +1,20 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
-import { useApiContext } from '../components/App';
+import { useAppContext } from '../components/App';
 import { useFetchWithContext } from '../hooks/useFetch'; 
 import { useFiltersToRender, useFormToRender } from './componentsGenerationHooks';
 import { useRequestBodySchema } from '../hooks/documentationHooks';
 import { buildRequest, inputParamValueOrDefault, inputBodyValueOrDefault } from '../utils/requestBuilder';
 
-function useGenericOperationResolver(target) {
-  const { apiDocumentation } = useApiContext();
+function useGenericOperationResolver(target, onSuccessCallback, onErrorCallback) {
+  const { apiDocumentation } = useAppContext();
 
   const operation = useMemo(() => apiDocumentation.findOperation(target), [target, apiDocumentation]);
-  return useGenericOperationResolverOperation(operation);
+  return useGenericOperationResolverOperation(operation, onSuccessCallback, onErrorCallback);
 }
 
-export function useGenericOperationResolverOperation(operation) {
-  const { apiDocumentation } = useApiContext();
+export function useGenericOperationResolverOperation(operation, onSuccessCallback, onErrorCallback) {
+  const { apiDocumentation } = useAppContext();
   const requestBodySchema = useRequestBodySchema(apiDocumentation, operation);
 
   const defaultParametersState = useMemo(() => inputParamValueOrDefault(operation, {}), [operation]);
@@ -35,7 +35,7 @@ export function useGenericOperationResolverOperation(operation) {
 
   const [shouldRecomputeRequest, setShouldRecomputeRequest] = useState(true);
 
-  const triggerCall = useCallback(() => setShouldRecomputeRequest(true), [setShouldRecomputeRequest])
+  const triggerCall = useCallback(() => setShouldRecomputeRequest(true))
 
   if (shouldRecomputeRequest) {
     setShouldRecomputeRequest(false);
@@ -43,7 +43,7 @@ export function useGenericOperationResolverOperation(operation) {
     setRequest(request)
   }
 
-  const [ semanticData, isLoading, error ] = useFetchWithContext(request, operation);
+  const [ semanticData, isLoading, error ] = useFetchWithContext(request, operation, undefined, onSuccessCallback, onErrorCallback);
 
   return [ semanticData, isLoading, error, triggerCall, filtersToDisplay, formToDisplay ];
 }

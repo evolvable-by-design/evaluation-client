@@ -1,20 +1,20 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import { Alert, Button, Dialog, Pane, majorScale } from 'evergreen-ui';
 
 import { useGenericOperationResolverOperation } from '../hooks/useGenericOperationResolver';
-import { capitalize, spaceCamelCaseWord, onlyWhen } from '../utils/javascriptUtils';
+import { capitalize, spaceCamelCaseWord } from '../utils/javascriptUtils';
 
-const GenericOperationModal = ({label, operation, buttonAppearance}) =>  {
+const GenericOperationModal = ({label, operation, buttonAppearance, alwaysShown, onSuccessCallback, onErrorCallback}) =>  {
   const [isShown, setIsShown] = useState(false);
   const [operationKey, operationSchema] = operation;
 
   const [ semanticData, isLoading, error, triggerCall, filtersToDisplay, formToDisplay ] =
-    useGenericOperationResolverOperation(operationSchema);
+    useGenericOperationResolverOperation(operationSchema, onSuccessCallback, onErrorCallback);
 
   return (<Pane marginBottom={majorScale(3)}>
     <Dialog
-      isShown={isShown}
+      isShown={alwaysShown === true || isShown}
       title={operationSchema.summary}
       onCloseComplete={() => setIsShown(false)}
       isConfirmLoading={isLoading}
@@ -22,11 +22,9 @@ const GenericOperationModal = ({label, operation, buttonAppearance}) =>  {
       confirmLabel={isLoading ? 'Loading...' : 'Ok'}
     >
       { formToDisplay || <></> }
-      { onlyWhen(error, () =>
-        <Alert intent="danger" title={error} />
-      )}
+      { error && <Alert intent="danger" title={error} /> }
     </Dialog>
-    <Button appearance={buttonAppearance || "default"} onClick={() => setIsShown(true)}>{ spaceCamelCaseWord(capitalize(label || operationKey)) }</Button>
+    { !(alwaysShown === true) && <Button appearance={buttonAppearance || "default"} onClick={() => setIsShown(true)}>{ spaceCamelCaseWord(capitalize(label || operationKey)) }</Button> }
   </Pane>)
 }
 

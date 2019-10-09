@@ -9,7 +9,6 @@ import { capitalize, spaceCamelCaseWord, stateSetter } from '../utils/javascript
 // TODO: show required fields close to the label
 
 export function genericForm({bodySchema, values, setValues, errors, setErrors}) {
-  console.log(values)
   if (bodySchema === undefined)
     return <></>;
 
@@ -61,7 +60,7 @@ function SelectInput({schema, value, setValue, error, setError}) {
   } else if (schema.type === 'string' && schema.enum !== undefined) {
     return <SelectField
         isInvalid={error !== undefined}
-        value={value}
+        value={value || null}
         placeholder={'Please select an option...'}
         width="100%"
         onChange={(e) => onChange(e.target.value)}
@@ -71,7 +70,7 @@ function SelectInput({schema, value, setValue, error, setError}) {
   } else {
     return <TextInput
         isInvalid={error !== undefined}
-        value={value}
+        value={value || ''}
         placeholder={schema.format}
         width="100%"
         onChange={(e) => onChange(e.target.value)}
@@ -80,7 +79,6 @@ function SelectInput({schema, value, setValue, error, setError}) {
 }
 
 function _validateValue(value, schema) {
-  console.log(value)
   const val = schema.type === 'number' ? parseFloat(value, 10)
     : schema.type === 'integer' ? parseInt(value, 10)
     : schema.type === 'boolean' ? value === true

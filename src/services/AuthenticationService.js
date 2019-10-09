@@ -6,19 +6,27 @@ class AuthenticationService {
     this.apiDocumentation = apiDocumentation;
   }
 
-  static isAuthenticated = () => this.getToken() !== undefined
+  static isAuthenticated = () => this.getToken() !== undefined && this.getToken() !== null
 
   logout() {
-    this.updateToken(undefined)
+    this.removeToken()
     // call the API function when available
   }
 
   static getToken() {
-    window.localStorage.getItem(tokenLocalStorageKey)
+    return window.localStorage.getItem(tokenLocalStorageKey)
   }
 
   static updateToken(token) {
     window.localStorage.setItem(tokenLocalStorageKey, token)
+  }
+
+  static removeToken() {
+    window.localStorage.removeItem(tokenLocalStorageKey)
+  }
+
+  static currentTokenWasRefusedByApi() {
+    this.removeToken();
   }
 
 }
