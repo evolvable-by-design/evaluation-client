@@ -6,6 +6,7 @@ import GenericOperationModal from './GenericOperationModal';
 
 import { useApiContext } from '../components/App';
 import useGenericOperationResolver from '../hooks/useGenericOperationResolver';
+import useRelations from '../hooks/useRelations';
 import Semantics from '../utils/semantics';
 import { onlyWhen } from '../utils/javascriptUtils';
 
@@ -16,15 +17,14 @@ const requiredData = {
 }
 
 const Projects = () => {
-  const apiDocumentation = useApiContext();
+  const { apiDocumentation } = useApiContext();
 
   const [ semanticData, isLoading, error, triggerCall, filtersToDisplay, formToDisplay ] =
     useGenericOperationResolver(Semantics.vnd_jeera.terms.listProjects);
 
   const projects = useMemo(() =>
     semanticData !== undefined ? semanticData.get(requiredData.projects) : undefined, [semanticData]);
-  const createOperation = useMemo(() =>
-    semanticData !== undefined ? semanticData.getRelation(Semantics.vnd_jeera.terms.createRelation, apiDocumentation) : undefined, [semanticData, apiDocumentation]);
+  const [createOperation, authRequired] = useRelations(semanticData, apiDocumentation, Semantics.vnd_jeera.terms.createRelation);
 
   if (isLoading) {
     return <Text>Loading...</Text>
@@ -38,9 +38,9 @@ const Projects = () => {
       { onlyWhen(filtersToDisplay || formToDisplay, () =>
         <Button appearance="primary" onClick={triggerCall} marginBottom={majorScale(3)}>Update</Button>
       )}
-      { onlyWhen(createOperation, () =>
-          <GenericOperationModal operation={createOperation} buttonAppearance="primary" />
-      )}
+      { createOperation && <Heading>Actions</Heading> }
+      { createOperation && <GenericOperationModal operation={createOperation} buttonAppearance="primary" /> }
+      { authRequired && <Alert intent="none" marginBottom={32} title="Login to see more actions."/> }
       <ProjectCards projects={projects} />
     </>
   }

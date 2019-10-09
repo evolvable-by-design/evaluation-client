@@ -1,5 +1,7 @@
 import * as JsonLDParser from './JsonLdParser';
+import AuthService from './AuthenticationService';
 import { mapObject } from '../utils/javascriptUtils';
+import { AuthenticationRequiredError } from '../utils/Errors'; 
 
 class DocumentationBrowser {
 
@@ -138,6 +140,10 @@ class DocumentationBrowser {
       const [path, operations] = pathFound;
       const parametersOfPath = this._refine(operations['parameters']);
       const [verb, operation] = Object.entries(operations).find(([v, op]) => predicate(op))
+
+      if (operation.security !== undefined && !AuthService.isAuthenticated()) {
+        throw new AuthenticationRequiredError();
+      }
 
       let parameters = this._mergeOptionalArrays(parametersOfPath, operation.parameters);
 

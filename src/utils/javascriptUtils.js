@@ -19,7 +19,7 @@ export const onlyWhen = (values, toRender) => {
   ) {
     return <React.Fragment></React.Fragment>
   } else {
-    return toRender();
+    return toRender instanceof Function ? toRender() : toRender;
   }
 }
 

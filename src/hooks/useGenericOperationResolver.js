@@ -7,14 +7,14 @@ import { useRequestBodySchema } from '../hooks/documentationHooks';
 import { buildRequest, inputParamValueOrDefault, inputBodyValueOrDefault } from '../utils/requestBuilder';
 
 function useGenericOperationResolver(target) {
-  const apiDocumentation = useApiContext();
+  const { apiDocumentation } = useApiContext();
 
   const operation = useMemo(() => apiDocumentation.findOperation(target), [target, apiDocumentation]);
   return useGenericOperationResolverOperation(operation);
 }
 
 export function useGenericOperationResolverOperation(operation) {
-  const apiDocumentation = useApiContext();
+  const { apiDocumentation } = useApiContext();
   const requestBodySchema = useRequestBodySchema(apiDocumentation, operation);
 
   const defaultParametersState = useMemo(() => inputParamValueOrDefault(operation, {}), [operation]);
