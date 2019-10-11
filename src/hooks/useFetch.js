@@ -28,10 +28,11 @@ export const useFetch = (requestConfig, resultMapper, onSuccessCallback, onError
             }
             if (onSuccessCallback !== undefined) { onSuccessCallback(data); }
           } catch (error) {
+            console.error(error);
             setError(error.message);
             if (onErrorCallback !== undefined) { onErrorCallback(error); }
 
-            if (error.response.status === 401) {
+            if (error.response && error.response.status === 401) {
               AuthService.currentTokenWasRefusedByApi()
               history.push('/login')
             }
@@ -43,7 +44,7 @@ export const useFetch = (requestConfig, resultMapper, onSuccessCallback, onError
       };
   
       fetch();
-    }, [requestConfig, resultMapper, history]
+    }, [requestConfig, resultMapper, history, onSuccessCallback, onErrorCallback]
   );
 
   return [data, isLoading, error];
@@ -59,7 +60,10 @@ export const useFetchWithContext = (requestConfig, operation, resultMapper, onSu
 
 const getDataAndItsDescription = (operation, resultMapper) => (result) => {
   const responseSchema = operation ? operation.responses[result.status] : undefined;
-  const resourceSchema = responseSchema ? responseSchema.content[result.headers['content-type'].split(';')[0]].schema : undefined;
+  const resourceSchema =
+    result.data !== '' && result.headers['content-type'] && responseSchema
+      ? responseSchema.content[result.headers['content-type'].split(';')[0]].schema
+      : undefined;
   const data = resultMapper ? resultMapper(result) : result.data;
   return new SemanticData(data, resourceSchema, responseSchema)
 };

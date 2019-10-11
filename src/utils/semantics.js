@@ -84,7 +84,8 @@ const vocabularies = {
       JWT: vndJeeraUrl + 'JWT'
     },
     actions: {
-      login: vndJeeraUrl + 'login'
+      login: vndJeeraUrl + 'login',
+      logout: vndJeeraUrl + 'logout'
     }
   }
 };

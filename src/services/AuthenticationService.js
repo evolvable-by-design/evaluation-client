@@ -8,11 +8,6 @@ class AuthenticationService {
 
   static isAuthenticated = () => this.getToken() !== undefined && this.getToken() !== null
 
-  logout() {
-    this.removeToken()
-    // call the API function when available
-  }
-
   static getToken() {
     return window.localStorage.getItem(tokenLocalStorageKey)
   }

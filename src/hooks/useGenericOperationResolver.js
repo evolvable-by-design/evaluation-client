@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 
 import { useAppContext } from '../components/App';
 import { useFetchWithContext } from '../hooks/useFetch'; 
@@ -35,7 +35,7 @@ export function useGenericOperationResolverOperation(operation, onSuccessCallbac
 
   const [shouldRecomputeRequest, setShouldRecomputeRequest] = useState(true);
 
-  const triggerCall = useCallback(() => setShouldRecomputeRequest(true))
+  const triggerCall = useCallback(() => setShouldRecomputeRequest(true), [])
 
   if (shouldRecomputeRequest) {
     setShouldRecomputeRequest(false);
@@ -45,7 +45,9 @@ export function useGenericOperationResolverOperation(operation, onSuccessCallbac
 
   const [ semanticData, isLoading, error ] = useFetchWithContext(request, operation, undefined, onSuccessCallback, onErrorCallback);
 
-  return [ semanticData, isLoading, error, triggerCall, filtersToDisplay, formToDisplay ];
+  return operation === undefined
+    ? [ undefined, undefined, undefined, undefined, undefined, undefined ]
+    : [ semanticData, isLoading, error, triggerCall, filtersToDisplay, formToDisplay ];
 }
 
 function buildDefaultRequest(apiDocumentation, operation, requestBodySchema) {
