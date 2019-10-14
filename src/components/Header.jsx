@@ -1,14 +1,18 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
-import { Button, Pane, Text, majorScale } from 'evergreen-ui'
+import { Pane, Text, majorScale } from 'evergreen-ui'
 
-import AuthenticationService from '../services/AuthenticationService'
+import UserProfileBubble from './UserProfileBubble'
 
 function Header({ width }) {
   return (
-    <Pane width={ width || majorScale(9) } background='#0747A6'>
-      <Text color='white'>This is the header</Text>
-      { !AuthenticationService.isAuthenticated() && <Link to="/login"><Button>Login</Button></Link> }
+    <Pane width={ width || majorScale(9) } background='#0747A6' display="flex" flexDirection="column" justifyContent="space-between" paddingY={majorScale(2)} paddingX={majorScale(1)}>
+      <Pane display="flex" flexDirection="column" justifyContent="flext-start">
+        <Text color='white'>This is the header</Text>
+      </Pane>
+      <Pane display="flex" flexDirection="column" justifyContent="flext-end">
+        <UserProfileBubble />
+      </Pane>
+      
     </Pane>
   );
 }
