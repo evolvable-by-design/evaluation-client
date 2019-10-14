@@ -46,8 +46,8 @@ export function useGenericOperationResolverOperation(operation, onSuccessCallbac
   const [ semanticData, isLoading, error ] = useFetchWithContext(request, operation, undefined, onSuccessCallback, onErrorCallback);
 
   return operation === undefined
-    ? [ undefined, undefined, undefined, undefined, undefined, undefined ]
-    : [ semanticData, isLoading, error, triggerCall, filtersToDisplay, formToDisplay ];
+    ? [ undefined, undefined, 'Operation not found', undefined, undefined, undefined, undefined ]
+    : [ semanticData, isLoading, error, triggerCall, filtersToDisplay, formToDisplay, operation ];
 }
 
 function buildDefaultRequest(apiDocumentation, operation, requestBodySchema) {

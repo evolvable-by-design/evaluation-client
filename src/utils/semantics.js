@@ -85,7 +85,8 @@ const vocabularies = {
     },
     actions: {
       login: vndJeeraUrl + 'login',
-      logout: vndJeeraUrl + 'logout'
+      logout: vndJeeraUrl + 'logout',
+      getCurrentUserDetails: vndJeeraUrl + 'getCurrentUserDetails'
     }
   }
 };
