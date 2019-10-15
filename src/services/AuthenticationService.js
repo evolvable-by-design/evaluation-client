@@ -1,3 +1,9 @@
+import React from 'react'
+import { Redirect } from 'react-router-dom'
+
+import GenericActionInBackground from '../components/generic/GenericActionInBackground'
+import Semantics from '../utils/semantics'
+
 const tokenLocalStorageKey = 'Authorization'
 
 class AuthenticationService {
@@ -22,6 +28,20 @@ class AuthenticationService {
 
   static currentTokenWasRefusedByApi() {
     this.removeToken();
+  }
+
+  static fetchCurrentUserDetails(callback) {
+    if (AuthenticationService.isAuthenticated()) {
+      return <GenericActionInBackground
+        loadingMessage='We are retrieving your profile...'
+        successMessage='All set :)'
+        errorMessage='An error occured while trying to get your profile'
+        actionKey={Semantics.vnd_jeera.actions.getCurrentUserDetails}
+        onSuccessCallback={callback}
+      />
+    } else {
+      return <Redirect to="/login" />
+    }
   }
 
 }

@@ -3,7 +3,7 @@ import React from 'react';
 import GenericAction from './GenericAction';
 import FullscreenCenterContainer from '../FullscreenCenterContainer';
 
-const GenericActionFullscreen = ({ Loading, Success, ErrorComponent, Component, actionKey, operation, onSuccessCallback, onErrorCallback }) =>
+const GenericActionFullscreen = ({ Loading, Success, ErrorComponent, MainComponent, actionKey, operation, onSuccessCallback, onErrorCallback }) =>
   <FullscreenCenterContainer>
     <GenericAction
       actionKey={actionKey}
@@ -11,7 +11,7 @@ const GenericActionFullscreen = ({ Loading, Success, ErrorComponent, Component, 
       Loading={Loading}
       Success={Success}
       ErrorComponent={ErrorComponent}
-      Component={Component}
+      MainComponent={MainComponent}
       onSuccessCallback={onSuccessCallback}
       onErrorCallback={onErrorCallback}
     />

@@ -1,7 +1,8 @@
 import React from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { Redirect, useHistory, useParams } from 'react-router-dom';
 import { Alert, Dialog, Heading, Spinner } from 'evergreen-ui';
 
+import { useAppContextDispatch } from '../context/AppContext';
 import FullscreenCenterContainer from '../components/FullscreenCenterContainer';
 import useGenericOperationResolver from '../hooks/useGenericOperationResolver';
 import AuthenticationService from '../services/AuthenticationService';
@@ -25,14 +26,22 @@ function Login() {
 };
 
 const LoginDialog = () => {
-  const history = useHistory();
   const { redirectTo } = useParams();
   const [ semanticData, isLoading, error, triggerCall, filtersToDisplay, formToDisplay ] =
   useGenericOperationResolver(Semantics.vnd_jeera.terms.login);
+  const contextDispatch = useAppContextDispatch();
 
   if (semanticData !== undefined) {
     AuthenticationService.updateToken(semanticData.getValue(Semantics.vnd_jeera.terms.JWT))
-    history.push(redirectTo || '/')
+    
+    return <>
+      {
+        AuthenticationService.fetchCurrentUserDetails((userProfile) => {
+          contextDispatch({ type: 'updateUserProfile', userProfile })
+        })
+      }
+      <Redirect to={redirectTo || '/'} />
+    </>
   }
 
   return (

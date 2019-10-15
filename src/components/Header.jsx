@@ -12,7 +12,6 @@ function Header({ width }) {
       <Pane display="flex" flexDirection="column" justifyContent="flext-end">
         <UserProfileBubble />
       </Pane>
-      
     </Pane>
   );
 }

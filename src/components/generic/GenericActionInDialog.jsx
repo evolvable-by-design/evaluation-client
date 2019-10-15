@@ -10,13 +10,13 @@ const GenericActionInDialog = ({ label, alwaysShown, successMessage, actionKey, 
   return <GenericAction
     actionKey={actionKey}
     operation={operation}
-    Component={Component(label, successMessage, alwaysShown, buttonAppearance, isShown, setIsShown)}
+    MainComponent={MainComponent(label, successMessage, alwaysShown, buttonAppearance, isShown, setIsShown)}
     onSuccessCallback={onSuccessCallback}
     onErrorCallback={onErrorCallback}
   />
 }
 
-const Component = (label, successMessage, alwaysShown, buttonAppearance, isShown, setIsShown) => ({isLoading, success, error, triggerCall, filtersToDisplay, formToDisplay, operation}) => {
+const MainComponent = (label, successMessage, alwaysShown, buttonAppearance, isShown, setIsShown) => ({isLoading, success, error, triggerCall, filtersToDisplay, formToDisplay, operation}) => {
   const operationKey = operation.operationId;
 
   return <Pane>

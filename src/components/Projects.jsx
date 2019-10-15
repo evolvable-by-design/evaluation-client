@@ -4,7 +4,7 @@ import { Alert, Button, Pane, Text, Heading, majorScale } from 'evergreen-ui';
 import { ProjectSemanticBuilder } from './Project';
 import GenericActionInDialog from './generic/GenericActionInDialog';
 
-import { useAppContext } from '../components/App';
+import { useAppContextState } from '../context/AppContext';
 import FullscreenError from '../components/FullscreenError';
 import useGenericOperationResolver from '../hooks/useGenericOperationResolver';
 import useRelations from '../hooks/useRelations';
@@ -17,7 +17,7 @@ const requiredData = {
 }
 
 const Projects = () => {
-  const { apiDocumentation } = useAppContext();
+  const { apiDocumentation } = useAppContextState();
 
   const [ projectsList, isLoading, error, triggerCall, filtersToDisplay, formToDisplay ] =
     useGenericOperationResolver(Semantics.vnd_jeera.terms.listProjects);

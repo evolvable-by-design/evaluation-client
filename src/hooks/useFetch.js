@@ -17,18 +17,15 @@ export const useFetch = (requestConfig, resultMapper, onSuccessCallback, onError
       const fetch = async () => {
         setError(undefined);
         setIsLoading(true);
-  
+
         if (requestConfig !== undefined && Object.keys(requestConfig).length !== 0) {
+          setIsLoading(true);
           try {
             const result = await HttpCaller.call(requestConfig);
-            if (resultMapper) {
-              setData(resultMapper(result))
-            } else {
-              setData(result.data || {})
-            }
+            const data = resultMapper ? resultMapper(result) : result.data;
+            setData(data);
             if (onSuccessCallback !== undefined) { onSuccessCallback(data); }
           } catch (error) {
-            console.error(error);
             setError(error.message);
             if (onErrorCallback !== undefined) { onErrorCallback(error); }
 

@@ -19,8 +19,8 @@ const LogoutDialog = () => {
   const history = useHistory();
 
   return <GenericActionFullscreen
-    action={Semantics.vnd_jeera.actions.logout}
-    Loading={Loading}
+    actionKey={Semantics.vnd_jeera.actions.logout}
+    Loading={<Loading />}
     Success={Success}
     ErrorComponent={FullScreenError}
     Component={Component}

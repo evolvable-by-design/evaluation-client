@@ -1,20 +1,34 @@
 import { useState, useCallback, useMemo } from 'react';
+import { useHistory } from 'react-router-dom';
 
-import { useAppContext } from '../components/App';
+import { useAppContextState } from '../context/AppContext'
 import { useFetchWithContext } from '../hooks/useFetch'; 
 import { useFiltersToRender, useFormToRender } from './componentsGenerationHooks';
 import { useRequestBodySchema } from '../hooks/documentationHooks';
 import { buildRequest, inputParamValueOrDefault, inputBodyValueOrDefault } from '../utils/requestBuilder';
+import { AuthenticationRequiredError } from '../utils/Errors';
 
 function useGenericOperationResolver(actionKey, operation, onSuccessCallback, onErrorCallback) {
-  const { apiDocumentation } = useAppContext();
+  const { apiDocumentation } = useAppContextState();
+  const history = useHistory();
 
-  const foundOperation = useMemo(() => operation || apiDocumentation.findOperation(actionKey), [actionKey, operation, apiDocumentation]);
+  const foundOperation = useMemo(() => {
+    try {
+      return operation || apiDocumentation.findOperation(actionKey)
+    } catch (error) {
+      if (error instanceof AuthenticationRequiredError) {
+        console.log('Redirecting to login')
+        history.push('/login')
+      }
+      return undefined
+    }
+  }, [actionKey, operation, apiDocumentation, history]);
+  
   return useGenericOperationResolverOperation(foundOperation, onSuccessCallback, onErrorCallback);
 }
 
 export function useGenericOperationResolverOperation(operation, onSuccessCallback, onErrorCallback) {
-  const { apiDocumentation } = useAppContext();
+  const { apiDocumentation } = useAppContextState();
   const requestBodySchema = useRequestBodySchema(apiDocumentation, operation);
 
   const defaultParametersState = useMemo(() => inputParamValueOrDefault(operation, {}), [operation]);

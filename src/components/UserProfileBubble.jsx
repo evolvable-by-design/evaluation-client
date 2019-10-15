@@ -2,13 +2,14 @@ import React from 'react'
 import { Link, useHistory } from 'react-router-dom'
 import { Avatar, IconButton, Menu, Popover, Position, Tooltip } from 'evergreen-ui'
 
-import { useAppContext } from './App'
+import { useAppContextState } from '../context/AppContext';
 import AuthenticationService from '../services/AuthenticationService';
 import Semantics from '../utils/semantics';
 
 const UserProfileBubble = () => {
   const history = useHistory();
-  const { userProfile } = useAppContext();
+  const context = useAppContextState();
+  const { userProfile } = context;
 
   if (AuthenticationService.isAuthenticated()) {
     return <Popover
