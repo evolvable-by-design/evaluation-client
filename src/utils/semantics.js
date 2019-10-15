@@ -80,7 +80,13 @@ const vocabularies = {
       EmailOwnershipConfirmation: vndJeeraUrl + 'EmailOwnershipConfirmation',
       getProjectDetails: vndJeeraUrl + 'getProjectDetails',
       isPublic: vndJeeraUrl + 'isPublic',
-      createRelation: vndJeeraUrlRel + 'create'
+      createRelation: vndJeeraUrlRel + 'create',
+      JWT: vndJeeraUrl + 'JWT'
+    },
+    actions: {
+      login: vndJeeraUrl + 'login',
+      logout: vndJeeraUrl + 'logout',
+      getCurrentUserDetails: vndJeeraUrl + 'getCurrentUserDetails'
     }
   }
 };

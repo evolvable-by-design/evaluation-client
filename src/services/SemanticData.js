@@ -9,7 +9,8 @@ class SemanticData {
 
   constructor(data, resourceSchema, responseSchema) {
     this.value = data;
-    this.type = resourceSchema['@id'] || resourceSchema.type;
+    
+    this.type = resourceSchema ? resourceSchema['@id'] || resourceSchema.type : undefined;
     this.resourceSchema = resourceSchema;
     this.responseSchema = responseSchema;
     this.alreadyReadData = [];

@@ -1,13 +1,47 @@
-export function buildRequestWithDefaultParams(operation, requestBodySchema) {
-  return {
-    method: operation.verb,
-    url: buildUrlWithDefaultParams(operation),
-    data: buildBodyWithDefaultParams(operation.operationId, requestBodySchema),
-    headers: buildHeadersWithDefaultParams(operation)
-  };
+export const buildRequest = (apiDocumentation, operation, requestBodySchema, parameters, form) => {
+  if (operation === undefined
+    || !apiDocumentation.noRequiredParametersWithoutValue(operation, parameters, form)
+  ) return undefined;
+
+  return _buildRequest(operation, parameters, form);
 }
 
-const buildUrlWithDefaultParams = (operation) => buildUrl(operation, {})
+export function inputParamValueOrDefault(operation, inputValues) {
+  const defaultValues = (operation.parameters || [])
+    .filter(param => param.schema.default !== undefined)
+    .reduce((acc, param) => { acc[param.name] = param.schema.default; return acc; }, {});
+  return { ...defaultValues, ...inputValues};
+}
+
+export function inputBodyValueOrDefault(requestBodySchema, form) {
+  if (requestBodySchema === undefined) return form || {}
+
+  const defaultValues = Object.entries(requestBodySchema.properties)
+    .filter(([name, value]) => value.default !== undefined)
+    .reduce((acc, [name, value]) => {
+      acc[name] = value.default;
+      return acc;
+    }, {});
+  return { ...defaultValues, ...form };
+}
+
+
+function _buildRequest(operation, parameters, form) {
+  if (operation.requestBody && !operation.requestBody.content['application/json']) {
+    return {};
+  }
+
+  const requestBodySchema = operation.requestBody
+    ? operation.requestBody.content['application/json'].schema
+    : undefined;
+
+  return {
+    method: operation.verb,
+    url: buildUrl(operation, parameters),
+    data: buildBody(operation.operationId, requestBodySchema, form),
+    headers: buildHeaders(operation, parameters)
+  };
+}
 
 function buildUrl(operation, parameters) {
   let url = operation.url;
@@ -33,9 +67,6 @@ function buildUrl(operation, parameters) {
   return url;
 }
 
-const buildBodyWithDefaultParams = (operationId, requestBodySchema) =>
-  buildBody(operationId, requestBodySchema, {})
-
 function buildBody(operationId, requestBodySchema, values) {
   if (!requestBodySchema) {
     return undefined;
@@ -56,8 +87,6 @@ function buildBody(operationId, requestBodySchema, values) {
   }
 }
 
-const buildHeadersWithDefaultParams = (operation) => buildHeaders(operation, {})
-
 function buildHeaders(operation, values) {
   if (operation.parameters) {
     const headers = {};
@@ -68,19 +97,4 @@ function buildHeaders(operation, values) {
   } else {
     return undefined;
   }
-}
-
-export function buildRequest(operation, parameters, form) {
-  if (operation.requestBody && !operation.requestBody.content['application/json']) {
-    return {};
-  }
-
-  const requestBodySchema = operation.requestBody.content['application/json'].schema;
-
-  return {
-    method: operation.verb,
-    url: buildUrl(operation, parameters),
-    data: buildBody(operation.operationId, requestBodySchema, form),
-    headers: buildHeaders(operation, parameters)
-  };
 }

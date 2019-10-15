@@ -1,35 +1,38 @@
 import { useEffect, useState, useMemo } from 'react';
-import axios from 'axios';
+import { useHistory } from 'react-router-dom';
 
-import Config from '../config';
+import AuthService from '../services/AuthenticationService';
+import HttpCaller from '../services/HttpCaller';
 import SemanticData from '../services/SemanticData';
 
-const axiosInstance = axios.create({
-  baseURL: Config.serverUrl
-});
-
-export function useFetch(axiosConfig, resultMapper) {
+export const useFetch = (requestConfig, resultMapper, onSuccessCallback, onErrorCallback) => {
   const [data, setData] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(undefined);
+
+  const history = useHistory();
 
   useEffect(
     () => {
       const fetch = async () => {
         setError(undefined);
         setIsLoading(true);
-  
-        if (axiosConfig !== undefined && Object.keys(axiosConfig).length !== 0) {
+
+        if (requestConfig !== undefined && Object.keys(requestConfig).length !== 0) {
+          setIsLoading(true);
           try {
-            const result = await axiosInstance(axiosConfig);
-            if (resultMapper) {
-              setData(resultMapper(result))
-            } else {
-              setData(result.data)
-            }
+            const result = await HttpCaller.call(requestConfig);
+            const data = resultMapper ? resultMapper(result) : result.data;
+            setData(data);
+            if (onSuccessCallback !== undefined) { onSuccessCallback(data); }
           } catch (error) {
-            console.error(error);
             setError(error.message);
+            if (onErrorCallback !== undefined) { onErrorCallback(error); }
+
+            if (error.response && error.response.status === 401) {
+              AuthService.currentTokenWasRefusedByApi()
+              history.push('/login')
+            }
           }
           setIsLoading(false);
         } else {
@@ -38,21 +41,26 @@ export function useFetch(axiosConfig, resultMapper) {
       };
   
       fetch();
-    }, [axiosConfig, resultMapper]
+    }, [requestConfig, resultMapper, history, onSuccessCallback, onErrorCallback]
   );
 
   return [data, isLoading, error];
 };
 
-export const useFetchWithContext = (axiosConfig, operation, resultMapper) =>
+export const useFetchWithContext = (requestConfig, operation, resultMapper, onSuccessCallback, onErrorCallback) =>
   useFetch(
-    axiosConfig,
-    useMemo(() => getDataAndItsDescription(operation, resultMapper), [operation, resultMapper])
+    requestConfig,
+    useMemo(() => getDataAndItsDescription(operation, resultMapper), [operation, resultMapper]),
+    onSuccessCallback,
+    onErrorCallback
   );
 
 const getDataAndItsDescription = (operation, resultMapper) => (result) => {
   const responseSchema = operation ? operation.responses[result.status] : undefined;
-  const resourceSchema = responseSchema ? responseSchema.content[result.headers['content-type'].split(';')[0]].schema : undefined;
+  const resourceSchema =
+    result.data !== '' && result.headers['content-type'] && responseSchema
+      ? responseSchema.content[result.headers['content-type'].split(';')[0]].schema
+      : undefined;
   const data = resultMapper ? resultMapper(result) : result.data;
   return new SemanticData(data, resourceSchema, responseSchema)
 };

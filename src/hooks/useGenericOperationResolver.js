@@ -1,67 +1,73 @@
-import { useState, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { useHistory } from 'react-router-dom';
 
-import { useApiContext } from '../components/App';
+import { useAppContextState } from '../context/AppContext'
 import { useFetchWithContext } from '../hooks/useFetch'; 
 import { useFiltersToRender, useFormToRender } from './componentsGenerationHooks';
-import { useRequestBodySchema, buildRequestSync } from '../hooks/documentationHooks';
+import { useRequestBodySchema } from '../hooks/documentationHooks';
+import { buildRequest, inputParamValueOrDefault, inputBodyValueOrDefault } from '../utils/requestBuilder';
+import { AuthenticationRequiredError } from '../utils/Errors';
 
-function useGenericOperationResolver(target) {
-  const apiDocumentation = useApiContext();
+function useGenericOperationResolver(actionKey, operation, onSuccessCallback, onErrorCallback) {
+  const { apiDocumentation } = useAppContextState();
+  const history = useHistory();
 
-  const operation = useMemo(() => apiDocumentation.findOperation(target), [target, apiDocumentation]);
-  return useGenericOperationResolverOperation(operation);
+  const foundOperation = useMemo(() => {
+    try {
+      return operation || apiDocumentation.findOperation(actionKey)
+    } catch (error) {
+      if (error instanceof AuthenticationRequiredError) {
+        console.log('Redirecting to login')
+        history.push('/login')
+      }
+      return undefined
+    }
+  }, [actionKey, operation, apiDocumentation, history]);
+  
+  return useGenericOperationResolverOperation(foundOperation, onSuccessCallback, onErrorCallback);
 }
 
-export function useGenericOperationResolverOperation(operation) {
-  const apiDocumentation = useApiContext();
+export function useGenericOperationResolverOperation(operation, onSuccessCallback, onErrorCallback) {
+  const { apiDocumentation } = useAppContextState();
   const requestBodySchema = useRequestBodySchema(apiDocumentation, operation);
 
-  const [ parameters, setParameters ] = useState(defaultParamValues(operation.parameters));
+  const defaultParametersState = useMemo(() => inputParamValueOrDefault(operation, {}), [operation]);
+  const [ parameters, setParameters ] = useState(defaultParametersState);
   const [ parameterErrors, setParamaterErrors ] = useState({});
   const filtersToDisplay = useFiltersToRender(operation, parameters, setParameters, parameterErrors, setParamaterErrors);
 
-  const [ form, setForm ] = useState(defaultBodyValues(requestBodySchema));
+  const defaultFormState = useMemo(() => inputBodyValueOrDefault(requestBodySchema, {}), [requestBodySchema]);
+  const [ form, setForm ] = useState(defaultFormState);
   const [ formErrors, setFormErrors ] = useState({});
   const formToDisplay = useFormToRender(operation, requestBodySchema, form, setForm, formErrors, setFormErrors);
 
-  const [request, setRequest] = useState(buildDefaultRequest(apiDocumentation, operation, requestBodySchema));
+  const defaultRequest = useMemo(
+    () => buildDefaultRequest(apiDocumentation, operation, requestBodySchema),
+    [apiDocumentation, operation, requestBodySchema]
+  );
+  const [request, setRequest] = useState(defaultRequest);
 
-  const triggerCall = () => setRequest(buildRequestSync(apiDocumentation, operation, requestBodySchema, parameters, form));
+  const [shouldRecomputeRequest, setShouldRecomputeRequest] = useState(true);
 
-  const [ semanticData, isLoading, error ] = useFetchWithContext(request, operation);
+  const triggerCall = useCallback(() => setShouldRecomputeRequest(true), [])
 
-  return [ semanticData, isLoading, error, triggerCall, filtersToDisplay, formToDisplay ];
+  if (shouldRecomputeRequest) {
+    setShouldRecomputeRequest(false);
+    const request = buildRequest(apiDocumentation, operation, requestBodySchema, parameters, form);
+    setRequest(request)
+  }
+
+  const [ semanticData, isLoading, error ] = useFetchWithContext(request, operation, undefined, onSuccessCallback, onErrorCallback);
+
+  return operation === undefined
+    ? [ undefined, undefined, 'Operation not found', undefined, undefined, undefined, undefined ]
+    : [ semanticData, isLoading, error, triggerCall, filtersToDisplay, formToDisplay, operation ];
 }
 
 function buildDefaultRequest(apiDocumentation, operation, requestBodySchema) {
-  // TODO: function to rewrite
-  if (operation && operation.verb === 'get' && apiDocumentation.notContainsRequiredParametersWithoutDefaultValue(operation)) {
-    return buildRequestSync(apiDocumentation, operation, requestBodySchema);
-  } else {
-    return undefined;
-  }
-}
-
-function defaultParamValues(parameters) {
-  const result = {};
-
-  if (parameters === undefined) return {};
-
-  parameters.filter(p => p.schema.default !== undefined)
-    .forEach(param => result[param.name] = param.schema.default);
-  
-  return result;
-}
-
-function defaultBodyValues(requestBodySchema) {
-  // TODO: test this function
-  if (requestBodySchema && requestBodySchema.properties) {
-    return Object.entries(requestBodySchema.properties)
-      .filter(([key, value]) => value.default !== undefined)
-      .reduce((res, [key, value]) => { res[key] = value.default; return res; }, {});
-  } else {
-    return {};
-  }
+  return operation && operation.verb === 'get'
+    ? buildRequest(apiDocumentation, operation, requestBodySchema, {}, {})
+    : undefined;
 }
 
 export default useGenericOperationResolver;

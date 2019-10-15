@@ -1,35 +1,54 @@
-import React, { useContext } from 'react';
-
-import { Text } from 'evergreen-ui';
+import React, { useEffect, useState } from 'react';
 
 import FullscreenLoader from '../components/FullscreenLoader';
+import FullscreenError from '../components/FullscreenError';
 
-import useApiDocumentation from '../hooks/useApiDocumentation';
+import { useAppContextDispatch, useAppContextState } from '../context/AppContext';
+import ApiDocumentationFetcher from '../services/ApiDocumentationFetcher';
+import AuthenticationService from '../services/AuthenticationService';
 
-const ApiContext = React.createContext(undefined);
-export const useApiContext = () => {
-  const documentation = useContext(ApiContext);
+const useApiDocumentation = () => {
+  const [documentation, setDocumentation] = useState(undefined);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(undefined);
 
-  if (documentation === undefined) {
-    throw new Error('useApiContext must be used within App');
-  }
-  return documentation;
-};
+  useEffect(() => { ApiDocumentationFetcher.fetch(setDocumentation, setIsLoading, setError) }, [setDocumentation, setIsLoading, setError]);
+
+  return [documentation, isLoading, error];
+}
 
 const App = ({children}) => {
   const [documentation, isLoading, error] = useApiDocumentation();
+  const contextDispatch = useAppContextDispatch();
+
+  useEffect(
+    () => contextDispatch({ type: 'updateDocumentation', documentation }),
+    [documentation]
+  )
 
   if (isLoading) {
     return <FullscreenLoader />
   } else if (error) {
-    return <Text>{error}</Text>
+    return <FullscreenError error={error}/>
   } else {
     return <>
-      <ApiContext.Provider value={documentation} >
+        <UserDetailsFetcher />  
         {children}
-      </ApiContext.Provider>
-    </>;
+      </>
   }
 };
+
+const UserDetailsFetcher = () => {
+  const { userProfile } = useAppContextState();
+  const contextDispatch = useAppContextDispatch();
+
+  if (userProfile === undefined && AuthenticationService.isAuthenticated()) {
+    return AuthenticationService.fetchCurrentUserDetails((userProfile) =>
+      contextDispatch({ type: 'updateUserProfile', userProfile })
+    )
+  } else {
+    return null;
+  }
+}
 
 export default App;

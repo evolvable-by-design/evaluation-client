@@ -3,7 +3,7 @@ import { Alert, Heading, Pane, SelectField, Switch, TextInput, majorScale } from
 
 import ajv from '../services/Ajv';
 
-import { capitalize, spaceCamelCaseWord, stateSetter } from '../utils/javascript-utils';
+import { capitalize, spaceCamelCaseWord, stateSetter } from '../utils/javascriptUtils';
 
 // TODO: display an error message when required as TextInputField does
 // TODO: show required fields close to the label
@@ -60,7 +60,7 @@ function SelectInput({schema, value, setValue, error, setError}) {
   } else if (schema.type === 'string' && schema.enum !== undefined) {
     return <SelectField
         isInvalid={error !== undefined}
-        value={value}
+        value={value || null}
         placeholder={'Please select an option...'}
         width="100%"
         onChange={(e) => onChange(e.target.value)}
@@ -70,7 +70,7 @@ function SelectInput({schema, value, setValue, error, setError}) {
   } else {
     return <TextInput
         isInvalid={error !== undefined}
-        value={value}
+        value={value || ''}
         placeholder={schema.format}
         width="100%"
         onChange={(e) => onChange(e.target.value)}
@@ -79,7 +79,6 @@ function SelectInput({schema, value, setValue, error, setError}) {
 }
 
 function _validateValue(value, schema) {
-  console.log(value)
   const val = schema.type === 'number' ? parseFloat(value, 10)
     : schema.type === 'integer' ? parseInt(value, 10)
     : schema.type === 'boolean' ? value === true
