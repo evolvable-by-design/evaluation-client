@@ -2,8 +2,8 @@ import React from 'react';
 import { Icon, Pane, Paragraph, SelectField, TextInputField, Tooltip, majorScale } from 'evergreen-ui';
 
 import ajv from '../services/Ajv';
-import SwitchInputField from './SwitchInputField';
-import { stateSetter } from '../utils/javascriptUtils';
+import SwitchInputField from '../../app/components/SwitchInputField';
+import { stateSetter } from '../../app/utils/javascriptUtils';
 
 export function genericFilters({parameters, values, setValues, errors, setErrors}) {
   return parameters.length === 0

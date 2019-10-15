@@ -2,11 +2,11 @@ import React from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import './App.css';
 
-import AppProxy from './components/App';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Logout from './pages/Logout';
-import { AppContextProvider } from './context/AppContext';
+import AppProxy from './app/components/App';
+import Home from './app/pages/Home';
+import Login from './app/pages/Login';
+import Logout from './app/pages/Logout';
+import { AppContextProvider } from './app/context/AppContext';
 
 function App() {
   return (

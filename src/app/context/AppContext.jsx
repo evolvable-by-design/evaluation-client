@@ -1,6 +1,6 @@
 import React from 'react'
 
-import AuthenticationService from "../services/AuthenticationService"
+import AuthenticationService from "../../library/services/AuthenticationService"
 
 const AppStateContext = React.createContext()
 const AppDispatchContext = React.createContext()

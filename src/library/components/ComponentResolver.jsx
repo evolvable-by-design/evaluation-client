@@ -1,7 +1,7 @@
 import React from 'react';
-import SomethingWrongHappened from "./SomethingWrongHappened";
+import SomethingWrongHappened from "../../components/SomethingWrongHappened";
 
-import { ProjectSemanticBuilder } from './Project';
+import { ProjectSemanticBuilder } from '../../components/Project';
 
 const components = [ProjectSemanticBuilder];
 

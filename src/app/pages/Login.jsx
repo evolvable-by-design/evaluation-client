@@ -4,8 +4,8 @@ import { Alert, Dialog, Heading, Spinner } from 'evergreen-ui';
 
 import { useAppContextDispatch } from '../context/AppContext';
 import FullscreenCenterContainer from '../components/FullscreenCenterContainer';
-import useGenericOperationResolver from '../hooks/useGenericOperationResolver';
-import AuthenticationService from '../services/AuthenticationService';
+import useGenericOperationResolver from '../../library/hooks/useGenericOperationResolver';
+import AuthenticationService from '../../library/services/AuthenticationService';
 import Semantics from '../utils/semantics';
 
 function Login() {

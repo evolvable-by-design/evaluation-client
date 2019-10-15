@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Alert, Button, Dialog, Heading, Pane, Spinner } from 'evergreen-ui';
 
 import GenericAction from './GenericAction';
-import { capitalize, spaceCamelCaseWord } from '../../utils/javascriptUtils';
+import { capitalize, spaceCamelCaseWord } from '../../app/utils/javascriptUtils';
 
 const GenericActionInDialog = ({ label, alwaysShown, successMessage, actionKey, operation, buttonAppearance, onSuccessCallback, onErrorCallback }) => {
   const [isShown, setIsShown] = useState(false)

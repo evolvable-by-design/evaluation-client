@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 
-import { AuthenticationRequiredError } from '../utils/Errors'
+import { AuthenticationRequiredError } from '../../app/utils/Errors'
 
 const useRelation = (semanticData, apiDocumentation, relations) => {
   const [foundAuthOperations, setFoundAuthOperations] = useState(false)

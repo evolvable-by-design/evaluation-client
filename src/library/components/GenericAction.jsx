@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 
-import useGenericOperationResolver from '../../hooks/useGenericOperationResolver';
+import useGenericOperationResolver from '../hooks/useGenericOperationResolver';
 
 const GenericAction = ({ Loading, Success, MainComponent, ErrorComponent, actionKey, operation, onSuccessCallback, onErrorCallback }) => {
   const [ semanticData, isLoading, error, triggerCall, filtersToDisplay, formToDisplay, trigerredOperation ] =

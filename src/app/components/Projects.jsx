@@ -2,12 +2,12 @@ import React from 'react';
 import { Alert, Button, Pane, Text, Heading, majorScale } from 'evergreen-ui';  
 
 import { ProjectSemanticBuilder } from './Project';
-import GenericActionInDialog from './generic/GenericActionInDialog';
+import GenericActionInDialog from '../../library/components/GenericActionInDialog';
 
 import { useAppContextState } from '../context/AppContext';
 import FullscreenError from '../components/FullscreenError';
-import useGenericOperationResolver from '../hooks/useGenericOperationResolver';
-import useRelations from '../hooks/useRelations';
+import useGenericOperationResolver from '../../library/hooks/useGenericOperationResolver';
+import useRelations from '../../library/hooks/useRelations';
 import Semantics from '../utils/semantics';
 
 const Project = ProjectSemanticBuilder.build();

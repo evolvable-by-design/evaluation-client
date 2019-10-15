@@ -1,7 +1,7 @@
 import React from 'react';
 
 import GenericAction from './GenericAction';
-import FullscreenCenterContainer from '../FullscreenCenterContainer';
+import FullscreenCenterContainer from '../../app/components/FullscreenCenterContainer';
 
 const GenericActionFullscreen = ({ Loading, Success, ErrorComponent, MainComponent, actionKey, operation, onSuccessCallback, onErrorCallback }) =>
   <FullscreenCenterContainer>

@@ -2,8 +2,8 @@ import React from 'react';
 import { useHistory, Redirect } from 'react-router-dom';
 import { Heading, Spinner, Paragraph, Pane, majorScale } from 'evergreen-ui';
 
-import GenericActionFullscreen from '../components/generic/GenericActionFullscreen';
-import AuthenticationService from '../services/AuthenticationService';
+import GenericActionFullscreen from '../../library/components/GenericActionFullscreen';
+import AuthenticationService from '../../library/services/AuthenticationService';
 import Semantics from '../utils/semantics';
 import FullScreenError from '../components/FullscreenError';
 

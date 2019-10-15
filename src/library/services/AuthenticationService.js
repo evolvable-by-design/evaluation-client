@@ -1,8 +1,8 @@
 import React from 'react'
 import { Redirect } from 'react-router-dom'
 
-import GenericActionInBackground from '../components/generic/GenericActionInBackground'
-import Semantics from '../utils/semantics'
+import GenericActionInBackground from '../components/GenericActionInBackground'
+import Semantics from '../../app/utils/semantics'
 
 const tokenLocalStorageKey = 'Authorization'
 
