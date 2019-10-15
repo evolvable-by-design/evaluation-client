@@ -3,18 +3,20 @@ import { toaster } from 'evergreen-ui';
 
 import GenericAction from './GenericAction';
 
-const GenericActionInBackground = ({ loadingMessage, successMessage, errorMessage, Component, action, onSuccessCallback, onErrorCallback }) => 
+const GenericActionInBackground = ({ loadingMessage, successMessage, errorMessage, Component, actionKey, operation, onSuccessCallback, onErrorCallback }) => 
   <GenericAction
-    Loading={<Loading message={loadingMessage} action={action} />}
-    Success={<Success message={successMessage} action={action} />}
-    Error={<Error message={errorMessage} action={action} />}
+    actionKey={actionKey}
+    operation={operation}
+    Loading={<Loading message={loadingMessage} actionKey={actionKey} />}
+    Success={<Success message={successMessage} actionKey={actionKey} />}
+    Error={<Error message={errorMessage} actionKey={actionKey} />}
     Component={Component}
     onSuccessCallback={onSuccessCallback}
     onErrorCallback={onErrorCallback}
   />
 
-const Loading = ({message, action}) => {
-  const loadingMessage = message || `Http operation ${action} is loading...`
+const Loading = ({message, actionKey}) => {
+  const loadingMessage = message || `Http operation ${actionKey} is loading...`
   const duration = 1000;
   const [refresh, setRefresh] = useState(true);
 
@@ -29,13 +31,13 @@ const Loading = ({message, action}) => {
   })
 }
 
-const Success = ({ message, action }) => {
-  const successMessage = message || `Http operation ${action} successfully executed :)`
+const Success = ({ message, actionKey }) => {
+  const successMessage = message || `Http operation ${actionKey} successfully executed :)`
   toaster.success(successMessage);
 }
 
-const Error = ({ message, error, action }) => {
-  const errorMessage = message || `Sadly, an error occured while executing the Http operation ${action}.`
+const Error = ({ message, error, actionKey }) => {
+  const errorMessage = message || `Sadly, an error occured while executing the Http operation ${actionKey}.`
   toaster.success(errorMessage, { description: error });
 }
 

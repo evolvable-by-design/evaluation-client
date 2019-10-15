@@ -2,13 +2,12 @@ import React, { useMemo, useState } from 'react';
 
 import useGenericOperationResolver from '../../hooks/useGenericOperationResolver';
 
-const GenericAction = ({ Loading, Success, Component, ErrorComponent, action, onSuccessCallback, onErrorCallback }) => {
-  const [ semanticData, isLoading, error, triggerCall, filtersToDisplay, formToDisplay, operation ] =
-    useGenericOperationResolver(action, onSuccessCallback, onErrorCallback);
+const GenericAction = ({ Loading, Success, Component, ErrorComponent, actionKey, operation, onSuccessCallback, onErrorCallback }) => {
+  const [ semanticData, isLoading, error, triggerCall, filtersToDisplay, formToDisplay, trigerredOperation ] =
+    useGenericOperationResolver(actionKey, operation, onSuccessCallback, onErrorCallback);
 
-  const success = useMemo(() => !isLoading && error === undefined, [isLoading, error])
-
-  const [callAlreadyTriggered, setCallAlreadyTriggered] = useState(operation.verb === 'get');
+  const [callAlreadyTriggered, setCallAlreadyTriggered] = useState(trigerredOperation.verb === 'get');
+  const success = useMemo(() => callAlreadyTriggered && !isLoading && error === undefined, [callAlreadyTriggered, isLoading, error])
 
   if (Loading && isLoading === true) {
     return <Loading />
@@ -23,7 +22,7 @@ const GenericAction = ({ Loading, Success, Component, ErrorComponent, action, on
       triggerCall();
       setCallAlreadyTriggered(true);
     }
-    console.warn(`No component provided for <GenericAction action={${action} .../>`)
+    console.warn(`No component provided for <GenericAction actionKey={${actionKey}} .../>`)
   }
 }
 

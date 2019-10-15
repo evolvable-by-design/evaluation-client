@@ -6,11 +6,11 @@ import { useFiltersToRender, useFormToRender } from './componentsGenerationHooks
 import { useRequestBodySchema } from '../hooks/documentationHooks';
 import { buildRequest, inputParamValueOrDefault, inputBodyValueOrDefault } from '../utils/requestBuilder';
 
-function useGenericOperationResolver(target, onSuccessCallback, onErrorCallback) {
+function useGenericOperationResolver(actionKey, operation, onSuccessCallback, onErrorCallback) {
   const { apiDocumentation } = useAppContext();
 
-  const operation = useMemo(() => apiDocumentation.findOperation(target), [target, apiDocumentation]);
-  return useGenericOperationResolverOperation(operation, onSuccessCallback, onErrorCallback);
+  const foundOperation = useMemo(() => operation || apiDocumentation.findOperation(actionKey), [actionKey, operation, apiDocumentation]);
+  return useGenericOperationResolverOperation(foundOperation, onSuccessCallback, onErrorCallback);
 }
 
 export function useGenericOperationResolverOperation(operation, onSuccessCallback, onErrorCallback) {

@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { toaster } from 'evergreen-ui'
 
 import FullscreenLoader from '../components/FullscreenLoader';
 import FullscreenError from '../components/FullscreenError';
 
 import AuthenticationService from '../services/AuthenticationService';
 import ApiDocumentationFetcher from '../services/ApiDocumentationFetcher';
+import Semantics from '../utils/semantics';
 
 const ApiContext = React.createContext(undefined);
 export const useAppContext = () => {
@@ -45,5 +47,13 @@ const App = ({children}) => {
       </ApiContext.Provider>
   }
 };
+
+// const fetchCurrentUserDetails = (context) => {
+//   fetchOperation(
+//     Semantics.vnd_jeera.actions.getCurrentUserDetails,
+//     (userProfile) => { context['userProfile'] = userProfile; },
+//     (error) => { toaster.danger(`An error occured while trying to get your profile: ${error.message}`) }
+//   )
+// }
 
 export default App;

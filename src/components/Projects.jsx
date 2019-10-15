@@ -2,7 +2,7 @@ import React from 'react';
 import { Alert, Button, Pane, Text, Heading, majorScale } from 'evergreen-ui';  
 
 import { ProjectSemanticBuilder } from './Project';
-import GenericOperationModal from './GenericOperationModal';
+import GenericActionInDialog from './generic/GenericActionInDialog';
 
 import { useAppContext } from '../components/App';
 import FullscreenError from '../components/FullscreenError';
@@ -38,8 +38,12 @@ const Projects = () => {
       { (filtersToDisplay || formToDisplay)
         && <Button appearance="primary" onClick={triggerCall} marginBottom={majorScale(3)}>Update</Button>
       }
-      { createOperation && <Heading marginBottom={majorScale(3)}>Actions</Heading> }
-      { createOperation && <GenericOperationModal operation={createOperation} buttonAppearance="primary" onSuccessCallback={triggerCall} /> }
+      { createOperation && 
+        <Pane marginBottom={majorScale(3)}>
+          <Heading marginBottom={majorScale(2)}>Actions</Heading>
+          <GenericActionInDialog operation={createOperation[1]} buttonAppearance="primary" onSuccessCallback={triggerCall} />
+        </Pane>
+      }
       { authRequired && <Alert intent="none" marginBottom={32} title="Login to see more actions."/> }
       <ProjectCards projects={projects} />
     </>
