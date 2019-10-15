@@ -1,7 +1,7 @@
 import * as JsonLDParser from './JsonLdParser';
 import AuthService from './AuthenticationService';
-import { AuthenticationRequiredError } from '../utils/Errors'
-import { mapObject } from '../utils/javascriptUtils';
+import { AuthenticationRequiredError } from '../../app/utils/Errors'
+import { mapObject } from '../../app/utils/javascriptUtils';
 
 class DocumentationBrowser {
 

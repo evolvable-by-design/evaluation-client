@@ -1,12 +1,11 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { useAppContextState } from '../context/AppContext'
-import { useFetchWithContext } from '../hooks/useFetch'; 
+import { useAppContextState } from '../../app/context/AppContext'
+import { useFetchWithContext } from './useFetch'; 
 import { useFiltersToRender, useFormToRender } from './componentsGenerationHooks';
-import { useRequestBodySchema } from '../hooks/documentationHooks';
 import { buildRequest, inputParamValueOrDefault, inputBodyValueOrDefault } from '../utils/requestBuilder';
-import { AuthenticationRequiredError } from '../utils/Errors';
+import { AuthenticationRequiredError } from '../../app/utils/Errors';
 
 function useGenericOperationResolver(actionKey, operation, onSuccessCallback, onErrorCallback) {
   const { apiDocumentation } = useAppContextState();
@@ -69,5 +68,12 @@ function buildDefaultRequest(apiDocumentation, operation, requestBodySchema) {
     ? buildRequest(apiDocumentation, operation, requestBodySchema, {}, {})
     : undefined;
 }
+
+const useRequestBodySchema = (apiDocumentation, operation) => useMemo(
+  () => operation && operation.requestBody
+    ? apiDocumentation.requestBodySchema(operation)
+    : undefined,
+  [apiDocumentation, operation]
+);
 
 export default useGenericOperationResolver;

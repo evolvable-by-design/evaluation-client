@@ -3,7 +3,7 @@ import { Alert, Heading, Pane, SelectField, Switch, TextInput, majorScale } from
 
 import ajv from '../services/Ajv';
 
-import { capitalize, spaceCamelCaseWord, stateSetter } from '../utils/javascriptUtils';
+import { capitalize, spaceCamelCaseWord, stateSetter } from '../../app/utils/javascriptUtils';
 
 // TODO: display an error message when required as TextInputField does
 // TODO: show required fields close to the label

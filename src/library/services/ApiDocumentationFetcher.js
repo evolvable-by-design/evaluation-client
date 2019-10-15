@@ -1,4 +1,4 @@
-import Config from '../config';
+import Config from '../../config';
 import DocumentationBrowser from './DocumentationBrowser';
 import HttpCaller from './HttpCaller';
 

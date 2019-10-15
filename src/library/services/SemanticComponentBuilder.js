@@ -1,8 +1,8 @@
 import React from 'react';
 
-import SemanticData from "./SemanticData";
+import SemanticData from './SemanticData';
 
-import { mapObject } from "../utils/javascriptUtils";
+import { mapObject } from "../../app/utils/javascriptUtils";
 
 export class SemanticComponentBuilder {
 

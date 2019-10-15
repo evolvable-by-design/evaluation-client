@@ -4,8 +4,8 @@ import FullscreenLoader from '../components/FullscreenLoader';
 import FullscreenError from '../components/FullscreenError';
 
 import { useAppContextDispatch, useAppContextState } from '../context/AppContext';
-import ApiDocumentationFetcher from '../services/ApiDocumentationFetcher';
-import AuthenticationService from '../services/AuthenticationService';
+import ApiDocumentationFetcher from '../../library/services/ApiDocumentationFetcher';
+import AuthenticationService from '../../library/services/AuthenticationService';
 
 const useApiDocumentation = () => {
   const [documentation, setDocumentation] = useState(undefined);
