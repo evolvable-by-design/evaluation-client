@@ -1,9 +1,11 @@
-export const buildRequest = (apiDocumentation, operation, requestBodySchema, parameters, form) => {
-  if (operation === undefined
-    || !apiDocumentation.noRequiredParametersWithoutValue(operation, parameters, form)
-  ) return undefined;
-
-  return _buildRequest(operation, parameters, form);
+export const buildRequest = (apiDocumentation, operation, parameters, form) => {
+  if (operation === undefined) {
+    return undefined
+  } else if (!apiDocumentation.noRequiredParametersWithoutValue(operation, parameters, form)) {
+    throw new Error('Required parameters are missing')
+  } else {
+    return _buildRequest(operation, parameters, form)
+  }
 }
 
 export function inputParamValueOrDefault(operation, inputValues) {

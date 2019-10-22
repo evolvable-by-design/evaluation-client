@@ -11,6 +11,10 @@ class DocumentationBrowser {
     this.semanticKeyMapping = JsonLDParser.findSemanticWithKeyMappings(documentation);
   }
 
+  getServerUrl() {
+    return this.documentation.servers[0].url
+  }
+
   hasOperation = (target) => this.findOperation(target) !== undefined
 
   findOperation(target) {

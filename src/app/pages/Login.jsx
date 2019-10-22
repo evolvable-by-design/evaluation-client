@@ -27,7 +27,7 @@ function Login() {
 
 const LoginDialog = () => {
   const { redirectTo } = useParams();
-  const [ semanticData, isLoading, error, triggerCall, filtersToDisplay, formToDisplay ] =
+  const [ semanticData, isLoading, error, triggerCall, _, formToDisplay ] =
   useGenericOperationResolver(Semantics.vnd_jeera.terms.login);
   const contextDispatch = useAppContextDispatch();
 

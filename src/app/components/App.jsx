@@ -1,29 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 import FullscreenLoader from '../components/FullscreenLoader';
 import FullscreenError from '../components/FullscreenError';
 
 import { useAppContextDispatch, useAppContextState } from '../context/AppContext';
-import ApiDocumentationFetcher from '../../library/services/ApiDocumentationFetcher';
+import useApiDocumentation from '../../library/hooks/useApiDocumentation';
 import AuthenticationService from '../../library/services/AuthenticationService';
 
-const useApiDocumentation = () => {
-  const [documentation, setDocumentation] = useState(undefined);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(undefined);
-
-  useEffect(() => { ApiDocumentationFetcher.fetch(setDocumentation, setIsLoading, setError) }, [setDocumentation, setIsLoading, setError]);
-
-  return [documentation, isLoading, error];
-}
+import Config from '../../config';
 
 const App = ({children}) => {
-  const [documentation, isLoading, error] = useApiDocumentation();
+  const [documentation, isLoading, error] = useApiDocumentation(Config.serverUrl);
   const contextDispatch = useAppContextDispatch();
 
   useEffect(
     () => contextDispatch({ type: 'updateDocumentation', documentation }),
-    [documentation]
+    [documentation, contextDispatch]
   )
 
   if (isLoading) {
