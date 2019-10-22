@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { toaster } from 'evergreen-ui';
 
 import GenericAction from './GenericAction';
@@ -19,11 +19,15 @@ const Loading = ({message, actionKey}) => {
   const loadingMessage = message || `Http operation ${actionKey} is loading...`
   const duration = 1; // second
   
-  const notify = () => toaster.notify(loadingMessage, { duration, id: actionKey });
+  const notify = useCallback(
+    () => toaster.notify(loadingMessage, { duration, id: actionKey }),
+    [loadingMessage, duration, actionKey]
+  );
+
   useEffect(() => {
     const interval = setInterval(notify, duration*1000)
     return () => clearInterval(interval)
-  }, [])
+  }, [notify])
   
   return null;
 }

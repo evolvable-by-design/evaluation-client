@@ -1,22 +1,13 @@
-import Config from '../../config';
+
 import DocumentationBrowser from './DocumentationBrowser';
 import HttpCaller from './HttpCaller';
 
-const fetchDocumentationOptions = { method: 'options', url: Config.serverUrl };
+const fetchDocumentation = async (serverUrl) => {
+  const httpCaller = new HttpCaller(serverUrl)
 
-const fetchDocumentation = async (setDocumentation, setIsLoading, setError) => {
-  setError(undefined);
-  setIsLoading(true);
-  
-  try {
-    const result = await HttpCaller.call(fetchDocumentationOptions);
-    const documentation = toDocumentationBrowser(result);
-    setDocumentation(documentation);
-  } catch (error) {
-    setError(error.message);
-  } finally {
-    setIsLoading(false);
-  }
+  const result = await httpCaller.call({ method: 'options' })
+  const documentation = toDocumentationBrowser(result)
+  return documentation
 }
 
 const toDocumentationBrowser = result => new DocumentationBrowser(

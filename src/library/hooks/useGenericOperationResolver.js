@@ -41,8 +41,8 @@ export function useGenericOperationResolverOperation(operation, onSuccessCallbac
   const formToDisplay = useFormToRender(operation, requestBodySchema, form, setForm, formErrors, setFormErrors);
 
   const defaultRequest = useMemo(
-    () => buildDefaultRequest(apiDocumentation, operation, requestBodySchema),
-    [apiDocumentation, operation, requestBodySchema]
+    () => buildDefaultRequest(apiDocumentation, operation),
+    [apiDocumentation, operation]
   );
   const [request, setRequest] = useState(defaultRequest);
 
@@ -50,9 +50,15 @@ export function useGenericOperationResolverOperation(operation, onSuccessCallbac
 
   const triggerCall = useCallback(() => setShouldRecomputeRequest(true), [])
 
+  const [ missingRequiredParams, setMissingRequiredParams ] = useState()
+
+  useEffect(() => {
+    // compute missingRequiredParams...
+  }, [form, parameters] )
+
   if (shouldRecomputeRequest) {
     setShouldRecomputeRequest(false);
-    const request = buildRequest(apiDocumentation, operation, requestBodySchema, parameters, form);
+    const request = buildRequest(apiDocumentation, operation, parameters, form);
     setRequest(request)
   }
 
@@ -63,9 +69,9 @@ export function useGenericOperationResolverOperation(operation, onSuccessCallbac
     : [ semanticData, isLoading, error, triggerCall, filtersToDisplay, formToDisplay, operation ];
 }
 
-function buildDefaultRequest(apiDocumentation, operation, requestBodySchema) {
+function buildDefaultRequest(apiDocumentation, operation) {
   return operation && operation.verb === 'get'
-    ? buildRequest(apiDocumentation, operation, requestBodySchema, {}, {})
+    ? buildRequest(apiDocumentation, operation, {}, {})
     : undefined;
 }
 
