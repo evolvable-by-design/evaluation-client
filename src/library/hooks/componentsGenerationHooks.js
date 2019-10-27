@@ -5,6 +5,8 @@ import { useMemo } from 'react';
 import GenericFilters from '../components/GenericFilters';
 import GenericForm from '../components/GenericForm';
 
+// TO DELETE SOON
+
 export const useFiltersToRender = (operation, values, setValues, errors, setErrors) => useMemo(
   () => operation && operation.parameters
     ? <GenericFilters parameters={operation.parameters} values={values} setValues={setValues} errors={errors} setErrors={setErrors} />
