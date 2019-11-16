@@ -16,16 +16,17 @@ const requiredData = {
   projects: Semantics.vnd_jeera.terms.projects
 }
 
+const LIST_PROJECTS_KEY = Semantics.vnd_jeera.terms.listProjects
+
 const Projects = () => {
-  const listProjectsKey = Semantics.vnd_jeera.terms.listProjects
   const { apiDocumentation, genericOperationBuilder } = useAppContextState()
 
-  const listProjectOperation = useMemo(() => genericOperationBuilder.fromKey(listProjectsKey), [])
+  const listProjectOperation = useMemo(() => genericOperationBuilder.fromKey(LIST_PROJECTS_KEY), [])
   const { form, filters, makeCall, isLoading, success, data, error } = useOperation(listProjectOperation)
 
-  const projects = data !== undefined ? data.get(requiredData.projects) : undefined;
+  const projects = data !== undefined ? data.get(requiredData.projects) : undefined
 
-  const [createOperation, authRequired] = useRelations(data, apiDocumentation, Semantics.vnd_jeera.terms.createRelation);
+  const [createOperation, authRequired] = useRelations(data, apiDocumentation, Semantics.vnd_jeera.terms.createRelation)
 
   if (isLoading) {
     return <Text>Loading...</Text>
@@ -34,13 +35,16 @@ const Projects = () => {
   } else {
     return <>
       <Heading size={900} marginBottom={majorScale(3)}>Projects</Heading>
+      
       { filters }
       { form }
       { (filters || form)
         && <Button appearance="primary" onClick={makeCall} marginBottom={majorScale(3)}>Update</Button>
       }
+
       <Operations createOperation={createOperation} triggerCall={makeCall} />
       <AuthRequired authRequired={authRequired}/>
+
       <ProjectCards projects={projects} />
     </>
   }
