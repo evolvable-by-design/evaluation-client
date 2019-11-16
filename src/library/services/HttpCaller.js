@@ -6,11 +6,12 @@ import { AuthenticationRequiredError } from '../../app/utils/Errors'
 
 class HttpCaller {
 
-  constructor(baseUrl) {
+  constructor(baseUrl, history) {
     this.baseUrl = baseUrl
+    this.history = history
   }
 
-  async call(options, history) {
+  async call(options) {
     if (options !== undefined && Object.keys(options).length !== 0) {
       try {
         const result = await this._callerInstance()(options)
@@ -18,8 +19,8 @@ class HttpCaller {
       } catch (error) {
         if (error.response && error.response.status === 401) {
           AuthService.currentTokenWasRefusedByApi()
-          if (history !== undefined) {
-            history.push('/login')
+          if (this.history !== undefined) {
+            this.history.push('/login')
             throw error
           } else {
             throw new AuthenticationRequiredError()
@@ -33,8 +34,8 @@ class HttpCaller {
     }
   }
 
-  async semanticCall(options, operation, resultMapper, history) {
-    const result = await this.call(options, history)
+  async semanticCall(options, operation, resultMapper) {
+    const result = await this.call(options)
     return HttpCaller.getDataAndItsDescription(result, operation, resultMapper)
   }
 

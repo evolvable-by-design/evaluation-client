@@ -6,9 +6,15 @@ import { mapObject } from '../../app/utils/javascriptUtils';
 class DocumentationBrowser {
 
   constructor(documentation) {
-    this.documentation = JsonLDParser.replaceAllId(documentation);
-    console.log(this.documentation);
-    this.semanticKeyMapping = JsonLDParser.findSemanticWithKeyMappings(documentation);
+    const refinedDoc = JSON.parse(
+      JSON.stringify(documentation)
+        .replace(new RegExp('x-@id', 'g'), '@id')
+        .replace(new RegExp('x-@type', 'g'), '@type')
+        .replace(new RegExp('x-@context', 'g'), '@context')
+        .replace(new RegExp('x-@relation', 'g'), '@relation')
+    )
+    this.documentation = JsonLDParser.replaceAllId(refinedDoc)
+    this.semanticKeyMapping = JsonLDParser.findSemanticWithKeyMappings(refinedDoc)
   }
 
   getServerUrl() {
