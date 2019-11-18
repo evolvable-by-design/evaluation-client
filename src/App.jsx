@@ -1,12 +1,13 @@
-import React from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-import './App.css';
+import React from 'react'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
+import './App.css'
 
-import AppProxy from './app/components/App';
-import Home from './app/pages/Home';
-import Login from './app/pages/Login';
-import Logout from './app/pages/Logout';
-import { AppContextProvider } from './app/context/AppContext';
+import AppProxy from './app/components/App'
+import Home from './app/pages/Home'
+import Login from './app/pages/Login'
+import Logout from './app/pages/Logout'
+import Project from './app/pages/Project'
+import { AppContextProvider } from './app/context/AppContext'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <AppProxy>
             <Route path="/" exact component={Home} />
             <Route path="/home" exact component={Home} />
+            <Route path="/project/:id" exact component={Project}/>
             <Route path="/login" exact component={Login} />
             <Route path="/logout" exact component={Logout} />
           </AppProxy>

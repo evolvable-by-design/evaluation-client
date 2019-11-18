@@ -20,7 +20,7 @@ export function genericForm({bodySchema, values, setValues, errors, setErrors}) 
   return <Pane width="100%">
     {
       Object.entries(properties).map(([key, value]) =>
-        <WithLabel label={key} key={key} required={required.includes(key)}>
+        <WithLabel label={key} key={key} required={required && required.includes(key)}>
           <SelectInput 
             schema={value}
             value={values[key]}

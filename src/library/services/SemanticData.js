@@ -10,10 +10,11 @@ class SemanticData {
   constructor(data, resourceSchema, responseSchema) {
     this.value = data;
     
-    this.type = resourceSchema ? resourceSchema['@id'] || resourceSchema.type : undefined;
-    this.resourceSchema = resourceSchema;
-    this.responseSchema = responseSchema;
-    this.alreadyReadData = [];
+    this.type = resourceSchema ? resourceSchema['@id'] || resourceSchema.type : undefined
+    this.resourceSchema = resourceSchema
+    this.responseSchema = responseSchema
+    this.alreadyReadData = []
+    this.alreadyReadRelations = []
   }
 
   isObject() { return this.resourceSchema.type === 'object'; }
@@ -65,16 +66,51 @@ class SemanticData {
   getRelation(semanticRelation, apiDocumentation) {
     const hypermediaControl = this._findRelation(semanticRelation);
     const hypermediaControlKey = hypermediaControl[0];
+    return this._getRelation(hypermediaControlKey, apiDocumentation, true)
+  }
 
+  _getRelation(hypermediaControlKey, apiDocumentation, addToReadList) {
     if (hypermediaControlKey !== undefined) {
-      const schemaLinks = this.responseSchema.links || {};
-      const notResolvedOperation = schemaLinks[hypermediaControlKey];
+      const linksSchema = this.responseSchema.links || {};
+      const notResolvedOperation = linksSchema[hypermediaControlKey];
       
       const operation = apiDocumentation.findOperationById(notResolvedOperation.operationId)
+
+      if (operation === undefined) {
+        console.warn(`Error found in the documentation: operation with id ${hypermediaControlKey} does not exist.`)
+        return [undefined, undefined]
+      }
+
+      const links = this.value._links || []
+      const controlFromPayload = links[hypermediaControlKey]
+        || links.find(control => control['relation'] === hypermediaControlKey)
+
+      if (controlFromPayload && controlFromPayload['parameters']) {
+        Object.entries(controlFromPayload['parameters']).forEach(([key, value]) => {
+          const param = operation['parameters'].find(p => p.name === key)
+          if (param) {
+            param.schema['default'] = value
+          } else {
+            operation['parameters'].push({name: key, schema: { default: value}})
+          }
+        })
+      }
+
+      if (addToReadList && !this.alreadyReadRelations.includes(hypermediaControlKey)) {
+        this.alreadyReadRelations.push(hypermediaControlKey)
+      }
+
       return [hypermediaControlKey, operation];
     } else {
       return [undefined, undefined];
     }
+  }
+
+  getOtherRelations(apiDocumentation) {
+    const others = this.value._links.map(l => l instanceof Object ? l.relation : l)
+      .filter(key => !this.alreadyReadRelations.includes(key))
+    
+    return others.map(key => this._getRelation(key, apiDocumentation, false)).filter(val => val[0] && val[1])
   }
 
   _findRelation(semanticRelation) {
@@ -82,13 +118,17 @@ class SemanticData {
     const hypermediaControl = Object.entries(schemaLinks)
       .find(([key, value]) => value['@relation'] === semanticRelation)
 
-      if (hypermediaControl === undefined)
+    if (hypermediaControl === undefined)
       return undefined;
 
     const hypermediaControlKey = hypermediaControl[0];
-    const links = this.value._links || [];
 
-    if (hypermediaControlKey !== undefined && links.includes(hypermediaControlKey)) {
+    const links = this.value._links || [];
+    const isInPayload = links.includes(hypermediaControlKey)
+      || links.find(control => control['relation'] === hypermediaControlKey)
+
+
+    if (hypermediaControlKey !== undefined && isInPayload) {
       return hypermediaControl;
     } else {
       return [undefined, undefined];

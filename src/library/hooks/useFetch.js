@@ -33,7 +33,7 @@ export const useFetch = (requestConfig, resultMapper, onSuccessCallback, onError
         setIsLoading(false);
       };
   
-      fetch();
+      if (requestConfig) { fetch() };
     }, [requestConfig, resultMapper, history, onSuccessCallback, onErrorCallback, httpCaller]
   );
 

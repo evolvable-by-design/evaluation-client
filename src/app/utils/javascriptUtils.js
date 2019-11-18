@@ -12,6 +12,14 @@ export const reduceObject = (res, [key, value]) => {
   return res;
 };
 
+export const filterObjectKeys = (object, predicate) => {
+  const res = {}
+  Object.keys(res).forEach(key => { 
+    if (predicate(key)) { res[key] = object[key] }
+  })
+  return res
+}
+
 export const onlyWhen = (values, toRender) => {
   if (
     values === undefined

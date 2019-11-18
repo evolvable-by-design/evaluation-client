@@ -54,7 +54,7 @@ function buildUrl(operation, parameters) {
         param.in === 'path'
         && (param.schema.default !== undefined || parameters[param.name] !== undefined)
       )
-      .forEach(param => url.replace(param.name, parameters[param.name] || param.schema.default));
+      .forEach(param => { url = url.replace(`{${param.name}}`, parameters[param.name] || param.schema.default)});
 
       operation.parameters
       .filter(param =>

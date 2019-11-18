@@ -87,6 +87,9 @@ const vocabularies = {
       login: vndJeeraUrl + 'login',
       logout: vndJeeraUrl + 'logout',
       getCurrentUserDetails: vndJeeraUrl + 'getCurrentUserDetails'
+    },
+    relations: {
+      listProjectTasks: vndJeeraUrl + 'rel/listProjectTasks'
     }
   }
 };

@@ -163,7 +163,7 @@ class DocumentationBrowser {
         ...this._refine(operation),
         verb,
         url: path,
-        parameters
+        parameters: this._refine(parameters)
       }
     } else {
       return undefined;

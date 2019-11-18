@@ -19,7 +19,7 @@ const GenericActionInDialog = ({ label, alwaysShown, successMessage, actionKey, 
 const MainComponent = (label, successMessage, alwaysShown, buttonAppearance, isShown, setIsShown) => ({isLoading, success, error, triggerCall, filtersToDisplay, formToDisplay, operation}) => {
   const operationKey = operation.operationId;
 
-  return <Pane>
+  return <>
     <Dialog
       isShown={alwaysShown === true || isShown}
       title={operation.summary}
@@ -39,7 +39,7 @@ const MainComponent = (label, successMessage, alwaysShown, buttonAppearance, isS
       }
     </Dialog>
     { !(alwaysShown === true) && <Button appearance={buttonAppearance || "default"} onClick={() => setIsShown(true)}>{ spaceCamelCaseWord(capitalize(label || operationKey)) }</Button> }
-  </Pane>
+  </>
 }
 
 export default GenericActionInDialog;

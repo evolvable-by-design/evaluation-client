@@ -13,13 +13,18 @@ import HttpCaller from '../../library/services/HttpCaller'
 import Config from '../../config';
 
 const AppProxy = ({children}) => {
-  const [documentation, isLoading, error] = useApiDocumentation(Config.serverUrl)
   const contextDispatch = useAppContextDispatch()
 
+  const [documentation, isLoading, error] = useApiDocumentation(Config.serverUrl)
   useEffect(
-    () => { if (documentation) contextDispatch({ type: 'updateDocumentation', documentation }) },
+    () => { if (documentation) {
+      contextDispatch({ type: 'updateDocumentation', documentation })
+    }},
     [documentation, contextDispatch]
   )
+
+  const history = useHistory()
+  useEffect(() => contextDispatch({ type: 'setHistory', history}), [contextDispatch, history])
 
   if (error) {
     return <FullscreenError error={error}/>
@@ -31,10 +36,6 @@ const AppProxy = ({children}) => {
 }
 
 const Application = ({children}) => {
-  const history = useHistory()
-  const contextDispatch = useAppContextDispatch()
-
-  useEffect(() => contextDispatch({ type: 'setHistory', history}), [contextDispatch, history])
   useUserDetails()
   return children
 }
@@ -50,7 +51,7 @@ function useUserDetails() {
         .call()
         .then(userProfile => contextDispatch({ type: 'updateUserProfile', userProfile }))
     }
-  }, [])
+  }, [genericOperationBuilder])
 }
 
 const useApiDocumentation = (serverUrl) => {

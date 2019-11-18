@@ -46,7 +46,8 @@ export function useGenericOperationResolverOperation(operation, onSuccessCallbac
   );
   const [request, setRequest] = useState(defaultRequest);
 
-  const [shouldRecomputeRequest, setShouldRecomputeRequest] = useState(true);
+  const [shouldRecomputeRequest, setShouldRecomputeRequest] =
+    useState(operation.verb === 'get' && apiDocumentation.noRequiredParametersWithoutValue(operation, parameters, form));
 
   const triggerCall = useCallback(() => setShouldRecomputeRequest(true), [])
 
@@ -54,6 +55,7 @@ export function useGenericOperationResolverOperation(operation, onSuccessCallbac
 
   useEffect(() => {
     // compute missingRequiredParams...
+
   }, [form, parameters] )
 
   if (shouldRecomputeRequest) {

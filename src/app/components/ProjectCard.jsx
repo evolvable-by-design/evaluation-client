@@ -1,14 +1,15 @@
 import React from 'react';
+import { Link } from 'react-router-dom'
 import { Alert, Avatar, Badge, Card, Heading, Pane, Paragraph, majorScale } from 'evergreen-ui';
 
 import { onlyWhen } from '../utils/javascriptUtils';
 import { SemanticComponentBuilder } from '../../library/services/SemanticComponentBuilder';
 import Semantics from '../utils/semantics';
 
-const Project = ({title, isPublic, lastUpdate, collaborators}) =>
+const ProjectCard = ({id, title, isPublic, lastUpdate, collaborators}) =>
   <Card display="flex" flexDirection="column" elevation={1} hoverElevation={3} width={majorScale(40)} padding={majorScale(2)} marginRight={majorScale(3)} marginBottom={majorScale(3)} minHeight="100px" >
     <Pane display="flex" flexDirection="row" marginBottom={majorScale(2)}>
-      <Heading flexGrow="10">{title}</Heading>
+      <Link to={`/project/${id}`}><Heading flexGrow="10">{title}</Heading></Link>
       { onlyWhen(isPublic, () => <IsPublicBadge isPublic={isPublic} />) }
     </Pane>
     { onlyWhen(lastUpdate, () => <Paragraph><b>Last updated on:</b>{lastUpdate}</Paragraph>) }
@@ -25,10 +26,11 @@ const IsPublicBadge = ({isPublic}) =>
 
 const CollaboratorBadge = ({name}) => <Avatar name={name} size={30} />
 
-export const ProjectSemanticBuilder = new SemanticComponentBuilder(
+export const ProjectCardSemanticBuilder = new SemanticComponentBuilder(
   Semantics.schema.terms.Project,
-  Project,
+  ProjectCard,
   {
+    id: Semantics.vnd_jeera.terms.projectId,
     title: Semantics.schema.terms.name,
     collaborators: Semantics.vnd_jeera.terms.collaborators,
   },
@@ -50,4 +52,4 @@ function errorHandler (e) {
   }
 }
 
-export default Project;
+export default ProjectCard;
