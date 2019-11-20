@@ -1,5 +1,5 @@
-import React, { useMemo, useEffect } from 'react'
-import { useParams, Redirect } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 
 import { useAppContextState } from '../context/AppContext'
 import BaseApplicationLayout from '../components/BaseApplicationLayout'
@@ -8,29 +8,16 @@ import FullscreenLoader from '../components/FullscreenLoader'
 import FullScreenError from '../components/FullscreenError'
 import Semantics from '../utils/semantics'
 import { useOperation } from '../../library/services/ReactGenericOperation'
-import { AuthenticationRequiredError } from '../utils/Errors'
 
 const GET_PROJECT_DETAILS_KEY = Semantics.vnd_jeera.terms.getProjectDetails
 
-const ProjectProxyComponent = () => {
+const Project = () => {
   const { id } = useParams()
 
   const { genericOperationBuilder } = useAppContextState()
   
-  try {
-    const getProjectDetailsOperation = genericOperationBuilder.fromKey(GET_PROJECT_DETAILS_KEY)
-    return <Project getProjectDetailsOperation={getProjectDetailsOperation} id={id} />
-  } catch (error) {
-    if (error instanceof AuthenticationRequiredError) {
-      return <Redirect to={`/login?redirectTo=/project/${id}`} />
-    } else {
-      return <FullScreenError error='Something unexpected happened. Please try again later.'/>
-    }
-  }
+  const getProjectDetailsOperation = genericOperationBuilder.fromKey(GET_PROJECT_DETAILS_KEY)
   
-}
-
-const Project = ({getProjectDetailsOperation, id}) => {
   const { makeCall, isLoading, success, data, error } =
     useOperation(getProjectDetailsOperation, { [Semantics.vnd_jeera.terms.projectId]: id})
 
@@ -46,6 +33,7 @@ const Project = ({getProjectDetailsOperation, id}) => {
         : <p>Something unexpected happened. Please try again later.</p>
     }
   </BaseApplicationLayout>
+
 }
 
-export default ProjectProxyComponent
+export default Project

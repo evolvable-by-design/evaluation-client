@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Alert, Button, Dialog, Heading, Pane, Spinner } from 'evergreen-ui';
+import { Alert, Button, Dialog, Heading, Spinner, majorScale } from 'evergreen-ui'
 
-import GenericAction from './GenericAction';
-import { capitalize, spaceCamelCaseWord } from '../../app/utils/javascriptUtils';
+import GenericAction from './GenericAction'
+import { capitalize, spaceCamelCaseWord } from '../../app/utils/javascriptUtils'
 
 const GenericActionInDialog = ({ label, alwaysShown, successMessage, actionKey, operation, buttonAppearance, onSuccessCallback, onErrorCallback }) => {
   const [isShown, setIsShown] = useState(false)
@@ -38,7 +38,7 @@ const MainComponent = (label, successMessage, alwaysShown, buttonAppearance, isS
           </>
       }
     </Dialog>
-    { !(alwaysShown === true) && <Button appearance={buttonAppearance || "default"} onClick={() => setIsShown(true)}>{ spaceCamelCaseWord(capitalize(label || operationKey)) }</Button> }
+    { !(alwaysShown === true) && <Button appearance={buttonAppearance || "default"} marginRight={majorScale(2)} onClick={() => setIsShown(true)}>{ spaceCamelCaseWord(capitalize(label || operationKey)) }</Button> }
   </>
 }
 

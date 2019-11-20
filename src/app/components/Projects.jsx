@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Alert, Button, Pane, Text, Heading, majorScale } from 'evergreen-ui';  
 
 import { ProjectCardSemanticBuilder } from './ProjectCard';
@@ -8,7 +8,7 @@ import { useAppContextState } from '../context/AppContext';
 import FullscreenError from '../components/FullscreenError';
 import Semantics from '../utils/semantics';
 import { useOperation } from '../../library/services/ReactGenericOperation';
-import AuthenticationService from '../../library/services/AuthenticationService';
+import { AuthenticationRequiredError } from '../utils/Errors';
 
 const ProjectCard = ProjectCardSemanticBuilder.build();
 
@@ -26,8 +26,16 @@ const Projects = () => {
 
   const projects = data !== undefined ? data.get(requiredData.projects) : undefined
 
-  const [createOperationKey, createOperation] = data !== undefined ? data.getRelation(Semantics.vnd_jeera.terms.createRelation, apiDocumentation) : [undefined, undefined]
-  const authRequired = !AuthenticationService.isAuthenticated() && createOperation && createOperation.security && createOperation.security.length !== 0
+  const [ authRequired, setAuthRequired ] = useState(false)
+  const [ createOperation, setCreateOperation ] = useState()
+
+  try {
+    const [_, createOperationRel] = data !== undefined ? data.getRelation(Semantics.vnd_jeera.terms.createRelation, apiDocumentation) : [undefined, undefined]
+    setCreateOperation(createOperationRel)
+  } catch (e) {
+    // if (e instanceof AuthenticationRequiredError) { setAuthRequired(true) }
+    if (e instanceof AuthenticationRequiredError) { console.error(e) }
+  }
 
   if (isLoading) {
     return <Text>Loading...</Text>

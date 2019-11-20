@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom' 
+import { Redirect, useHistory } from 'react-router-dom' 
 
 import FullscreenLoader from '../components/FullscreenLoader'
 import FullscreenError from '../components/FullscreenError'
 import Semantics from '../utils/semantics'
+import { AuthenticationRequiredError } from '../utils/Errors'
 
 import { useAppContextDispatch, useAppContextState } from '../context/AppContext'
 import AuthenticationService from '../../library/services/AuthenticationService'
@@ -31,7 +32,15 @@ const AppProxy = ({children}) => {
   } else if (isLoading) {
     return <FullscreenLoader />
   } else {
-    return <Application>{children}</Application>
+    try {
+      return <Application>{children}</Application>  
+    } catch (error) {
+      if (error instanceof AuthenticationRequiredError) {
+        return <Redirect to={`/login?redirectTo=${window.location.pathname}${window.location.search}`} />
+      } else {
+        return <FullscreenError error='Something unexpected happened. Please try again later.'/>
+      }
+    }
   }
 }
 

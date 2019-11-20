@@ -1,29 +1,30 @@
-import React, { useEffect, useMemo } from 'react'
-import { Alert, Heading, Pane, majorScale } from 'evergreen-ui'
+import React from 'react'
+import { Alert, Heading, Pane } from 'evergreen-ui'
 
+import Tasks from './Tasks'
 import Semantics from '../utils/semantics'
 import SemanticComponentBuilder from '../../library/services/SemanticComponentBuilder'
 import { useAppContextState } from '../context/AppContext'
 import GenericActionInDialog from '../../library/components/GenericActionInDialog'
 
-const ProjectDetails = ({id, title, collaborators, lastUpdate, semanticData}) => {
+const ProjectDetails = ({ title, semanticData }) => {
   const { apiDocumentation } = useAppContextState()
 
-  const listTasksOperation = semanticData.getRelation(Semantics.vnd_jeera.relations.listProjectTasks, apiDocumentation)
+  const [ listTasksLabel, listTasksOperation ] = semanticData.getRelation(Semantics.vnd_jeera.relations.listProjectTasks, apiDocumentation)
   const otherOperations = semanticData.getOtherRelations(apiDocumentation)
 
   return <>
     <Pane display="flex" flexDirection="row" justifyContent="space-between" width="100%" overflow="hidden">
       <Pane><Heading size={900}>{title}</Heading></Pane>
-      <Pane flexDirection="column">{otherOperations.map(op => <GenericActionInDialog label={op[0]} key={op[0]} alwaysShown={false} operation={op[1]} buttonAppearance="default" />)}</Pane>
+      <Pane flexDirection="column"><Operations operations={otherOperations}/></Pane>
     </Pane>
-    <TasksComponent listTasksOperation={listTasksOperation}/>
+    <Tasks listTasksOperation={listTasksOperation}/>
   </>
 }
 
-const TasksComponent = ({ listTasksOperation }) => {
-  return <p>Tasks will appear over here very soon. Believe me :)</p>
-}
+const Operations = ({operations}) => operations.map(operation =>
+  <GenericActionInDialog label={operation[0]} key={operation[0]} alwaysShown={false} operation={operation[1]} buttonAppearance="default" />
+)
 
 export const ProjectDetailsSemantic = new SemanticComponentBuilder(
   Semantics.schema.terms.Project,

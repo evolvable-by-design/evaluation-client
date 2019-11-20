@@ -2,7 +2,21 @@ import { useCallback, useMemo, useState } from 'react'
 
 import GenericFilters from '../components/GenericFilters';
 import GenericForm from '../components/GenericForm';
-import { filterObjectKeys } from '../../app/utils/javascriptUtils'
+
+export function useOperation(genericOperation, providedValues) {
+  const requestBodyKeys = genericOperation.getRequestBodyKeys()
+  const defaultValues = mapProvidedValueToOperationParameter(providedValues, requestBodyKeys)
+
+  const parameterKeys = genericOperation.getParameterKeys()
+  const defaultParameters = mapProvidedValueToOperationParameter(providedValues, parameterKeys)
+
+  const [form, values] = useForm(genericOperation, defaultValues)
+  const [filters, parameters] = useFilters(genericOperation, defaultParameters)
+
+  const { makeCall, isLoading, success, data, error } = useCaller(values, parameters, genericOperation.call.bind(genericOperation))
+
+  return { form, filters, makeCall, isLoading, success, data, error, parameters, values }
+}
 
 export function useForm(genericOperation, defaultValues) {
   const [values, setValues] = useState({ ...genericOperation.getDefaultBodyValue(), ...(defaultValues || {}) })
@@ -53,21 +67,6 @@ export function useCaller(values, parameters, callFct) {
   }, [callFct, parameters, values])
 
   return { makeCall, isLoading, success, data, error }
-}
-
-export function useOperation(genericOperation, providedValues) {
-  const requestBodyKeys = genericOperation.getRequestBodyKeys()
-  const defaultValues = mapProvidedValueToOperationParameter(providedValues, requestBodyKeys)
-
-  const parameterKeys = genericOperation.getParameterKeys()
-  const defaultParameters = mapProvidedValueToOperationParameter(providedValues, parameterKeys)
-
-  const [form, values] = useForm(genericOperation, defaultValues)
-  const [filters, parameters] = useFilters(genericOperation, defaultParameters)
-
-  const { makeCall, isLoading, success, data, error } = useCaller(values, parameters, genericOperation.call.bind(genericOperation))
-
-  return { form, filters, makeCall, isLoading, success, data, error, parameters, values }
 }
 
 function mapProvidedValueToOperationParameter(values, keys) {
