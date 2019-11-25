@@ -21,9 +21,7 @@ const Project = () => {
   const { makeCall, isLoading, success, data, error } =
     useOperation(getProjectDetailsOperation, { [Semantics.vnd_jeera.terms.projectId]: id})
 
-  useEffect(() => {
-    makeCall()
-  }, [])
+  useEffect(() => { makeCall() }, [])
 
   return <BaseApplicationLayout>
     {

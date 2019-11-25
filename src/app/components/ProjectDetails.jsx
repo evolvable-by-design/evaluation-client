@@ -4,18 +4,16 @@ import { Alert, Heading, Pane } from 'evergreen-ui'
 import Tasks from './Tasks'
 import Semantics from '../utils/semantics'
 import SemanticComponentBuilder from '../../library/services/SemanticComponentBuilder'
-import { useAppContextState } from '../context/AppContext'
 import GenericActionInDialog from '../../library/components/GenericActionInDialog'
+import { majorScale } from 'evergreen-ui/commonjs/scales'
 
 const ProjectDetails = ({ title, semanticData }) => {
-  const { apiDocumentation } = useAppContextState()
-
-  const [ listTasksLabel, listTasksOperation ] = semanticData.getRelation(Semantics.vnd_jeera.relations.listProjectTasks, apiDocumentation)
-  const otherOperations = semanticData.getOtherRelations(apiDocumentation)
+  const [ listTasksLabel, listTasksOperation ] = semanticData.getRelation(Semantics.vnd_jeera.relations.listProjectTasks)
+  const otherOperations = semanticData.getOtherRelations()
 
   return <>
-    <Pane display="flex" flexDirection="row" justifyContent="space-between" width="100%" overflow="hidden">
-      <Pane><Heading size={900}>{title}</Heading></Pane>
+    <Pane display="flex" flexDirection="row" justifyContent="space-between" width="100%" overflow="hidden" marginBottom={majorScale(4)}>
+      <Heading size={900}>{title}</Heading>
       <Pane flexDirection="column"><Operations operations={otherOperations}/></Pane>
     </Pane>
     <Tasks listTasksOperation={listTasksOperation}/>

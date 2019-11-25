@@ -16,26 +16,31 @@ export class SemanticComponentBuilder {
   }
 
   canDisplay(type) {
-    return this.forType === type;
+    if (this.forType instanceof Array) {
+      return this.forType.includes(type)
+    } else {
+      return this.forType === type
+    }
   }
 
   // Returns a react component
   build() {
-    return ({value}) => {
-      if (!value instanceof SemanticData) {
+    return (props) => {
+      if (!props.value instanceof SemanticData) {
         console.error('[ERROR] SemanticComponent.render({value}) must be passed an instance of SemanticData')
         return <React.Fragment></React.Fragment>
       }
 
-      const [requiredData, missingData] = this._getRequired(value)
+      props.value.resetReadCounter()
+      const [requiredData, missingData] = this._getRequired(props.value)
       if (Object.keys(missingData).length !== 0) {
         return this.errorHandler({missingData})
       }
 
-      const optionalData = this._getOptionals(value)
+      const optionalData = this._getOptionals(props.value)
 
       // TODO: support ignoredData + semanticData is temporary, it should disappear
-      return this.component({ ...requiredData, ...optionalData, semanticData: value})
+      return this.component({ ...props, ...requiredData, ...optionalData, semanticData: props.value })
     }
   }
 

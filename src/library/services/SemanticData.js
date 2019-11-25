@@ -5,21 +5,34 @@
  * 
  * TODO: look deeper into the semantic 
  */
+import ajv from './Ajv'
+
 class SemanticData {
 
-  constructor(data, resourceSchema, responseSchema) {
+  constructor(data, resourceSchema, responseSchema, apiDocumentation) {
     this.value = data;
-    
-    this.type = resourceSchema ? resourceSchema['@id'] || resourceSchema.type : undefined
-    this.resourceSchema = resourceSchema
     this.responseSchema = responseSchema
+    this.apiDocumentation = apiDocumentation
     this.alreadyReadData = []
     this.alreadyReadRelations = []
+
+    if (resourceSchema.oneOf) {
+      const schema = resourceSchema.oneOf
+        .sort((a, b) => (b.required ? b.required.length : 0) - (a.required ? a.required.length : 0))
+        .find(schema => doesSchemaMatch(data, schema))
+      this.type = schema ? schema['@id'] || schema.type || resourceSchema.type : undefined
+      this.resourceSchema = schema
+    } else {
+      this.type = resourceSchema ? resourceSchema['@id'] || resourceSchema.type : undefined
+      this.resourceSchema = resourceSchema
+    }
   }
 
   isObject() { return this.resourceSchema.type === 'object'; }
   isArray() { return this.resourceSchema.type === 'array'; }
   isPrimitive() { return !this.isArray() && ! this.isObject(); }
+
+  resetReadCounter() {  this.alreadyReadData = []; this.alreadyReadRelations = []; return this; }
 
   get(semanticKey) {
     if (this.value === undefined) return undefined;
@@ -29,12 +42,12 @@ class SemanticData {
         .find(([key, value]) => value['@id'] !== undefined && value['@id'] === semanticKey);
       const [key, schema] = result || [undefined, undefined];
       if (key && schema) {
-        this.alreadyReadData.push(key);
+        if (!this.alreadyReadData.includes(key)) { this.alreadyReadData.push(key) }
         const value = this.value[key];
         if (schema.type === 'array') {
-          return value.map(v => new SemanticData(v, schema.items));
+          return value.map(v => new SemanticData(v, schema.items, this.apiDocumentation?.responseBodySchema(schema.items['@id']), this.apiDocumentation))
         } else {
-          return new SemanticData(value, schema);
+          return new SemanticData(value, schema, this.apiDocumentation?.responseBodySchema(schema['@id']), this.apiDocumentation)
         }
       } else {
         return undefined;
@@ -59,22 +72,29 @@ class SemanticData {
     }
   }
 
+  getOtherData() {
+    const toReturn = Object.assign({}, this.value)
+    this.alreadyReadData.forEach(key => { delete toReturn[key] })
+    delete toReturn['_links']
+    return toReturn
+  }
+
   isRelationAvailable(semanticRelation) {
     return this._findRelation(semanticRelation) !== [undefined, undefined];
   }
 
-  getRelation(semanticRelation, apiDocumentation) {
+  getRelation(semanticRelation) {
     const hypermediaControl = this._findRelation(semanticRelation);
     const hypermediaControlKey = hypermediaControl[0];
-    return this._getRelation(hypermediaControlKey, apiDocumentation, true)
+    return this._getRelation(hypermediaControlKey, true)
   }
 
-  _getRelation(hypermediaControlKey, apiDocumentation, addToReadList) {
+  _getRelation(hypermediaControlKey, addToReadList) {
     if (hypermediaControlKey !== undefined) {
       const linksSchema = this.responseSchema.links || {};
       const notResolvedOperation = linksSchema[hypermediaControlKey];
       
-      const operation = apiDocumentation.findOperationById(notResolvedOperation.operationId)
+      const operation = this.apiDocumentation.findOperationById(notResolvedOperation.operationId)
 
       if (operation === undefined) {
         console.warn(`Error found in the documentation: operation with id ${hypermediaControlKey} does not exist.`)
@@ -106,11 +126,11 @@ class SemanticData {
     }
   }
 
-  getOtherRelations(apiDocumentation) {
+  getOtherRelations() {
     const others = this.value._links.map(l => l instanceof Object ? l.relation : l)
       .filter(key => !this.alreadyReadRelations.includes(key))
     
-    return others.map(key => this._getRelation(key, apiDocumentation, false)).filter(val => val[0] && val[1])
+    return others.map(key => this._getRelation(key, false)).filter(val => val[0] && val[1])
   }
 
   _findRelation(semanticRelation) {
@@ -135,6 +155,12 @@ class SemanticData {
     }
   }
 
+}
+
+// utility, file private functions
+function doesSchemaMatch (value, schema) {
+  const validate = ajv.compile(schema)
+  return validate(value)
 }
 
 export default SemanticData;

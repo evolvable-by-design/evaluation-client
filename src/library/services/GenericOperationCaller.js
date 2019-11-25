@@ -9,7 +9,7 @@ class GenericOperationCaller {
     this.requestBodySchema = requestBodySchema
     this.defaultBodyValue = defaultBodyValue
     this.defaultParameters = defaultParameters
-    this.httpCaller = new HttpCaller(apiDocumentation.getServerUrl())
+    this.httpCaller = new HttpCaller(apiDocumentation.getServerUrl(), undefined, apiDocumentation)
   }
 
   computeBodyValue(values) {

@@ -24,6 +24,9 @@ class DocumentationBrowser {
   hasOperation = (target) => this.findOperation(target) !== undefined
 
   findOperation(target) {
+    if (target === undefined)
+      return undefined
+
     const operationFromId = this._findOperationWithId(target);
     if (operationFromId) {
       return operationFromId;
@@ -37,6 +40,43 @@ class DocumentationBrowser {
     return this._findOperation(operation => operation.operationId === openApiId);
   }
 
+  findTypeInOperationResponse(semanticKey, operation) {
+    if (operation.responses['200']
+      && operation.responses['200'].content['application/json']
+      && operation.responses['200'].content['application/json'].schema
+    ) {
+      const rbs = operation.responses['200'].content['application/json'].schema
+      const responseBodySchema = this._refine(rbs)
+      return this._findTypeInSchema(semanticKey, responseBodySchema)
+    }
+
+    return undefined
+  }
+
+  _findTypeInSchema(semanticKey, schema) {
+    if (schema === undefined) {
+      return undefined
+    } else if (schema['@id'] !== undefined && schema['@id'] === semanticKey) {
+      return schema
+    } else if (schema.oneOf) {
+      return schema.oneOf
+          .map(prop => this._findTypeInSchema(semanticKey, prop))
+          .reduce((acc, b) => acc || b)
+    } else if (schema.type === 'object') {
+      if (!schema.properties) { return undefined }
+
+      return Object.values(schema['properties'])
+        .map(prop => this._findTypeInSchema(semanticKey, prop))
+        .reduce((acc, b) => acc || b)
+    } else if (schema.type === 'array') {
+      if (!schema.items) { return undefined }
+      
+      return this._findTypeInSchema(semanticKey, schema.items)
+    } else {
+      return undefined
+    }
+  }
+
   requestBodySchema(operation) {
     if (operation && operation.requestBody) {
       const contents = operation.requestBody.content;
@@ -45,6 +85,15 @@ class DocumentationBrowser {
     }
 
     return undefined;
+  }
+
+  responseBodySchema(operation) {
+    const actualOperation = typeof operation === 'string'
+      ? this.findOperation(operation)
+      : operation
+    
+    const responses = actualOperation?.responses
+    return responses?.['200'] || responses?.['201']
   }
 
   notContainsRequiredParametersWithoutDefaultValue(operation) {
