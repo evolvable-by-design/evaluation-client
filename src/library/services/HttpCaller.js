@@ -37,7 +37,10 @@ class HttpCaller {
 
   async semanticCall(options, operation, resultMapper) {
     const result = await this.call(options)
-    return this._getDataAndItsDescription(result, operation, resultMapper)
+
+    return [200, 201].includes(result.status)
+      ? this._getDataAndItsDescription(result, operation, resultMapper)
+      : undefined
   }
 
   _getDataAndItsDescription(result, operation, resultMapper) {

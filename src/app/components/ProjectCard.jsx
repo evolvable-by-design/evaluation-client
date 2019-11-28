@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom'
-import { Alert, Avatar, Badge, Card, Heading, Pane, Paragraph, majorScale } from 'evergreen-ui';
+import { Avatar, Badge, Card, Heading, Pane, Paragraph, majorScale } from 'evergreen-ui';
 
 import { onlyWhen } from '../utils/javascriptUtils';
 import { SemanticComponentBuilder } from '../../library/services/SemanticComponentBuilder';
 import Semantics from '../utils/semantics';
+import { defaultSemanticComponentErrorHandler } from '../utils/Errors';
 
 const ProjectCard = ({id, title, isPublic, lastUpdate, collaborators}) =>
   <Card display="flex" flexDirection="column" elevation={1} hoverElevation={3} width={majorScale(40)} padding={majorScale(2)} marginRight={majorScale(3)} marginBottom={majorScale(3)} minHeight="100px" >
@@ -39,17 +40,7 @@ export const ProjectCardSemanticBuilder = new SemanticComponentBuilder(
     lastUpdate: Semantics.schema.terms.lastUpdate
   },
   undefined,
-  errorHandler
-);
-
-function errorHandler (e) {
-  console.error(e);
-  if (e.missingData) {
-    return <Alert
-      intent="danger"
-      title={`Unable to display project, required data are missing: ${e.missingData}`}
-    />
-  }
-}
+  defaultSemanticComponentErrorHandler('project')
+)
 
 export default ProjectCard;

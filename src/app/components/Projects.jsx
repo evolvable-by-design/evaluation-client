@@ -8,7 +8,6 @@ import { useAppContextState } from '../context/AppContext';
 import FullscreenError from '../components/FullscreenError';
 import Semantics from '../utils/semantics';
 import { useOperation } from '../../library/services/ReactGenericOperation';
-import { AuthenticationRequiredError } from '../utils/Errors';
 
 const ProjectCard = ProjectCardSemanticBuilder.build();
 
@@ -21,6 +20,7 @@ const LIST_PROJECTS_KEY = Semantics.vnd_jeera.terms.listProjects
 const Projects = () => {
   const { apiDocumentation, genericOperationBuilder } = useAppContextState()
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const listProjectOperation = useMemo(() => genericOperationBuilder.fromKey(LIST_PROJECTS_KEY), [])
   const { form, filters, makeCall, isLoading, data, error } = useOperation(listProjectOperation)
 
@@ -30,11 +30,10 @@ const Projects = () => {
   const [ createOperation, setCreateOperation ] = useState()
 
   try {
-    const [_, createOperationRel] = data !== undefined ? data.getRelation(Semantics.vnd_jeera.terms.createRelation, apiDocumentation) : [undefined, undefined]
+    const createOperationRel = data !== undefined ? data.getRelation(Semantics.vnd_jeera.terms.createRelation, apiDocumentation)[1] : undefined
     setCreateOperation(createOperationRel)
   } catch (e) {
-    // if (e instanceof AuthenticationRequiredError) { setAuthRequired(true) }
-    if (e instanceof AuthenticationRequiredError) { console.error(e) }
+    // TODO if (e instanceof AuthenticationRequiredError) { setAuthRequired(true) }
   }
 
   if (isLoading) {

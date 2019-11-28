@@ -60,6 +60,7 @@ function useUserDetails() {
         .call()
         .then(userProfile => contextDispatch({ type: 'updateUserProfile', userProfile }))
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [genericOperationBuilder])
 }
 
@@ -77,7 +78,8 @@ const useApiDocumentation = (serverUrl) => {
       .then(setDocumentation)
       .catch(setError)
       .finally(() => setIsLoading(false))
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return [documentation, isLoading, error]
 }

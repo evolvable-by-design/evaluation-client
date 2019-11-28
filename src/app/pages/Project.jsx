@@ -9,19 +9,19 @@ import FullScreenError from '../components/FullscreenError'
 import Semantics from '../utils/semantics'
 import { useOperation } from '../../library/services/ReactGenericOperation'
 
-const GET_PROJECT_DETAILS_KEY = Semantics.vnd_jeera.terms.getProjectDetails
-
 const Project = () => {
   const { id } = useParams()
 
   const { genericOperationBuilder } = useAppContextState()
   
-  const getProjectDetailsOperation = genericOperationBuilder.fromKey(GET_PROJECT_DETAILS_KEY)
+  // const getProjectDetailsOperation = genericOperationBuilder.fromKey(Semantics.vnd_jeera.terms.Project) -> breaks
+  const getProjectDetailsOperation = genericOperationBuilder.fromKey(Semantics.vnd_jeera.terms.getProjectDetails)
   
   const { makeCall, isLoading, success, data, error } =
     useOperation(getProjectDetailsOperation, { [Semantics.vnd_jeera.terms.projectId]: id})
 
-  useEffect(() => { makeCall() }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => makeCall(), [])
 
   return <BaseApplicationLayout>
     {

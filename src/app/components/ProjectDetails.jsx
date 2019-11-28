@@ -1,13 +1,15 @@
 import React from 'react'
-import { Alert, Heading, Pane } from 'evergreen-ui'
+import { Heading, Pane } from 'evergreen-ui'
 
 import Tasks from './Tasks'
 import Semantics from '../utils/semantics'
 import SemanticComponentBuilder from '../../library/services/SemanticComponentBuilder'
 import GenericActionInDialog from '../../library/components/GenericActionInDialog'
 import { majorScale } from 'evergreen-ui/commonjs/scales'
+import { defaultSemanticComponentErrorHandler } from '../utils/Errors'
 
 const ProjectDetails = ({ title, semanticData }) => {
+  // eslint-disable-next-line
   const [ listTasksLabel, listTasksOperation ] = semanticData.getRelation(Semantics.vnd_jeera.relations.listProjectTasks)
   const otherOperations = semanticData.getOtherRelations()
 
@@ -37,17 +39,7 @@ export const ProjectDetailsSemantic = new SemanticComponentBuilder(
     lastUpdate: Semantics.schema.terms.lastUpdate
   },
   undefined,
-  errorHandler
-).build();
-
-function errorHandler (e) {
-  console.error(e);
-  if (e.missingData) {
-    return <Alert
-      intent="danger"
-      title={`Unable to display project, required data are missing: ${e.missingData}`}
-    />
-  }
-}
+  defaultSemanticComponentErrorHandler('project')
+).build()
 
 export default ProjectDetails

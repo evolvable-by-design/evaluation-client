@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Heading, Pane, SelectField, Switch, TextInput, majorScale } from 'evergreen-ui';
+import { Alert, Heading, Pane, Select, Switch, TextInput, majorScale } from 'evergreen-ui';
 
 import ajv from '../services/Ajv';
 
@@ -58,15 +58,20 @@ function SelectInput({schema, value, setValue, error, setError}) {
   if (schema.type === 'boolean') {
     return <Switch checked={value} onChange={(e) => onChange(e.target.checked)} height={majorScale(3)}/>
   } else if (schema.type === 'string' && schema.enum !== undefined) {
-    return <SelectField
+    let options = new Set(schema.enum)
+    if (schema.default !== undefined && schema.default !== '')
+      options.add(schema.default)
+    options = Array.from(options)
+
+    return <Select
         isInvalid={error !== undefined}
-        value={value || null}
+        value={value || schema.default}
         placeholder={'Please select an option...'}
         width="100%"
         onChange={(e) => onChange(e.target.value)}
       >
-        { schema.enum.map(option => <option value="option" selected={schema.default === option} >{option}</option>) }
-      </SelectField>
+        { options.map(option => <option key={option} value={option}>{option}</option>) }
+      </Select>
   } else {
     return <TextInput
         isInvalid={error !== undefined}

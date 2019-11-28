@@ -1,6 +1,7 @@
 import { NotFoundOperation } from '../../app/utils/Errors'
 import { buildRequest} from '../utils/requestBuilder'
 import { mapObject } from '../../app/utils/javascriptUtils'
+import DocumentationBrowser from './DocumentationBrowser'
 
 export class GenericOperation {
 
@@ -49,7 +50,7 @@ export class GenericOperation {
 
   getRequestBodySchema() {
     if (this.requestBodySchema === undefined && this.operation.requestBody) {
-      this.requestBodySchema = this.apiDocumentation.requestBodySchema(this.operation)
+      this.requestBodySchema = DocumentationBrowser.requestBodySchema(this.operation)
     }
     return this.requestBodySchema
   }

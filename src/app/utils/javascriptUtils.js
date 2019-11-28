@@ -48,7 +48,7 @@ export const spaceCamelCaseWord = (str) => {
   var result = str[0];
   const s = str.slice(1);
   for (const i in s) {
-    if (isUpperCase(s[i])) {
+    if (isUpperCase(s[i]) && (i <= 0 || !isUpperCase(s[i-1]))) {
       result += ' '
     }
 

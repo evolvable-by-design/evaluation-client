@@ -26,9 +26,11 @@ export class SemanticComponentBuilder {
   // Returns a react component
   build() {
     return (props) => {
-      if (!props.value instanceof SemanticData) {
-        console.error('[ERROR] SemanticComponent.render({value}) must be passed an instance of SemanticData')
-        return <React.Fragment></React.Fragment>
+      if (!(props.value instanceof SemanticData)) {
+        if (props.value !== undefined) {
+          console.error('[ERROR] SemanticComponent.render({value}) must be passed an instance of SemanticData')
+        }
+        return null
       }
 
       props.value.resetReadCounter()

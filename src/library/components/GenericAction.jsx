@@ -19,6 +19,7 @@ const GenericAction = ({ Loading, Success, MainComponent, ErrorComponent, action
       makeCall()
       setCallAlreadyTriggered(true)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   if (Loading && isLoading === true) {

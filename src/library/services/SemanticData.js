@@ -6,6 +6,7 @@
  * TODO: look deeper into the semantic 
  */
 import ajv from './Ajv'
+import DocumentationBrowser from './DocumentationBrowser';
 
 class SemanticData {
 
@@ -92,35 +93,36 @@ class SemanticData {
   _getRelation(hypermediaControlKey, addToReadList) {
     if (hypermediaControlKey !== undefined) {
       const linksSchema = this.responseSchema.links || {};
-      const notResolvedOperation = linksSchema[hypermediaControlKey];
+      const notResolvedOperation = linksSchema[hypermediaControlKey]
+
+      const links = this.value._links || []
+      const controlFromPayload = links[hypermediaControlKey]
+        || links.find(control => control['relation'] === hypermediaControlKey)
       
-      const operation = this.apiDocumentation.findOperationById(notResolvedOperation.operationId)
+      const operation = notResolvedOperation ? this.apiDocumentation.findOperationById(notResolvedOperation.operationId) : undefined
 
       if (operation === undefined) {
         console.warn(`Error found in the documentation: operation with id ${hypermediaControlKey} does not exist.`)
         return [undefined, undefined]
       }
 
-      const links = this.value._links || []
-      const controlFromPayload = links[hypermediaControlKey]
-        || links.find(control => control['relation'] === hypermediaControlKey)
-
-      if (controlFromPayload && controlFromPayload['parameters']) {
-        Object.entries(controlFromPayload['parameters']).forEach(([key, value]) => {
-          const param = operation['parameters'].find(p => p.name === key)
-          if (param) {
-            param.schema['default'] = value
-          } else {
-            operation['parameters'].push({name: key, schema: { default: value}})
-          }
-        })
+      if (operation) {
+        const requestBodySchema = DocumentationBrowser.requestBodySchema(operation)
+        if (requestBodySchema && requestBodySchema.oneOf) {
+          DocumentationBrowser.updateRequestBodySchema(
+            operation,
+            this._findClosestSchema(requestBodySchema.oneOf, controlFromPayload)
+          )
+        }
       }
+
+      const operationWithDefaultValues = this._addDefaultValuesToOperationSchema(controlFromPayload, operation)
 
       if (addToReadList && !this.alreadyReadRelations.includes(hypermediaControlKey)) {
         this.alreadyReadRelations.push(hypermediaControlKey)
       }
 
-      return [hypermediaControlKey, operation];
+      return [hypermediaControlKey, operationWithDefaultValues];
     } else {
       return [undefined, undefined];
     }
@@ -153,6 +155,44 @@ class SemanticData {
     } else {
       return [undefined, undefined];
     }
+  }
+
+  _addDefaultValuesToOperationSchema(hypermediaControl, operation) {
+    if (hypermediaControl === undefined || hypermediaControl.parameters === undefined) return operation
+
+    const op = Object.assign({}, operation)
+    
+    if (op.parameters) op.parameters.forEach(param => {
+      if (hypermediaControl.parameters[param.name] !== undefined) {
+        param.schema.default = hypermediaControl.parameters[param.name]
+      }
+    })
+    const requestBodySchema = DocumentationBrowser.requestBodySchema(op)
+    
+    if (requestBodySchema && requestBodySchema.properties) {
+      Object.entries(requestBodySchema.properties).forEach(([name, prop]) => {
+        prop.default = hypermediaControl.parameters[name]
+      })
+    } 
+    
+    return op
+  }
+
+  _findClosestSchema(schemas, control) {
+    // TODO look deeper into the schemas, don't limit to first level
+    const controlProperties = Object.keys(control.parameters || {})
+    const match = schemas
+      .map(schema => {
+        const matchingPropertiesCount = Object.keys(schema.properties || {})
+          .filter(p => controlProperties.includes(p))
+          .length
+        return [schema, matchingPropertiesCount]
+      })
+      .sort((a, b) => b[1] - a[1])
+
+    if (match !== undefined) return match
+
+    return schemas[0]
   }
 
 }

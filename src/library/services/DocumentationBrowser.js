@@ -77,7 +77,7 @@ class DocumentationBrowser {
     }
   }
 
-  requestBodySchema(operation) {
+  static requestBodySchema(operation) {
     if (operation && operation.requestBody) {
       const contents = operation.requestBody.content;
       const content = contents['application/json'] || contents[Object.keys(contents)[0]]
@@ -85,6 +85,14 @@ class DocumentationBrowser {
     }
 
     return undefined;
+  }
+
+  static updateRequestBodySchema(operation, schema) {
+    if (operation && operation.requestBody) {
+      const contents = operation.requestBody.content;
+      const content = contents['application/json'] || contents[Object.keys(contents)[0]]
+      content.schema = schema
+    }
   }
 
   responseBodySchema(operation) {
@@ -100,7 +108,7 @@ class DocumentationBrowser {
     const foundRequiredParamWithoutDefaultValue = operation.parameters && operation.parameters
       .find(parameter => parameter.required && parameter.schema.default === undefined);
 
-    const bodySchema = this.requestBodySchema(operation);
+    const bodySchema = DocumentationBrowser.requestBodySchema(operation);
     const requiredArgs = bodySchema && bodySchema.required ? bodySchema.required : [];
 
     if (bodySchema === undefined || requiredArgs.length === 0) {
@@ -128,7 +136,7 @@ class DocumentationBrowser {
     if (foundMissingParams) return false;
 
     // Check body params
-    const bodySchema = this.requestBodySchema(operation);
+    const bodySchema = DocumentationBrowser.requestBodySchema(operation);
     const requiredArgs = bodySchema && bodySchema.required ? bodySchema.required : [];
 
     if (bodySchema === undefined || requiredArgs.length === 0) return true;

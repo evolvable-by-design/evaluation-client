@@ -34,7 +34,7 @@ const MainComponent = (label, successMessage, alwaysShown, buttonAppearance, isS
         : <>
             {filtersToDisplay}
             {formToDisplay}
-            { error && <Alert intent="danger" title={error} /> }
+            { error && <Alert intent="danger" title={error.message || error} /> }
           </>
       }
     </Dialog>
