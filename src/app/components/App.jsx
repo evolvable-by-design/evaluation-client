@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom' 
+import { Redirect, useHistory } from 'react-router-dom' 
 
 import FullscreenLoader from '../components/FullscreenLoader'
 import FullscreenError from '../components/FullscreenError'
 import Semantics from '../utils/semantics'
+import { AuthenticationRequiredError } from '../utils/Errors'
 
 import { useAppContextDispatch, useAppContextState } from '../context/AppContext'
 import AuthenticationService from '../../library/services/AuthenticationService'
@@ -13,28 +14,37 @@ import HttpCaller from '../../library/services/HttpCaller'
 import Config from '../../config';
 
 const AppProxy = ({children}) => {
-  const [documentation, isLoading, error] = useApiDocumentation(Config.serverUrl)
   const contextDispatch = useAppContextDispatch()
 
+  const [documentation, isLoading, error] = useApiDocumentation(Config.serverUrl)
   useEffect(
-    () => { if (documentation) contextDispatch({ type: 'updateDocumentation', documentation }) },
+    () => { if (documentation) {
+      contextDispatch({ type: 'updateDocumentation', documentation })
+    }},
     [documentation, contextDispatch]
   )
+
+  const history = useHistory()
+  useEffect(() => contextDispatch({ type: 'setHistory', history}), [contextDispatch, history])
 
   if (error) {
     return <FullscreenError error={error}/>
   } else if (isLoading) {
     return <FullscreenLoader />
   } else {
-    return <Application>{children}</Application>
+    try {
+      return <Application>{children}</Application>  
+    } catch (error) {
+      if (error instanceof AuthenticationRequiredError) {
+        return <Redirect to={`/login?redirectTo=${window.location.pathname}${window.location.search}`} />
+      } else {
+        return <FullscreenError error='Something unexpected happened. Please try again later.'/>
+      }
+    }
   }
 }
 
 const Application = ({children}) => {
-  const history = useHistory()
-  const contextDispatch = useAppContextDispatch()
-
-  useEffect(() => contextDispatch({ type: 'setHistory', history}), [contextDispatch, history])
   useUserDetails()
   return children
 }
@@ -50,7 +60,8 @@ function useUserDetails() {
         .call()
         .then(userProfile => contextDispatch({ type: 'updateUserProfile', userProfile }))
     }
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [genericOperationBuilder])
 }
 
 const useApiDocumentation = (serverUrl) => {
@@ -67,7 +78,8 @@ const useApiDocumentation = (serverUrl) => {
       .then(setDocumentation)
       .catch(setError)
       .finally(() => setIsLoading(false))
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return [documentation, isLoading, error]
 }

@@ -1,16 +1,15 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Button, Pane, Text, Heading, majorScale } from 'evergreen-ui';  
 
-import { ProjectSemanticBuilder } from './Project';
+import { ProjectCardSemanticBuilder } from './ProjectCard';
 import GenericActionInDialog from '../../library/components/GenericActionInDialog';
 
 import { useAppContextState } from '../context/AppContext';
 import FullscreenError from '../components/FullscreenError';
-import useRelations from '../../library/hooks/useRelations';
 import Semantics from '../utils/semantics';
 import { useOperation } from '../../library/services/ReactGenericOperation';
 
-const Project = ProjectSemanticBuilder.build();
+const ProjectCard = ProjectCardSemanticBuilder.build();
 
 const requiredData = {
   projects: Semantics.vnd_jeera.terms.projects
@@ -21,12 +20,23 @@ const LIST_PROJECTS_KEY = Semantics.vnd_jeera.terms.listProjects
 const Projects = () => {
   const { apiDocumentation, genericOperationBuilder } = useAppContextState()
 
-  const listProjectOperation = useMemo(() => genericOperationBuilder.fromKey(LIST_PROJECTS_KEY), [])
-  const { form, filters, makeCall, isLoading, success, data, error } = useOperation(listProjectOperation)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const listProjectOperation = genericOperationBuilder.fromKey(LIST_PROJECTS_KEY)
+  const { form, filters, makeCall, isLoading, data, error } = useOperation(listProjectOperation)
+
+  useEffect(() => makeCall(), [])
 
   const projects = data !== undefined ? data.get(requiredData.projects) : undefined
 
-  const [createOperation, authRequired] = useRelations(data, apiDocumentation, Semantics.vnd_jeera.terms.createRelation)
+  const [ authRequired, setAuthRequired ] = useState(false)
+  const [ createOperation, setCreateOperation ] = useState()
+
+  try {
+    const createOperationRel = data !== undefined ? data.getRelation(Semantics.vnd_jeera.terms.createRelation, apiDocumentation)[1] : undefined
+    setCreateOperation(createOperationRel)
+  } catch (e) {
+    // TODO if (e instanceof AuthenticationRequiredError) { setAuthRequired(true) }
+  }
 
   if (isLoading) {
     return <Text>Loading...</Text>
@@ -53,7 +63,7 @@ const Projects = () => {
 const ProjectCards = ({projects}) => {
   if (projects !== undefined) {
     return <Pane width='100%' display='flex' flexDirection='row' flexWrap='wrap'>
-      { projects.map(project => <Project key={JSON.stringify(project)} value={project} />) }
+      { projects.map(project => <ProjectCard key={JSON.stringify(project)} value={project} />) }
     </Pane>
   } else {
     return <Alert intent="danger" title="Sorry we could not find any project." />;

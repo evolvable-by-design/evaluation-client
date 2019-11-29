@@ -6,9 +6,10 @@ import { AuthenticationRequiredError } from '../../app/utils/Errors'
 
 class HttpCaller {
 
-  constructor(baseUrl, history) {
+  constructor(baseUrl, history, apiDocumentation) {
     this.baseUrl = baseUrl
     this.history = history
+    this.apiDocumentation = apiDocumentation
   }
 
   async call(options) {
@@ -36,17 +37,20 @@ class HttpCaller {
 
   async semanticCall(options, operation, resultMapper) {
     const result = await this.call(options)
-    return HttpCaller.getDataAndItsDescription(result, operation, resultMapper)
+
+    return [200, 201].includes(result.status)
+      ? this._getDataAndItsDescription(result, operation, resultMapper)
+      : undefined
   }
 
-  static getDataAndItsDescription(result, operation, resultMapper) {
+  _getDataAndItsDescription(result, operation, resultMapper) {
     const responseSchema = operation ? operation.responses[result.status] : undefined
     const resourceSchema =
       result.data !== '' && result.headers['content-type'] && responseSchema
         ? responseSchema.content[result.headers['content-type'].split(';')[0]].schema
         : undefined
     const data = resultMapper ? resultMapper(result) : result.data
-    return new SemanticData(data, resourceSchema, responseSchema)
+    return new SemanticData(data, resourceSchema, responseSchema, this.apiDocumentation)
   }
 
   _callerInstance() {

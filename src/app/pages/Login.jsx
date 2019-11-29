@@ -42,6 +42,7 @@ const LoginComponent = () => {
 
 const LoginDialog = ({ onComplete }) => {
   const { genericOperationBuilder } = useAppContextState()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const loginOperation = useMemo(() => genericOperationBuilder.fromKey(Semantics.vnd_jeera.actions.login), [])
   const { form, filters, makeCall, isLoading, success, data, error } = useOperation(loginOperation)
 

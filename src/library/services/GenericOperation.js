@@ -1,5 +1,7 @@
 import { NotFoundOperation } from '../../app/utils/Errors'
 import { buildRequest} from '../utils/requestBuilder'
+import { mapObject } from '../../app/utils/javascriptUtils'
+import DocumentationBrowser from './DocumentationBrowser'
 
 export class GenericOperation {
 
@@ -48,9 +50,24 @@ export class GenericOperation {
 
   getRequestBodySchema() {
     if (this.requestBodySchema === undefined && this.operation.requestBody) {
-      this.requestBodySchema = this.apiDocumentation.requestBodySchema(this.operation)
+      this.requestBodySchema = DocumentationBrowser.requestBodySchema(this.operation)
     }
     return this.requestBodySchema
+  }
+
+  getRequestBodyKeys() {
+    const schema = this.getRequestBodySchema()
+
+    if (schema === undefined) {
+      return []
+    } else {
+      switch (schema.type) {
+        case 'object': {
+          return mapObject(schema.properties, (key, value) => [key, value['@id']])
+        }
+        default: return []
+      }
+    }
   }
 
   getDefaultBodyValue() {
@@ -65,7 +82,16 @@ export class GenericOperation {
   }
 
   getParametersSchema() {
-    return this.operation.parameters
+    return this.operation.parameters || []
+  }
+
+  getParameterKeys() {
+    return this.getParametersSchema()
+      .map(el => [el['name'], el['@id']])
+      .reduce((res, [key, value]) => {
+        res[key] = value;
+        return res;
+      }, {})
   }
 
   getDefaultParameters() {

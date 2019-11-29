@@ -16,24 +16,33 @@ export class SemanticComponentBuilder {
   }
 
   canDisplay(type) {
-    return this.forType === type;
+    if (this.forType instanceof Array) {
+      return this.forType.includes(type)
+    } else {
+      return this.forType === type
+    }
   }
 
   // Returns a react component
   build() {
-    return ({value}) => {
-      if (!value instanceof SemanticData) {
-        console.error('[ERROR] SemanticComponent.render({value}) must be passed an instance of SemanticData');
-        return <React.Fragment></React.Fragment>
+    return (props) => {
+      if (!(props.value instanceof SemanticData)) {
+        if (props.value !== undefined) {
+          console.error('[ERROR] SemanticComponent.render({value}) must be passed an instance of SemanticData')
+        }
+        return null
       }
 
-      const [requiredData, missingData] = this._getRequired(value);
+      props.value.resetReadCounter()
+      const [requiredData, missingData] = this._getRequired(props.value)
       if (Object.keys(missingData).length !== 0) {
-        return this.errorHandler({missingData});
+        return this.errorHandler({missingData})
       }
 
-      // TODO: support optional and ignoredData
-      return this.component({ ...requiredData});
+      const optionalData = this._getOptionals(props.value)
+
+      // TODO: support ignoredData + semanticData is temporary, it should disappear
+      return this.component({ ...props, ...requiredData, ...optionalData, semanticData: props.value })
     }
   }
 
@@ -45,5 +54,14 @@ export class SemanticComponentBuilder {
     return [result, missingData];
   }
 
+  _getOptionals(semanticData) {
+    return mapObject(this.optionalData, (key, semanticKey) => {
+      const value = semanticData.getValue(semanticKey)
+      return value ? [key, value] : [undefined, undefined]
+    })
+  }
+
 }
+
+export default SemanticComponentBuilder
 

@@ -81,12 +81,16 @@ const vocabularies = {
       getProjectDetails: vndJeeraUrl + 'getProjectDetails',
       isPublic: vndJeeraUrl + 'isPublic',
       createRelation: vndJeeraUrlRel + 'create',
-      JWT: vndJeeraUrl + 'JWT'
+      JWT: vndJeeraUrl + 'JWT',
+      tasks: vndJeeraUrl + 'tasks'
     },
     actions: {
       login: vndJeeraUrl + 'login',
       logout: vndJeeraUrl + 'logout',
       getCurrentUserDetails: vndJeeraUrl + 'getCurrentUserDetails'
+    },
+    relations: {
+      listProjectTasks: vndJeeraUrl + 'rel/listProjectTasks'
     }
   }
 };

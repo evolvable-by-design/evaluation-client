@@ -1,25 +1,38 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 
-import useGenericOperationResolver from '../hooks/useGenericOperationResolver';
+import { useAppContextState } from '../../app/context/AppContext'
+import { useOperation } from '../services/ReactGenericOperation'
 
 const GenericAction = ({ Loading, Success, MainComponent, ErrorComponent, actionKey, operation, onSuccessCallback, onErrorCallback }) => {
-  const [ semanticData, isLoading, error, triggerCall, filtersToDisplay, formToDisplay, trigerredOperation ] =
-    useGenericOperationResolver(actionKey, operation, onSuccessCallback, onErrorCallback);
+  const { genericOperationBuilder } = useAppContextState()
+  
+  const operationWithSemantics = operation
+    ? genericOperationBuilder.fromOperation(operation)
+    : genericOperationBuilder.fromKey(actionKey)
 
-  const [callAlreadyTriggered, setCallAlreadyTriggered] = useState(trigerredOperation.verb === 'get');
-  const success = useMemo(() => semanticData !== undefined || (callAlreadyTriggered && !isLoading && error === undefined), [callAlreadyTriggered, isLoading, error, semanticData])
+  const { apiDocumentation } = useAppContextState()
+  const { form, filters, makeCall, isLoading, success, data, error, parameters, values } = useOperation(operationWithSemantics)
+  const [ callAlreadyTriggered, setCallAlreadyTriggered ] = useState(false)
+
+  useEffect(() => {
+    if (operationWithSemantics.verb === 'get' && apiDocumentation.noRequiredParametersWithoutValue(operation, parameters, values)) {
+      makeCall()
+      setCallAlreadyTriggered(true)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   if (Loading && isLoading === true) {
     return Loading
   } else if (Success && success) {
-    return <Success data={semanticData} />
+    return <Success data={data} />
   } else if (ErrorComponent && error) {
     return <ErrorComponent error={error} />
   } else if (MainComponent) {
-    return <MainComponent isLoading={isLoading} success={success} data={semanticData} error={error} triggerCall={() => { setCallAlreadyTriggered(true); triggerCall(); }} filtersToDisplay={filtersToDisplay} formToDisplay={formToDisplay} operation={operation} />
+    return <MainComponent isLoading={isLoading} success={success} data={data} error={error} triggerCall={() => { setCallAlreadyTriggered(true); makeCall(); }} filtersToDisplay={filters} formToDisplay={form} operation={operation} />
   } else {
     if (!callAlreadyTriggered) {
-      triggerCall();
+      makeCall();
       setCallAlreadyTriggered(true);
     }
     

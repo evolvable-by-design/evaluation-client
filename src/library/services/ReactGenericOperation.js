@@ -3,8 +3,23 @@ import { useCallback, useMemo, useState } from 'react'
 import GenericFilters from '../components/GenericFilters';
 import GenericForm from '../components/GenericForm';
 
-export function useForm(genericOperation) {
-  const [values, setValues] = useState(genericOperation.getDefaultBodyValue())
+export function useOperation(genericOperation, providedValues) {
+  const requestBodyKeys = genericOperation.getRequestBodyKeys()
+  const defaultValues = mapProvidedValueToOperationParameter(providedValues, requestBodyKeys)
+
+  const parameterKeys = genericOperation.getParameterKeys()
+  const defaultParameters = mapProvidedValueToOperationParameter(providedValues, parameterKeys)
+
+  const [form, values] = useForm(genericOperation, defaultValues)
+  const [filters, parameters] = useFilters(genericOperation, defaultParameters)
+
+  const { makeCall, isLoading, success, data, error } = useCaller(values, parameters, genericOperation.call.bind(genericOperation))
+
+  return { form, filters, makeCall, isLoading, success, data, error, parameters, values }
+}
+
+export function useForm(genericOperation, defaultValues) {
+  const [values, setValues] = useState({ ...genericOperation.getDefaultBodyValue(), ...(defaultValues || {}) })
   const [errors, setErrors] = useState({})
 
   const bodySchema = genericOperation.getRequestBodySchema()
@@ -15,8 +30,8 @@ export function useForm(genericOperation) {
   }
 }
 
-export function useFilters(genericOperation) {
-  const [values, setValues] = useState(genericOperation.getDefaultParameters())
+export function useFilters(genericOperation, defaultValues) {
+  const [values, setValues] = useState({ ...genericOperation.getDefaultParameters(), ...defaultValues })
   const [errors, setErrors] = useState({})
 
   const parametersSchema = genericOperation.getParametersSchema()
@@ -54,11 +69,15 @@ export function useCaller(values, parameters, callFct) {
   return { makeCall, isLoading, success, data, error }
 }
 
-export function useOperation(genericOperation) {
-  const [form, values] = useForm(genericOperation)
-  const [filters, parameters] = useFilters(genericOperation)
-
-  const { makeCall, isLoading, success, data, error } = useCaller(values, parameters, genericOperation.call.bind(genericOperation))
-
-  return { form, filters, makeCall, isLoading, success, data, error, parameters, values }
+function mapProvidedValueToOperationParameter(values, keys) {
+  const valuesK = Object.keys(values || {})
+  const res = {}
+  Object.entries(keys).forEach(([key, semanticKey]) => {
+    if (valuesK.includes(key)) {
+      res[key] = values[key]
+    } else if (valuesK.includes(semanticKey)) {
+      res[key] = values[semanticKey]
+    }
+  })
+  return res
 }

@@ -11,7 +11,7 @@ function appContextReducer(state, action) {
   switch (action.type) {
     case 'updateDocumentation': {
       const documentation = action.documentation
-      const httpCaller = new HttpCaller(documentation.getServerUrl(), state.history)
+      const httpCaller = new HttpCaller(documentation.getServerUrl(), state.history, documentation)
       return {
         ...state,
         apiDocumentation: documentation,

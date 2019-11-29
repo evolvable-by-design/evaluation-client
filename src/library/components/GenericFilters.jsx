@@ -27,7 +27,11 @@ export function genericFilters({parameters, values, setValues, errors, setErrors
 function SelectInput({parameter, value, setValue, error, setError}) {
   // TODO: resolve and use type from the semantic description
   const labelText = parameter.name.charAt(0).toUpperCase() + parameter.name.slice(1);
-  const label = <Tooltip content={parameter.description}><Paragraph width="100%"><Icon size={11} icon="info-sign" /> {labelText}</Paragraph></Tooltip>;
+  const labelContent = <Paragraph width="100%"><Icon size={11} icon="info-sign" /> {labelText}</Paragraph>
+  const label = parameter.description
+    ? <Tooltip content={parameter.description}>{labelContent}</Tooltip>
+    : labelContent
+    
   const onChange = (val) => {
     const [value, error] = _validateValue(val, parameter.schema);
     setError(error);
