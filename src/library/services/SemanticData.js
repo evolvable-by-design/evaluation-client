@@ -189,8 +189,9 @@ class SemanticData {
         return [schema, matchingPropertiesCount]
       })
       .sort((a, b) => b[1] - a[1])
+      .map(([schema, matchingPropertiesCount]) => schema)
 
-    if (match !== undefined) return match
+    if (match !== undefined && match.length > 0) return match[0]
 
     return schemas[0]
   }

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { Alert, Dialog } from 'evergreen-ui' 
 
 import { useOperation } from '../services/ReactGenericOperation'
+import { capitalize, spaceCamelCaseWord } from '../../app/utils/javascriptUtils'
 
 const ActionDialog = ({ genericOperationBuilder, title, operationSchema, onSuccessCallback, onCloseComplete }) => {
   const operation = genericOperationBuilder.fromOperation(operationSchema)
@@ -11,7 +12,7 @@ const ActionDialog = ({ genericOperationBuilder, title, operationSchema, onSucce
 
   return <Dialog
     isShown={true}
-    title={title}
+    title={capitalize(spaceCamelCaseWord(title))}
     confirmLabel="Confirm"
     isConfirmLoading={isLoading}
     onConfirm={makeCall}

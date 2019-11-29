@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
 import './App.css'
 
 import AppProxy from './app/components/App'
@@ -17,7 +17,7 @@ function App() {
           <AppProxy>
             <Route path="/" exact component={Home} />
             <Route path="/home" exact component={Home} />
-            <Route path="/project/:id" exact component={Project}/>
+            <Route path="/project/:id" strict component={Project}/>
             <Route path="/login" exact component={Login} />
             <Route path="/logout" exact component={Logout} />
           </AppProxy>

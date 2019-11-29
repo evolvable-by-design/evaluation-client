@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Button, Pane, Text, Heading, majorScale } from 'evergreen-ui';  
 
 import { ProjectCardSemanticBuilder } from './ProjectCard';
@@ -21,8 +21,10 @@ const Projects = () => {
   const { apiDocumentation, genericOperationBuilder } = useAppContextState()
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const listProjectOperation = useMemo(() => genericOperationBuilder.fromKey(LIST_PROJECTS_KEY), [])
+  const listProjectOperation = genericOperationBuilder.fromKey(LIST_PROJECTS_KEY)
   const { form, filters, makeCall, isLoading, data, error } = useOperation(listProjectOperation)
+
+  useEffect(() => makeCall(), [])
 
   const projects = data !== undefined ? data.get(requiredData.projects) : undefined
 
