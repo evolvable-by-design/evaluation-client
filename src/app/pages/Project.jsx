@@ -8,6 +8,8 @@ import FullscreenLoader from '../components/FullscreenLoader'
 import FullScreenError from '../components/FullscreenError'
 import Semantics from '../utils/semantics'
 import { useOperation } from '../../library/services/ReactGenericOperation'
+import { AuthenticationRequiredError } from '../utils/Errors'
+import LoginRedirect from '../components/LoginRedirect'
 
 const Project = () => {
   const { id } = useParams()
@@ -26,6 +28,7 @@ const Project = () => {
   return <BaseApplicationLayout>
     {
       isLoading ? <FullscreenLoader />
+        : error && error instanceof AuthenticationRequiredError ? <LoginRedirect />
         : error ? <FullScreenError error={error.message}/>
         : success ? <ProjectDetailsSemantic value={data} />
         : <p>Something unexpected happened. Please try again later.</p>

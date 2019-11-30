@@ -1,4 +1,4 @@
-import { NotFoundOperation } from '../../app/utils/Errors'
+import { NotFoundOperation, AuthenticationRequiredError } from '../../app/utils/Errors'
 import { buildRequest} from '../utils/requestBuilder'
 import DocumentationBrowser from './DocumentationBrowser'
 
@@ -10,11 +10,16 @@ export class GenericOperation {
     }
 
     this.operation = operation
+    this.userShouldAuthenticate = operation.userShouldAuthenticate
     this.apiDocumentation = apiDocumentation
     this.httpCaller = httpCaller
   }
 
   async call(values, parameters) {
+    if (this.userShouldAuthenticate) {
+      throw new AuthenticationRequiredError()
+    }
+
     return this.httpCaller.semanticCall(
       this.buildRequest(values, parameters),
       this.operation

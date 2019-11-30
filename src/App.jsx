@@ -6,6 +6,7 @@ import AppRouter from './AppRouter'
 import { AppContextProvider, useAppContextDispatch, useAppContextState } from './app/context/AppContext'
 import FullscreenLoader from './app/components/FullscreenLoader'
 import FullscreenError from './app/components/FullscreenError'
+import LoginRedirect from './app/components/LoginRedirect'
 import { AuthenticationRequiredError } from './app/utils/Errors'
 import Semantics from './app/utils/semantics'
 
@@ -85,7 +86,8 @@ class AppProxy extends React.Component {
 
   render() {
     if (this.state.requiresAuth) {
-      return <Redirect to={`/login?redirectTo=${window.location.pathname}${window.location.search}`} />
+      this.setState({...this.state, hasError: false, requiresAuth: false, errorMessage: undefined, errorStack: undefined})
+      return <LoginRedirect/>
     } else if (this.state.hasError) {
       return <FullscreenError error={this.state.errorMessage} />
     } else if (this.state.isLoading) {

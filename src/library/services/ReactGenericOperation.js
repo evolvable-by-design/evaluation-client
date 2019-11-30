@@ -16,7 +16,8 @@ export function useOperation(genericOperation, providedValues) {
 
   const { makeCall, isLoading, success, data, error } = useCaller(parametersValue, genericOperation.call.bind(genericOperation))
 
-  return { parametersDetail, makeCall, isLoading, success, data, error }
+  const userShouldAuthenticate = genericOperation.userShouldAuthenticate
+  return { parametersDetail, makeCall, isLoading, success, data, error, userShouldAuthenticate }
 }
 
 export function useCaller(parameters, callFct) {

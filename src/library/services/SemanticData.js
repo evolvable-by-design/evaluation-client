@@ -46,7 +46,8 @@ class SemanticData {
         if (!this.alreadyReadData.includes(key)) { this.alreadyReadData.push(key) }
         const value = this.value[key];
         if (schema.type === 'array') {
-          return value.map(v => new SemanticData(v, schema.items, this.apiDocumentation?.responseBodySchema(schema.items['@id']), this.apiDocumentation))
+          const responseBodySchema = this.apiDocumentation?.responseBodySchema(schema.items['@id'])
+          return value.map(v => new SemanticData(v, schema.items, responseBodySchema, this.apiDocumentation))
         } else {
           return new SemanticData(value, schema, this.apiDocumentation?.responseBodySchema(schema['@id']), this.apiDocumentation)
         }
