@@ -1,35 +1,31 @@
-import React from 'react';
-import { Alert, Heading, Pane, Select, Switch, TextInput, majorScale } from 'evergreen-ui';
+import React, { useState } from 'react'
+import { Heading, Pane, Select, Switch, TextInput, majorScale } from 'evergreen-ui';
 
-import ajv from '../services/Ajv';
+import ajv from '../../library/services/Ajv';
 
-import { capitalize, spaceCamelCaseWord, stateSetter } from '../../app/utils/javascriptUtils';
+import { capitalize, spaceCamelCaseWord, stateSetter } from '../utils/javascriptUtils';
 
 // TODO: display an error message when required as TextInputField does
 // TODO: show required fields close to the label
 
-export function genericForm({bodySchema, values, setValues, errors, setErrors}) {
-  if (bodySchema === undefined)
-    return <></>;
-
-  if (bodySchema.type !== 'object')
-    return <Alert intent="danger" title="Sorry, we are unable to support this operation." />
-
-  const { required, properties } = bodySchema;
+const GenericForm = ({values, setter, documentation}) => {
+  const [ errors, setErrors ] = useState({}) 
+  
+  if (documentation === undefined || documentation === [])
+    return null
 
   return <Pane width="100%">
-    {
-      Object.entries(properties).map(([key, value]) =>
-        <WithLabel label={key} key={key} required={required && required.includes(key)}>
-          <SelectInput 
-            schema={value}
-            value={values[key]}
-            error={errors[key]}
-            setValue={stateSetter(setValues, key)}
-            setError={stateSetter(setErrors, key)}
-          />
-        </WithLabel>)
-    }
+    { documentation.map(parameter =>
+      <WithLabel label={parameter.name} key={parameter.name} required={parameter.required}>
+        <SelectInput 
+          schema={parameter.schema}
+          value={values[parameter.name]}
+          error={errors[parameter.name]}
+          setValue={stateSetter(setter, parameter.name)}
+          setError={stateSetter(setErrors, parameter.name)}
+        />
+      </WithLabel>
+    ) }
   </Pane>
 }
 
@@ -94,4 +90,4 @@ function _validateValue(value, schema) {
   return [val, valid ? undefined : ajv.errorsText(validate.errors)];
 }
 
-export default genericForm
+export default GenericForm

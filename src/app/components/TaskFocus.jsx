@@ -2,7 +2,7 @@ import React from 'react'
 import { useHistory } from 'react-router-dom'
 import qs from 'qs'
 
-import ActionDialog from '../../library/components/ActionDialog'
+import ActionDialog from './ActionDialog'
 
 import useQuery from '../hooks/useQuery'
 import Semantics from '../utils/semantics'

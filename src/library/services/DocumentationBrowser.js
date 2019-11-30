@@ -6,6 +6,7 @@ import { mapObject } from '../../app/utils/javascriptUtils';
 class DocumentationBrowser {
 
   constructor(documentation) {
+    // TODO: remove refinedDoc, already done in ApiDocumentationFetch
     const refinedDoc = JSON.parse(
       JSON.stringify(documentation)
         .replace(new RegExp('x-@id', 'g'), '@id')

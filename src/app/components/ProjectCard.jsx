@@ -27,7 +27,7 @@ const IsPublicBadge = ({isPublic}) =>
 
 const CollaboratorBadge = ({name}) => <Avatar name={name} size={30} />
 
-export const ProjectCardSemanticBuilder = new SemanticComponentBuilder(
+export const ProjectCardSemantic = new SemanticComponentBuilder(
   Semantics.schema.terms.Project,
   ProjectCard,
   {
@@ -41,6 +41,6 @@ export const ProjectCardSemanticBuilder = new SemanticComponentBuilder(
   },
   undefined,
   defaultSemanticComponentErrorHandler('project')
-)
+).build()
 
 export default ProjectCard;
