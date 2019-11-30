@@ -1,6 +1,5 @@
-import { NotFoundOperation } from '../../app/utils/Errors'
+import { NotFoundOperation, AuthenticationRequiredError } from '../../app/utils/Errors'
 import { buildRequest} from '../utils/requestBuilder'
-import { mapObject } from '../../app/utils/javascriptUtils'
 import DocumentationBrowser from './DocumentationBrowser'
 
 export class GenericOperation {
@@ -11,42 +10,60 @@ export class GenericOperation {
     }
 
     this.operation = operation
+    this.userShouldAuthenticate = operation.userShouldAuthenticate
     this.apiDocumentation = apiDocumentation
     this.httpCaller = httpCaller
   }
 
   async call(values, parameters) {
+    if (this.userShouldAuthenticate) {
+      throw new AuthenticationRequiredError()
+    }
+
     return this.httpCaller.semanticCall(
       this.buildRequest(values, parameters),
       this.operation
     )
   }
 
-  buildRequest(values, parameters) {
+  buildRequest(parameters) {
     // TODO: return details about missing params
+    const [params, body] = this.computeParamsAndBody(parameters)
     return buildRequest(
       this.apiDocumentation,
       this.operation,
-      this.computeParameters(parameters),
-      this.computeBodyValue(values)
+      params,
+      body
     )
   }
 
-  computeBodyValue(values) {
-    return { ...this.getDefaultBodyValue(), ...(values || {}) }
-  }
+  computeParamsAndBody(parameters) {
+    const parametersWithDefault =
+      { ...this.getDefaultParametersValue(), ...parameters }
 
-  computeParameters(parameters) {
-    return { ...this.getDefaultParameters(), ...(parameters || {}) }
+    const params = (this.getParametersSchema() || [])
+      .map(s => s.name)
+      .map(name => [name, parametersWithDefault[name]])
+      .reduce((acc, [name, value]) => { acc[name] = value; return acc; }, {})
+
+    const body = Object.keys(this.getRequestBodySchema()?.properties || {})
+      .map(key => [key, parametersWithDefault[key]])
+      .reduce((acc, [name, value]) => { acc[name] = value; return acc; }, {})
+    
+    return [params, body]
   }
 
   buildDefaultRequest() {
     return this.operation.verb === 'get' ? this.buildRequest({}, {}) : undefined
   }
 
-  hasForm = () => this.operation.requestBody
+  getParameters() {
+    return [ ...this.getParametersSchema(), ...schemaToParameters(this.getRequestBodySchema()) ]
+  }
 
-  hasFilters = () => this.getParametersSchema() !== undefined
+  getDefaultParametersValue() {
+    return { ...this.getDefaultBodyValue(), ...this.getDefaultParameters() }
+  }
 
   getRequestBodySchema() {
     if (this.requestBodySchema === undefined && this.operation.requestBody) {
@@ -55,23 +72,8 @@ export class GenericOperation {
     return this.requestBodySchema
   }
 
-  getRequestBodyKeys() {
-    const schema = this.getRequestBodySchema()
-
-    if (schema === undefined) {
-      return []
-    } else {
-      switch (schema.type) {
-        case 'object': {
-          return mapObject(schema.properties, (key, value) => [key, value['@id']])
-        }
-        default: return []
-      }
-    }
-  }
-
   getDefaultBodyValue() {
-    if (!this.hasForm()) return {}
+    if (!this.operation.requestBody) return {}
 
     return Object.entries(this.getRequestBodySchema().properties)
       .filter(([name, value]) => value.default !== undefined)
@@ -85,15 +87,6 @@ export class GenericOperation {
     return this.operation.parameters || []
   }
 
-  getParameterKeys() {
-    return this.getParametersSchema()
-      .map(el => [el['name'], el['@id']])
-      .reduce((res, [key, value]) => {
-        res[key] = value;
-        return res;
-      }, {})
-  }
-
   getDefaultParameters() {
     const defaultParameters = (this.getParametersSchema() || [])
       .filter(param => param.schema.default !== undefined)
@@ -102,6 +95,18 @@ export class GenericOperation {
     return defaultParameters || {}
   }
 
+}
+
+function schemaToParameters(schema) {
+  const properties = schema ? schema.properties : {}
+  return Object.entries(properties).map(([key, s]) => {
+    return {
+      name: key,
+      description: s.description,
+      required: schema.required?.includes(key),
+      schema: s
+    }
+  })
 }
 
 export class GenericOperationBuilder {

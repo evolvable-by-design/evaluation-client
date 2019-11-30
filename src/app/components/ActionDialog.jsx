@@ -1,25 +1,26 @@
 import React, { useEffect } from 'react'
 import { Alert, Dialog } from 'evergreen-ui' 
 
-import { useOperation } from '../services/ReactGenericOperation'
-import { capitalize, spaceCamelCaseWord } from '../../app/utils/javascriptUtils'
+import { useOperation } from '../../library/services/ReactGenericOperation'
 
-const ActionDialog = ({ genericOperationBuilder, title, operationSchema, onSuccessCallback, onCloseComplete }) => {
+import GenericForm from './GenericForm'
+import { capitalize, spaceCamelCaseWord } from '../utils/javascriptUtils'
+
+const ActionDialog = ({ isShown, genericOperationBuilder, title, operationSchema, onSuccessCallback, onCloseComplete }) => {
   const operation = genericOperationBuilder.fromOperation(operationSchema)
-  const { form, filters, makeCall, isLoading, data, error, success } = useOperation(operation)
+  const { parametersDetail, makeCall, isLoading, data, error, success } = useOperation(operation)
 
   useEffect(() => { if (success) { onSuccessCallback(data) } }, [success])
 
   return <Dialog
-    isShown={true}
+    isShown={isShown !== undefined ? isShown : true}
     title={capitalize(spaceCamelCaseWord(title))}
     confirmLabel="Confirm"
     isConfirmLoading={isLoading}
     onConfirm={makeCall}
     onCloseComplete={onCloseComplete}
   >
-    { filters }
-    { form }
+    <GenericForm {...parametersDetail} />
     { error && <Alert intent="danger" title={error.message || error} /> }
   </Dialog>
 }

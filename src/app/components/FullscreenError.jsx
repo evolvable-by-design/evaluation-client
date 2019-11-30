@@ -5,7 +5,7 @@ import Error from './Error'
 
 const FullScreenError = ({error}) => {
   return <FullscreenCenterContainer>
-    <Error error={error} />
+    <Error error={error instanceof Error ? error.message : error} />
   </FullscreenCenterContainer>
 }
 

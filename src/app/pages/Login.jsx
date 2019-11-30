@@ -2,11 +2,14 @@ import React, { useMemo, useState } from 'react';
 import { Redirect, useHistory, useParams } from 'react-router-dom';
 import { Alert, Dialog, Heading, Spinner, majorScale } from 'evergreen-ui';
 
-import FullscreenCenterContainer from '../components/FullscreenCenterContainer';
 import AuthenticationService from '../../library/services/AuthenticationService';
-import Semantics from '../utils/semantics';
 import { useOperation } from '../../library/services/ReactGenericOperation';
+
+import FullscreenCenterContainer from '../components/FullscreenCenterContainer';
+import GenericForm from '../components/GenericForm';
+import Semantics from '../utils/semantics';
 import { useAppContextState } from '../context/AppContext';
+
 
 function Login() {
   if (AuthenticationService.isAuthenticated()) {
@@ -44,7 +47,7 @@ const LoginDialog = ({ onComplete }) => {
   const { genericOperationBuilder } = useAppContextState()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const loginOperation = useMemo(() => genericOperationBuilder.fromKey(Semantics.vnd_jeera.actions.login), [])
-  const { form, filters, makeCall, isLoading, success, data, error } = useOperation(loginOperation)
+  const { parametersDetail, makeCall, isLoading, success, data, error } = useOperation(loginOperation)
 
   if (success) {
     onComplete(data)
@@ -65,8 +68,7 @@ const LoginDialog = ({ onComplete }) => {
         onConfirm={makeCall}
         confirmLabel={isLoading ? 'Loading...' : 'Ok'}
       >
-        { filters }
-        { form }
+        <GenericForm {...parametersDetail} />
         { error && <Alert intent="danger" title={error.message} /> }
       </Dialog>
     </FullscreenCenterContainer>

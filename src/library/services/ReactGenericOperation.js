@@ -1,48 +1,26 @@
 import { useCallback, useMemo, useState } from 'react'
 
-import GenericFilters from '../components/GenericFilters';
-import GenericForm from '../components/GenericForm';
-
 export function useOperation(genericOperation, providedValues) {
-  const requestBodyKeys = genericOperation.getRequestBodyKeys()
-  const defaultValues = mapProvidedValueToOperationParameter(providedValues, requestBodyKeys)
-
-  const parameterKeys = genericOperation.getParameterKeys()
-  const defaultParameters = mapProvidedValueToOperationParameter(providedValues, parameterKeys)
-
-  const [form, values] = useForm(genericOperation, defaultValues)
-  const [filters, parameters] = useFilters(genericOperation, defaultParameters)
-
-  const { makeCall, isLoading, success, data, error } = useCaller(values, parameters, genericOperation.call.bind(genericOperation))
-
-  return { form, filters, makeCall, isLoading, success, data, error, parameters, values }
-}
-
-export function useForm(genericOperation, defaultValues) {
-  const [values, setValues] = useState({ ...genericOperation.getDefaultBodyValue(), ...(defaultValues || {}) })
-  const [errors, setErrors] = useState({})
-
-  const bodySchema = genericOperation.getRequestBodySchema()
-  if (bodySchema) {
-    return [GenericForm({bodySchema, values, setValues, errors, setErrors}), values, errors]
-  } else {
-    return [null, values, errors]
+  const parameters = genericOperation.getParameters()
+  const parametersName = parameters.map(p => [p.name, p['@id'] || p.schema['@id']])
+  const defaultParametersValues = {
+    ...genericOperation.getDefaultParametersValue(),
+    ...mapProvidedValueToOperationParameter(providedValues, parametersName)
   }
-}
-
-export function useFilters(genericOperation, defaultValues) {
-  const [values, setValues] = useState({ ...genericOperation.getDefaultParameters(), ...defaultValues })
-  const [errors, setErrors] = useState({})
-
-  const parametersSchema = genericOperation.getParametersSchema()
-  if (parametersSchema) {
-    return [GenericFilters({parameters: parametersSchema, values, setValues, errors, setErrors}), values, errors]
-  } else {
-    return [null, values, errors]
+  const [parametersValue, setParametersValue] = useState(defaultParametersValues)
+  const parametersDetail = {
+    values: parametersValue,
+    setter: setParametersValue,
+    documentation: parameters
   }
+
+  const { makeCall, isLoading, success, data, error } = useCaller(parametersValue, genericOperation.call.bind(genericOperation))
+
+  const userShouldAuthenticate = genericOperation.userShouldAuthenticate
+  return { parametersDetail, makeCall, isLoading, success, data, error, userShouldAuthenticate }
 }
 
-export function useCaller(values, parameters, callFct) {
+export function useCaller(parameters, callFct) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState()
   const [data, setData] = useState()
@@ -54,7 +32,7 @@ export function useCaller(values, parameters, callFct) {
       setIsLoading(true)
       setCallAlreadyTriggered(true)
       try {
-        const data = await callFct(values, parameters)
+        const data = await callFct(parameters)
         setData(data)
       } catch (error) {
         setError(error)
@@ -64,7 +42,7 @@ export function useCaller(values, parameters, callFct) {
     }
 
     call()
-  }, [callFct, parameters, values])
+  }, [callFct, parameters])
 
   return { makeCall, isLoading, success, data, error }
 }
@@ -72,7 +50,7 @@ export function useCaller(values, parameters, callFct) {
 function mapProvidedValueToOperationParameter(values, keys) {
   const valuesK = Object.keys(values || {})
   const res = {}
-  Object.entries(keys).forEach(([key, semanticKey]) => {
+  keys.forEach(([key, semanticKey]) => {
     if (valuesK.includes(key)) {
       res[key] = values[key]
     } else if (valuesK.includes(semanticKey)) {

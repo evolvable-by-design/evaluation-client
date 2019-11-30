@@ -1,5 +1,3 @@
-import React from 'react';
-
 import SemanticData from './SemanticData';
 
 import { mapObject } from "../../app/utils/javascriptUtils";

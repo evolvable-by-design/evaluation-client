@@ -1,33 +1,34 @@
-import React from 'react';
-import { Icon, Pane, Paragraph, SelectField, TextInputField, Tooltip, majorScale } from 'evergreen-ui';
+import React, { useState } from 'react';
+import { Icon, Pane, Paragraph, SelectField, Text, TextInputField, Tooltip, majorScale } from 'evergreen-ui';
 
-import ajv from '../services/Ajv';
-import SwitchInputField from '../../app/components/SwitchInputField';
-import { stateSetter } from '../../app/utils/javascriptUtils';
+import ajv from '../../library/services/Ajv';
+import SwitchInputField from './SwitchInputField';
+import { stateSetter } from '../utils/javascriptUtils';
 
-export function genericFilters({parameters, values, setValues, errors, setErrors}) {
-  return parameters.length === 0
+export function GenericFilters({values, setter, documentation}) {
+  const [errors, setErrors] = useState({})
+  return documentation.length === 0
     ? <></>
     : <Pane width="100%" display="flex" flexDirection="row" flexWrap="wrap" alignItems="flex-start" justifyContent="flex-start">
         {
-          parameters.map(param =>
+          documentation.map(param =>
             <Pane display="flex" height="100%" key={param.name} marginRight={majorScale(3)} >
               <SelectInput
                 parameter={param}
                 value={values[param.name]}
-                setValue={stateSetter(setValues, param.name)}
+                setValue={stateSetter(setter, param.name)}
                 error={errors[param.name]}
                 setError={stateSetter(setErrors, param.name)}
               />
             </Pane>)
         }
-      </Pane>;
+      </Pane>
 };
 
 function SelectInput({parameter, value, setValue, error, setError}) {
   // TODO: resolve and use type from the semantic description
   const labelText = parameter.name.charAt(0).toUpperCase() + parameter.name.slice(1);
-  const labelContent = <Paragraph width="100%"><Icon size={11} icon="info-sign" /> {labelText}</Paragraph>
+  const labelContent = <Paragraph width="100%"><Icon size={11} icon="info-sign" /> {labelText} <Text color="red">{parameter.required ? '*' : ''}</Text></Paragraph>
   const label = parameter.description
     ? <Tooltip content={parameter.description}>{labelContent}</Tooltip>
     : labelContent
@@ -46,7 +47,6 @@ function SelectInput({parameter, value, setValue, error, setError}) {
         label={label}
         isInvalid={error !== undefined}
         value={value}
-        required={parameter.required}
         placeholder={'Please select an option...'}
         validationMessage={error}
         width="100%"
@@ -61,7 +61,6 @@ function SelectInput({parameter, value, setValue, error, setError}) {
         label={label}
         isInvalid={error !== undefined}
         value={value}
-        required={parameter.required}
         placeholder={parameter.schema.format}
         validationMessage={error}
         width="100%"
@@ -81,4 +80,4 @@ function _validateValue(value, schema) {
   return [val, valid ? undefined : ajv.errorsText(validate.errors)];
 }
 
-export default genericFilters
+export default GenericFilters
