@@ -32,7 +32,18 @@ export const findSemanticWithKeyMappings = (document) => {
     }
   });
 
-  return mapObject({...alias, ...vocabularies}, (key, value) => [value, key]);
+  return Object.entries({...alias, ...vocabularies})
+    .reduce((acc, [key, value]) => {
+      const accValue = acc[value]
+      if (accValue === undefined) {
+        acc[value] = key
+      } else if (typeof accValue === 'string') {
+        acc[value] = [accValue, key]
+      } else {
+        acc[value] = [...accValue, key]
+      }
+      return acc
+    })
 }
 
 export const replaceAllVocab = (document) => {

@@ -72,7 +72,7 @@ function SelectInput({schema, value, setValue, error, setError}) {
     return <TextInput
         isInvalid={error !== undefined}
         value={value || ''}
-        placeholder={schema.format}
+        type={schema.format}
         width="100%"
         onChange={(e) => onChange(e.target.value)}
       />

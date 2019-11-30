@@ -63,7 +63,6 @@ const AuthRequired = ({authRequired}) =>
 
 const CreateProject = ({operation, onSuccessCallback}) => {
   const [isShown, setIsShown] = useState(false)
-  console.log(operation)
   return <>
     <ActionDialog
       isShown={isShown}

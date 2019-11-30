@@ -191,7 +191,12 @@ class DocumentationBrowser {
   }
 
   _findSemanticOfKeyword(keyword) {
-    return Object.keys(this.semanticKeyMapping).find(key => this.semanticKeyMapping[key] === keyword);
+    return Object.keys(this.semanticKeyMapping).find(key => {
+      const keywordInMapping = this.semanticKeyMapping[key]
+      return keywordInMapping instanceof Array
+        ? keywordInMapping.includes(keyword)
+        : keywordInMapping === keyword
+    });
   }
 
   _findOperationWithId(target) {
