@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Button, Pane, Text, Heading, majorScale } from 'evergreen-ui';  
 
 import { useOperation } from '../../library/services/ReactGenericOperation';
 import GenericFilters from './GenericFilters';
 
+import ActionDialog from './ActionDialog'
 import { ProjectCardSemantic as ProjectCard } from './ProjectCard';
 import { useAppContextState } from '../context/AppContext';
 import FullscreenError from './FullscreenError';
@@ -38,8 +39,9 @@ const Projects = () => {
       <Heading size={900} marginBottom={majorScale(3)}>Projects</Heading>
       <GenericFilters {...parametersDetail} />
       { (parametersDetail)
-        && <Button appearance="primary" onClick={makeCall} marginBottom={majorScale(3)}>Update</Button>
+        && <Button appearance="primary" onClick={makeCall} marginBottom={majorScale(3)} marginRight={majorScale(1)}>Update</Button>
       }
+      { createOperation && <CreateProject operation={createOperation} onSuccessCallback={makeCall}/> }
       <AuthRequired authRequired={createOperation?.userShouldAuthenticate}/>
       <ProjectCards projects={projects} />
     </>
@@ -58,5 +60,20 @@ const ProjectCards = ({projects}) => {
 
 const AuthRequired = ({authRequired}) =>
   !authRequired ? null : <Alert intent="none" marginBottom={32} title="Login to see more actions."/>
+
+const CreateProject = ({operation, onSuccessCallback}) => {
+  const [isShown, setIsShown] = useState(false)
+  console.log(operation)
+  return <>
+    <ActionDialog
+      isShown={isShown}
+      title={operation.summary || 'Create project'}
+      operationSchema={operation}
+      onSuccessCallback={onSuccessCallback}
+      onCloseComplete={() => setIsShown(false)}
+    />
+    <Button appearance="primary" iconBefore="plus" onClick={() => setIsShown(true)} marginBottom={majorScale(3)} marginRight={majorScale(1)}>Create a new project</Button>
+  </>
+}
 
 export default Projects;

@@ -5,8 +5,10 @@ import { useOperation } from '../../library/services/ReactGenericOperation'
 
 import GenericForm from './GenericForm'
 import { capitalize, spaceCamelCaseWord } from '../utils/javascriptUtils'
+import { useAppContextState } from '../context/AppContext'
 
-const ActionDialog = ({ isShown, genericOperationBuilder, title, operationSchema, onSuccessCallback, onCloseComplete }) => {
+const ActionDialog = ({ isShown, title, operationSchema, onSuccessCallback, onCloseComplete }) => {
+  const { genericOperationBuilder } = useAppContextState()
   const operation = genericOperationBuilder.fromOperation(operationSchema)
   const { parametersDetail, makeCall, isLoading, data, error, success } = useOperation(operation)
 

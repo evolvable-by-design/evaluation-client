@@ -6,11 +6,9 @@ import ActionDialog from './ActionDialog'
 
 import useQuery from '../hooks/useQuery'
 import Semantics from '../utils/semantics'
-import { useAppContextState } from '../context/AppContext'
 import { TaskDialogSemantic as TaskDialog } from './TaskDialog'
 
 const TaskFocus = ({ tasks, onOperationInvokationSuccess }) => {
-  const { genericOperationBuilder } = useAppContextState()
   const { taskFocus, actionFocus } = useQuery()
   const history = useHistory()
 
@@ -24,7 +22,6 @@ const TaskFocus = ({ tasks, onOperationInvokationSuccess }) => {
 
   if (action) {
     return <ActionDialog
-      genericOperationBuilder={genericOperationBuilder}
       title={action[0]}
       operationSchema={action[1]}
       onSuccessCallback={() => { onOperationInvokationSuccess(); hideTaskActionDialog(history); }}

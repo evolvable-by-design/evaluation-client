@@ -42,7 +42,7 @@ const ProjectDetails = ({ title, semanticData }) => {
       </Pane>
     </Pane>
     <Tasks isLoading={isLoading} error={error} parametersDetail={parametersDetail} tasks={tasks} makeCall={makeCall} taskStatusTypeDoc={taskStatusTypeDoc} />
-    { operationFocus && <ActionDialog genericOperationBuilder={genericOperationBuilder} title={operationFocus[0]} operationSchema={operationFocus[1]} onSuccessCallback={() => { makeCall(); setOperationFocus(undefined);}} onCloseComplete={() => setOperationFocus(undefined)}/> }
+    { operationFocus && <ActionDialog title={operationFocus[0]} operationSchema={operationFocus[1]} onSuccessCallback={() => { makeCall(); setOperationFocus(undefined);}} onCloseComplete={() => setOperationFocus(undefined)}/> }
   </>
 }
 
@@ -67,28 +67,6 @@ const Tasks = ({ isLoading, error, parametersDetail, tasks, makeCall, taskStatus
     </>
   }
 }
-
-// const Tasks = ({ isLoading, error, filters, tasks, makeCall, taskStatusTypeDoc }) => {
-//   if (isLoading) {
-//     return <Text>Loading...</Text>
-//   } else if (error) {
-//     return <Error error={error}/>
-//   } else {
-//     return <>
-//       <div>
-//         <Heading>Tasks filters</Heading>
-//         { filters }
-//         { filters && <Button appearance="primary" onClick={makeCall} marginBottom={majorScale(3)}>Filter</Button>}
-//       </div>
-//       {
-//         tasks
-//           ? <Columns labels={taskStatusTypeDoc.enum} tasks={tasks} />
-//           : <Heading>Please figure out how to fetch tasks :).</Heading>
-//       }
-//       <TaskFocus tasks={tasks} onOperationInvokationSuccess={() => makeCall()} />
-//     </>
-//   }
-// }
 
 const Columns = ({ labels, tasks }) => {
   return <Pane display="flex" width="100%" overflowX="scroll" flexDirection="row">
