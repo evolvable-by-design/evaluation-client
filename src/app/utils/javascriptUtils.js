@@ -24,6 +24,7 @@ export const onlyWhen = (values, toRender) => {
   if (
     values === undefined
     || (values instanceof Array && values.filter(e => e === undefined).length !== 0)
+    || (typeof values === 'boolean' && !values)
   ) {
     return <React.Fragment></React.Fragment>
   } else {
@@ -33,9 +34,21 @@ export const onlyWhen = (values, toRender) => {
 
 export const stateSetter = (setState, key) => {
   return value => setState(state => {
-    state[key] = value;
+    state[key] = value
     return Object.assign({}, state);
   })
+}
+
+export function arrayWithoutElAtIndex(arr, index) {
+  const newArr = [...arr]
+  newArr.splice(index, 1)
+  return newArr
+}
+
+export function setInArray(arr, value, index) {
+  const copy = [...arr]
+  copy[index] = value
+  return copy
 }
 
 export const capitalize = (str) => str.split(" ").map(firstLetterUppercase).join(" ");
@@ -56,3 +69,5 @@ export const spaceCamelCaseWord = (str) => {
   }
   return result;
 }
+
+export const formatString = (str) => capitalize(spaceCamelCaseWord(str))

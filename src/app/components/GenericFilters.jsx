@@ -52,7 +52,7 @@ function SelectInput({parameter, value, setValue, error, setError}) {
         width="100%"
         onChange={e => onChange(e.target.value)}
       >
-        { parameter.schema.enum.map(option => <option value="option" selected={parameter.schema.default === option} >{option}</option>) }
+        { parameter.schema.enum.map(option => <option value={option} selected={parameter.schema.default === option} >{option}</option>) }
       </SelectField>
     </Pane>
   } else {
@@ -60,8 +60,9 @@ function SelectInput({parameter, value, setValue, error, setError}) {
       <TextInputField 
         label={label}
         isInvalid={error !== undefined}
-        value={value}
+        value={value || ''}
         placeholder={parameter.schema.format}
+        type={parameter.schema.format}
         validationMessage={error}
         width="100%"
         onChange={e => onChange(e.target.value)}

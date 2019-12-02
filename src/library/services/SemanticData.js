@@ -3,7 +3,7 @@
  * with direct semantic match. It doesn't look at the OWL description
  * in order to leverage the "sameAs" property.
  * 
- * TODO: look deeper into the semantic 
+ * TODO: look deeper into the semantic
  */
 import ajv from './Ajv'
 import DocumentationBrowser from './DocumentationBrowser';
@@ -39,8 +39,7 @@ class SemanticData {
     if (this.value === undefined) return undefined;
 
     if (this.isObject()) {
-      const result = Object.entries(this.resourceSchema.properties)
-        .find(([key, value]) => value['@id'] !== undefined && value['@id'] === semanticKey);
+      const result = this._findPathsToValueAndSchema(semanticKey)
       const [key, schema] = result || [undefined, undefined];
       if (key && schema) {
         if (!this.alreadyReadData.includes(key)) { this.alreadyReadData.push(key) }
@@ -60,6 +59,13 @@ class SemanticData {
     } else {
       return this.type === semanticKey ? this : undefined;
     }
+  }
+
+  _findPathsToValueAndSchema(semanticKey) {
+    const result = Object.entries(this.resourceSchema.properties)
+        .find(([key, value]) => value['@id'] !== undefined && value['@id'] === semanticKey);
+
+    return result
   }
 
   getValue(semanticKey) {

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { BrowserRouter as Router, Redirect, withRouter } from 'react-router-dom'
+import { BrowserRouter as Router, withRouter } from 'react-router-dom'
 import './App.css'
 
 import AppRouter from './AppRouter'
@@ -73,7 +73,7 @@ class AppProxy extends React.Component {
     const documentation = this.state.apiDocumentation
     if (documentation === undefined) return {}
 
-    const httpCaller = new HttpCaller(documentation.getServerUrl(), this.history, documentation)
+    const httpCaller = new HttpCaller(documentation.getServerUrl(), this.props.history, documentation)
     return {
       ...this.state,
       apiDocumentation: documentation,
