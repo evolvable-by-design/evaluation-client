@@ -9,7 +9,7 @@ const ActionsSelector = ({ actions, onSelect }) =>
     content={
       <Menu>
         <Menu.Group>
-          { actions.map(([key, schema]) => 
+          { actions.map(([key]) => 
             <Menu.Item key={key} onSelect={() => onSelect(key)}>
               {firstLetterUppercase(spaceCamelCaseWord(key))}
             </Menu.Item>)

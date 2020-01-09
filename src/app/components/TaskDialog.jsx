@@ -9,6 +9,7 @@ import ActionsSelector from '../components/ActionsSelector'
 import TextWithLabel from '../components/TextWithLabel'
 import { defaultSemanticComponentErrorHandler } from '../utils/Errors'
 import Semantics from '../utils/semantics'
+import { formatString } from '../utils/javascriptUtils'
 
 const TaskDialog = ({ id, assignee, title, description, points, status, lastUpdate, semanticData }) => {
   const history = useHistory()
@@ -38,7 +39,9 @@ const TaskDialog = ({ id, assignee, title, description, points, status, lastUpda
           <TextWithLabel label='Last update on'>{lastUpdate}</TextWithLabel>
           {
             Object.entries(otherData).map(([key, value]) => 
-              <TextWithLabel label={key} key={key}>{JSON.stringify(value)}</TextWithLabel>
+              <TextWithLabel label={formatString(key)} key={key}>
+                { ['boolean', 'number', 'string', 'bigint'].includes(typeof value) ? value : JSON.stringify(value) }
+              </TextWithLabel>
             )
           }
         </Pane>
