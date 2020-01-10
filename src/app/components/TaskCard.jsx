@@ -28,7 +28,7 @@ const TaskCard = ({id, title, points}) => {
   </Pane>
 }
 
-export const TaskCardSemantic = new SemanticComponentBuilder(
+export const TaskCardSemanticBuilder = new SemanticComponentBuilder(
   [ Semantics.schema.terms.Task, Semantics.schema.terms.TechnicalStory, Semantics.schema.terms.UserStory ],
   TaskCard,
   {
@@ -40,7 +40,9 @@ export const TaskCardSemantic = new SemanticComponentBuilder(
   },
   undefined,
   defaultSemanticComponentErrorHandler('task')
-).build()
+)
+
+export const TaskCardSemantic = TaskCardSemanticBuilder.build()
 
 function showTaskDialog(id, history) {
   const query = qs.parse(window.location.search.substring(1))

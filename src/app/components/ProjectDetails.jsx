@@ -85,7 +85,7 @@ const Columns = ({ labels, tasks }) => {
   </Pane>
 }
 
-export const ProjectDetailsSemantic = new SemanticComponentBuilder(
+export const ProjectDetailsSemanticBuilder = new SemanticComponentBuilder(
   Semantics.schema.terms.Project,
   ProjectDetails,
   {
@@ -99,6 +99,8 @@ export const ProjectDetailsSemantic = new SemanticComponentBuilder(
   },
   undefined,
   defaultSemanticComponentErrorHandler('project')
-).build()
+)
+
+export const ProjectDetailsSemantic = ProjectDetailsSemanticBuilder.build()
 
 export default ProjectDetails

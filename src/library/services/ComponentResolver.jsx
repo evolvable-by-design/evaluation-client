@@ -1,20 +1,20 @@
-import React from 'react';
-import SomethingWrongHappened from "../../components/SomethingWrongHappened";
+import React from 'react'
+import { useLibraryContextState } from '../react/LibraryContext'
 
-import { ProjectSemanticBuilder } from '../../components/Project';
+import UglyGenericComponent from '../react/UglyGenericComponent'
 
-const components = [ProjectSemanticBuilder];
+function ComponentResolver({ semanticData }) {
+  const { components, genericComponent } = useLibraryContextState()
 
-function ComponentResolver(semanticData) {
   const maybeComponent = components
-    .find(semanticComponent => semanticComponent.canDisplay(semanticData.type));
-  const Component = maybeComponent ? maybeComponent.build() : undefined;
-  
-  if (!Component) {
-    // Temporary - TODO: build a generic component for this purpose.
-    return <SomethingWrongHappened text={`Unable to display data of type: ${semanticData.type}`} />
+      .find(semanticComponent => semanticComponent.canDisplay(semanticData.type))
+    
+  if (maybeComponent) {
+    return <maybeComponent value={semanticData} />
+  } else if (genericComponent) {
+    return <genericComponent semanticData={semanticData} />
   } else {
-    return <Component value={semanticData} />
+    return <UglyGenericComponent semanticData={semanticData} />
   }
 }
 

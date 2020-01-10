@@ -36,7 +36,7 @@ const TaskDialog = ({ id, assignee, title, description, points, status, lastUpda
           <TextWithLabel label='Assignee'>{assignee}</TextWithLabel>
           { points && <TextWithLabel label='Points'>{points}</TextWithLabel> }
           <TextWithLabel label='Status'>{status}</TextWithLabel>
-          <TextWithLabel label='Last update on'>{lastUpdate}</TextWithLabel>
+          { lastUpdate && <TextWithLabel label='Last update on'>{lastUpdate}</TextWithLabel> } 
           {
             Object.entries(otherData).map(([key, value]) => 
               <TextWithLabel label={formatString(key)} key={key}>
@@ -50,23 +50,25 @@ const TaskDialog = ({ id, assignee, title, description, points, status, lastUpda
   </>
 }
 
-export const TaskDialogSemantic = new SemanticComponentBuilder(
+export const TaskDialogSemanticBuilder = new SemanticComponentBuilder(
   [ Semantics.schema.terms.Task, Semantics.schema.terms.TechnicalStory, Semantics.schema.terms.UserStory ],
   TaskDialog,
   {
     id: Semantics.vnd_jeera.terms.taskId,
     title: Semantics.schema.terms.name,
     assignee: Semantics.vnd_jeera.terms.assignee,
-    status: Semantics.vnd_jeera.terms.TaskStatus,
-    lastUpdate: Semantics.schema.terms.lastUpdate
+    status: Semantics.vnd_jeera.terms.TaskStatus
   },
   {
     description: Semantics.schema.terms.description,
-    points: Semantics.vnd_jeera.terms.points
+    points: Semantics.vnd_jeera.terms.points,
+    lastUpdate: Semantics.schema.terms.lastUpdate
   },
   undefined,
   defaultSemanticComponentErrorHandler('task')
-).build()
+)
+
+export const TaskDialogSemantic = TaskDialogSemanticBuilder.build()
 
 function hideTaskDialog(history) {
   const query = qs.parse(window.location.search.substring(1))
