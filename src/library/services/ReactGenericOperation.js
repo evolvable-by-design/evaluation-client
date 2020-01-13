@@ -34,7 +34,9 @@ export function useCaller(parameters, callFct) {
       try {
         const data = await callFct(parameters)
         setData(data)
+        setError(undefined)
       } catch (error) {
+        setData(undefined)
         setError(error)
       } finally {
         setIsLoading(false)

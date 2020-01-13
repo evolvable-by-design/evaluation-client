@@ -22,8 +22,8 @@ const ActionDialog = ({ isShown, title, operationSchema, onSuccessCallback, onCl
   >
     {({ close }) => <>
       <GenericForm {...parametersDetail} />
-      { error && <Alert intent="danger" title={error.message || error} /> }
-      { success && !data && <Alert intent="success" title='Success' />}
+      { error && <Alert intent="danger" title={error.message || error} marginBottom='16px' /> }
+      { success && !data && <Alert intent="success" title='Success' marginBottom='16px' />}
       { success && data && <><Heading size={600}>Result</Heading><ComponentResolver semanticData={data} /></>}
 
       <Pane display='flex' justifyContent='flex-end'>

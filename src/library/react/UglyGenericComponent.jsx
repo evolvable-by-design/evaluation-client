@@ -3,7 +3,7 @@ import { formatString } from '../../app/utils/javascriptUtils'
 
 const UglyGenericComponent = ({semanticData}) => {
   const typeName = typeNameFromSemanticUrl(semanticData.type)
-  return <BasicLiteral label={typeName} value={semanticData.value} />
+  return <BasicLiteral label={typeName} value={semanticData.getOtherData()} />
 }
 
 const BasicLiteral = ({label, value}) => {
@@ -16,7 +16,7 @@ const BasicLiteral = ({label, value}) => {
     return <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
       <p style={{width: '30%', marginRight: '8px'}}><b>{formatString(label)}</b></p>
       {
-        typeof value === 'array'
+        value instanceof Array
           ? <ul>{ value.map(v => <li key={v}>{v}</li>) }</ul>
           : <p>{value}</p>
       }
@@ -28,7 +28,7 @@ function typeNameFromSemanticUrl(s) {
   const lastIndexOfSlash = s.lastIndexOf('/')
   const lastIndexOfPound = s.lastIndexOf('#')
 
-  if (lastIndexOfSlash == -1 && lastIndexOfPound == -1) {
+  if (lastIndexOfSlash === -1 && lastIndexOfPound === -1) {
     return s
   } else {
     return s.substring(Math.max(lastIndexOfSlash, lastIndexOfPound) + 1)
