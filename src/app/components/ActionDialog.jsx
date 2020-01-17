@@ -1,5 +1,5 @@
-import React from 'react'
-import { Alert, Button, Dialog, Heading, Pane, Spinner } from 'evergreen-ui' 
+import React, { useEffect } from 'react'
+import { Alert, Dialog } from 'evergreen-ui' 
 
 import { useOperation } from '../../library/services/ReactGenericOperation'
 import ComponentResolver from '../../library/services/ComponentResolver'
@@ -13,25 +13,23 @@ const ActionDialog = ({ isShown, title, operationSchema, onSuccessCallback, onCl
   const operation = genericOperationBuilder.fromOperation(operationSchema)
   const { parametersDetail, makeCall, isLoading, data, error, success } = useOperation(operation)
 
+  const dialogTitle = success && data
+    ? 'Result'
+    : capitalize(spaceCamelCaseWord(title))
   return <Dialog
     isShown={isShown !== undefined ? isShown : true}
-    title={capitalize(spaceCamelCaseWord(title))}
+    title={dialogTitle}
     isConfirmLoading={isLoading}
-    onCloseComplete={onCloseComplete}
-    hasFooter={false}
+    confirmLabel="Confirm"
+    onConfirm={makeCall}
+    onCloseComplete={() => { if (success) { onSuccessCallback(data) } onCloseComplete() }}
+    hasFooter={!success}
   >
     {({ close }) => <>
-      <GenericForm {...parametersDetail} />
+      { !(success && data) && <GenericForm {...parametersDetail} /> }
       { error && <Alert intent="danger" title={error.message || error} marginBottom='16px' /> }
-      { success && !data && <Alert intent="success" title='Success' marginBottom='16px' />}
-      { success && data && <><Heading size={600}>Result</Heading><ComponentResolver semanticData={data} /></>}
-
-      <Pane display='flex' justifyContent='flex-end'>
-        <Button onClick={close} marginLeft='8px'>Cancel</Button>
-        { !isLoading && <Button appearance="primary" onClick={makeCall} marginLeft='8px'>Execute</Button>}
-        { isLoading && <Button disabled marginLeft='8px'><Spinner size={24} /> Loading...</Button>}
-        { success && <Button appearance='primary' intent='success' marginLeft='8px' onClick={() => { onSuccessCallback(data); close(); }}> Confirm</Button> }
-      </Pane>
+      { success && !data && close() && <Alert intent="success" title='Success' marginBottom='16px' />}
+      { success && data && <ComponentResolver semanticData={data} />}
     </>}
   </Dialog>
 }

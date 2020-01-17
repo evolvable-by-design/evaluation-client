@@ -35,14 +35,14 @@ const ProjectDetails = ({ title, semanticData }) => {
   return <>
     <Pane display="flex" flexDirection="row" justifyContent="space-between" width="100%" overflow="hidden" marginBottom={majorScale(4)}>
       <Heading size={900}>{title}</Heading>
-      <Pane flexDirection="column">
+      <Pane display="flex" flexDirection="row" justifyContent="flex-end" flexWrap="wrap">
         { otherOperations.map(operation =>
-          <Button key={`button-${operation[0]}`} appearance="default" marginRight={majorScale(2)} onClick={() => setOperationFocus(operation)}>{ spaceCamelCaseWord(capitalize(operation[0])) }</Button>
+          <Button key={`button-${operation[0]}`} appearance="default" marginRight={majorScale(2)} marginBottom={majorScale(1)} onClick={() => setOperationFocus(operation)}>{ spaceCamelCaseWord(capitalize(operation[0])) }</Button>
         ) }
       </Pane>
     </Pane>
     <Tasks isLoading={isLoading} error={error} parametersDetail={parametersDetail} tasks={tasks} makeCall={makeCall} taskStatusTypeDoc={taskStatusTypeDoc} />
-    { operationFocus && <ActionDialog title={operationFocus[0]} operationSchema={operationFocus[1]} onSuccessCallback={() => { makeCall(); setOperationFocus(undefined);}} onCloseComplete={() => setOperationFocus(undefined)}/> }
+    { operationFocus && <ActionDialog title={operationFocus[0]} operationSchema={operationFocus[1]} onSuccessCallback={() => makeCall()} onCloseComplete={() => setOperationFocus(undefined)}/> }
   </>
 }
 

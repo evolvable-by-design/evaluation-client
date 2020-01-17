@@ -24,7 +24,7 @@ const TaskFocus = ({ tasks, onOperationInvokationSuccess }) => {
     return <ActionDialog
       title={action[0]}
       operationSchema={action[1]}
-      onSuccessCallback={() => { onOperationInvokationSuccess(); hideTaskActionDialog(history); }}
+      onSuccessCallback={() => onOperationInvokationSuccess()}
       onCloseComplete={() => hideTaskActionDialog(history)}
     />
   } else if (task) {
