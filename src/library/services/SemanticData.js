@@ -29,8 +29,8 @@ class SemanticData {
     }
   }
 
-  isObject() { return this.resourceSchema.type === 'object'; }
-  isArray() { return this.resourceSchema.type === 'array'; }
+  isObject() { return this.resourceSchema ? this.resourceSchema.type === 'object' : this.value === Object(this.value) }
+  isArray() { return this.resourceSchema ? this.resourceSchema.type === 'array' : this.value instanceof Array }
   isPrimitive() { return !this.isArray() && ! this.isObject(); }
 
   resetReadCounter() {  this.alreadyReadData = []; this.alreadyReadRelations = []; return this; }
