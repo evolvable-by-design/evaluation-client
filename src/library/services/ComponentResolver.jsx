@@ -4,15 +4,16 @@ import { useLibraryContextState } from '../react/LibraryContext'
 import UglyGenericComponent from '../react/UglyGenericComponent'
 
 function ComponentResolver({ semanticData }) {
-  const { components, genericComponent } = useLibraryContextState()
+  const { components, GenericComponent } = useLibraryContextState()
 
-  const maybeComponent = components
-      .find(semanticComponent => semanticComponent.canDisplay(semanticData.type))
+  const MaybeComponent = components
+      .find(semanticComponent => semanticComponent.canDisplay(semanticData.type, semanticData.resourceSchema.format))
+      .build()
     
-  if (maybeComponent) {
-    return <maybeComponent value={semanticData} />
-  } else if (genericComponent) {
-    return <genericComponent semanticData={semanticData} />
+  if (MaybeComponent) {
+    return <MaybeComponent value={semanticData} />
+  } else if (GenericComponent) {
+    return <GenericComponent semanticData={semanticData} />
   } else {
     return <UglyGenericComponent semanticData={semanticData} />
   }
