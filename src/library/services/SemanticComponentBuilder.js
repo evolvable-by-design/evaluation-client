@@ -5,7 +5,7 @@ import { mapObject } from "../../app/utils/javascriptUtils";
 export class SemanticComponentBuilder {
 
   constructor(forType, component, requiredData, optionalData, toIgnoreData, errorHandler) {
-    this.forType = forType;
+    this.forType = forType instanceof Array ? forType : [forType];
     this.component = component;
     this.requiredData = requiredData || {};
     this.optionalData = optionalData || {}; 
@@ -13,12 +13,14 @@ export class SemanticComponentBuilder {
     this.errorHandler = errorHandler;
   }
 
-  canDisplay(type) {
-    if (this.forType instanceof Array) {
-      return this.forType.includes(type)
-    } else {
-      return this.forType === type
-    }
+  canDisplay(type, format) {
+    return this.forType.find(el => {
+      if (el === Object(el)) { // isObject
+        return el.type === type && (format === undefined || el.format === format)
+      } else {
+        return el === type && format === undefined
+      }
+    })
   }
 
   // Returns a react component
@@ -55,7 +57,7 @@ export class SemanticComponentBuilder {
   _getOptionals(semanticData) {
     return mapObject(this.optionalData, (key, semanticKey) => {
       const value = semanticData.getValue(semanticKey)
-      return value ? [key, value] : [undefined, undefined]
+      return value !== undefined ? [key, value] : [undefined, undefined]
     })
   }
 

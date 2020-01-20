@@ -18,6 +18,7 @@ const vocabularies = {
       description: schemaUrl + 'description',
       lastUpdatedOn: schemaUrl + 'dateModified',
       lastUpdate: schemaUrl + 'dateModified',
+      createdOn: schemaUrl + 'dateCreated',
       Error: schemaUrl + 'Error'
     }
   },
@@ -82,7 +83,9 @@ const vocabularies = {
       isPublic: vndJeeraUrl + 'isPublic',
       createRelation: vndJeeraUrlRel + 'create',
       JWT: vndJeeraUrl + 'JWT',
-      tasks: vndJeeraUrl + 'tasks'
+      tasks: vndJeeraUrl + 'tasks',
+      Analytics: vndJeeraUrl + 'Analytics',
+      resourceId: vndJeeraUrl + 'appResourceId',
     },
     actions: {
       login: vndJeeraUrl + 'login',

@@ -4,7 +4,7 @@ const LibraryContext = React.createContext()
 
 function LibraryContextProvider({children, components, genericComponent}) {
   return (
-    <LibraryContext.Provider value={{components, genericComponent}}>
+    <LibraryContext.Provider value={{components, GenericComponent: genericComponent}}>
       {children}
     </LibraryContext.Provider>
   )

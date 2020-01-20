@@ -51,7 +51,7 @@ const TaskDialog = ({ id, assignee, title, description, points, status, lastUpda
 }
 
 export const TaskDialogSemanticBuilder = new SemanticComponentBuilder(
-  [ Semantics.schema.terms.Task, Semantics.schema.terms.TechnicalStory, Semantics.schema.terms.UserStory ],
+  [ Semantics.vnd_jeera.terms.Task, Semantics.vnd_jeera.terms.TechnicalStory, Semantics.vnd_jeera.terms.UserStory ],
   TaskDialog,
   {
     id: Semantics.vnd_jeera.terms.taskId,

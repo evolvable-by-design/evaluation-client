@@ -29,7 +29,7 @@ const TaskCard = ({id, title, points}) => {
 }
 
 export const TaskCardSemanticBuilder = new SemanticComponentBuilder(
-  [ Semantics.schema.terms.Task, Semantics.schema.terms.TechnicalStory, Semantics.schema.terms.UserStory ],
+  [ Semantics.vnd_jeera.terms.Task, Semantics.vnd_jeera.terms.TechnicalStory, Semantics.vnd_jeera.terms.UserStory ],
   TaskCard,
   {
     id: Semantics.vnd_jeera.terms.taskId,

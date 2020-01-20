@@ -13,24 +13,28 @@ const ActionDialog = ({ isShown, title, operationSchema, onSuccessCallback, onCl
   const operation = genericOperationBuilder.fromOperation(operationSchema)
   const { parametersDetail, makeCall, isLoading, data, error, success } = useOperation(operation)
 
-  const dialogTitle = success && data
-    ? 'Result'
-    : capitalize(spaceCamelCaseWord(title))
+  useEffect(() => {
+    if (success && !data) { 
+      onSuccessCallback()
+      onCloseComplete()
+    }
+  }, [success])
+
   return <Dialog
     isShown={isShown !== undefined ? isShown : true}
-    title={dialogTitle}
+    title={capitalize(spaceCamelCaseWord(title))}
     isConfirmLoading={isLoading}
     confirmLabel="Confirm"
     onConfirm={makeCall}
     onCloseComplete={() => { if (success) { onSuccessCallback(data) } onCloseComplete() }}
+    hasHeader={!(success && data)}
     hasFooter={!success}
+    width="auto"
   >
-    {({ close }) => <>
-      { !(success && data) && <GenericForm {...parametersDetail} /> }
-      { error && <Alert intent="danger" title={error.message || error} marginBottom='16px' /> }
-      { success && !data && close() && <Alert intent="success" title='Success' marginBottom='16px' />}
-      { success && data && <ComponentResolver semanticData={data} />}
-    </>}
+    { !(success && data) && <GenericForm {...parametersDetail} /> }
+    { error && <Alert intent="danger" title={error.message || error} marginBottom='16px' /> }
+    { success && !data && <Alert intent="success" title='Success' marginBottom='16px' /> }
+    { success && data && <ComponentResolver semanticData={data} /> }
   </Dialog>
 }
 
