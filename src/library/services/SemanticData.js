@@ -7,6 +7,7 @@
  */
 import ajv from './Ajv'
 import DocumentationBrowser from './DocumentationBrowser';
+import { reduceObject } from '../../app/utils/javascriptUtils';
 
 class SemanticData {
 
@@ -46,6 +47,7 @@ class SemanticData {
         const value = this.value[key];
         if (schema.type === 'array') {
           const responseBodySchema = this.apiDocumentation?.responseBodySchema(schema.items['@id'])
+          // TODO return a SemanticData object with the array of values inside of it -> relevant ???
           return value.map(v => new SemanticData(v, schema.items, responseBodySchema, this.apiDocumentation))
         } else {
           return new SemanticData(value, schema, this.apiDocumentation?.responseBodySchema(schema['@id']), this.apiDocumentation)
@@ -81,10 +83,13 @@ class SemanticData {
   }
 
   getOtherData() {
-    const toReturn = Object.assign({}, this.value)
-    this.alreadyReadData.forEach(key => { delete toReturn[key] })
-    delete toReturn['_links']
-    return toReturn
+    const alreadyReadData = this.alreadyReadData
+    const result = Object.entries(this.resourceSchema.properties)
+      .filter(([key]) => !this.alreadyReadData.includes(key))
+      .map(([key, property]) => [key, this.get(property['@id'])])
+      .reduce(reduceObject, {})
+    this.alreadyReadData = alreadyReadData
+    return result
   }
 
   isRelationAvailable(semanticRelation) {

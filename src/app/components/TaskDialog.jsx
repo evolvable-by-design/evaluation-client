@@ -1,11 +1,13 @@
 import React from 'react'
 import { useHistory } from 'react-router-dom'
 import qs from 'qs'
-import { Badge, Dialog, Heading, Pane, Paragraph, majorScale } from 'evergreen-ui'
+import { Badge, Dialog, Heading, Pane, Paragraph, Pill, majorScale } from 'evergreen-ui'
 
+import ComponentResolver from '../../library/services/ComponentResolver'
 import SemanticComponentBuilder from '../../library/services/SemanticComponentBuilder'
 
 import ActionsSelector from '../components/ActionsSelector'
+import ContainerWithLabel from '../components/ContainerWithLabel'
 import TextWithLabel from '../components/TextWithLabel'
 import { defaultSemanticComponentErrorHandler } from '../utils/Errors'
 import Semantics from '../utils/semantics'
@@ -32,16 +34,23 @@ const TaskDialog = ({ id, assignee, title, description, points, status, lastUpda
           <Paragraph>{description || 'Empty description'}</Paragraph>
         </Pane>
         <Pane flexGrow={1} minWidth="200px" display="flex" flexDirection="column">
+
           <Pane><ActionsSelector actions={actions} onSelect={value => showTaskActionDialog(value, history)} /></Pane>
+
           <TextWithLabel label='Assignee'>{assignee}</TextWithLabel>
-          { points && <TextWithLabel label='Points'>{points}</TextWithLabel> }
+
+          { points && <ContainerWithLabel label='Points'>
+              <Pill display="inline-flex" color={points < 8 ? 'green' : points < 14 ? 'orange' : 'red'}>{points}</Pill>
+            </ContainerWithLabel>}
+
           <TextWithLabel label='Status'>{status}</TextWithLabel>
+
           { lastUpdate && <TextWithLabel label='Last update on'>{lastUpdate}</TextWithLabel> } 
           {
             Object.entries(otherData).map(([key, value]) => 
-              <TextWithLabel label={formatString(key)} key={key}>
-                { ['boolean', 'number', 'string', 'bigint'].includes(typeof value) ? value : JSON.stringify(value) }
-              </TextWithLabel>
+              <ContainerWithLabel label={formatString(key)} key={key}>
+                <ComponentResolver semanticData={value} />
+              </ContainerWithLabel>
             )
           }
         </Pane>
@@ -49,6 +58,8 @@ const TaskDialog = ({ id, assignee, title, description, points, status, lastUpda
     </Dialog>
   </>
 }
+
+//{ ['boolean', 'number', 'string', 'bigint'].includes(typeof value) ? value : JSON.stringify(value) }
 
 export const TaskDialogSemanticBuilder = new SemanticComponentBuilder(
   [ Semantics.vnd_jeera.terms.Task, Semantics.vnd_jeera.terms.TechnicalStory, Semantics.vnd_jeera.terms.UserStory ],

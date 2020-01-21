@@ -1,10 +1,11 @@
 import React from 'react'
-import { Pane, Heading, Paragraph, majorScale, minorScale } from 'evergreen-ui'
+import { Paragraph } from 'evergreen-ui'
+
+import ContainerWithLabel from './ContainerWithLabel'
 
 const TextWithLabel = ({label, children}) => 
-  <Pane marginBottom={majorScale(1)}>
-    <Heading size={400} marginBottom={minorScale(1)}>{label}</Heading>
+  <ContainerWithLabel label={label}>
     <Paragraph>{children}</Paragraph>
-  </Pane>
+  </ContainerWithLabel>
 
 export default TextWithLabel
