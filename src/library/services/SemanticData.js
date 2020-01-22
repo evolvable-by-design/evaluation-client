@@ -42,7 +42,7 @@ class SemanticData {
     if (this.isObject()) {
       const result = this._findPathsToValueAndSchema(semanticKey)
       const [key, schema] = result || [undefined, undefined];
-      if (key && schema) {
+      if (key && this.value[key] !== undefined && schema) {
         if (!this.alreadyReadData.includes(key)) { this.alreadyReadData.push(key) }
         const value = this.value[key];
         if (schema.type === 'array') {
@@ -86,6 +86,7 @@ class SemanticData {
     const result = Object.entries(this.resourceSchema.properties)
       .filter(([key]) => !this.alreadyReadData.includes(key))
       .map(([key, property]) => [key, this.get(property['@id'])])
+      .filter(([key, value]) => value !== undefined)
       .reduce(reduceObject, {})
     this.alreadyReadData = alreadyReadData
     return result

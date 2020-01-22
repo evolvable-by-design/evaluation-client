@@ -13,7 +13,8 @@ const UserId = ({ value, valueSemantics, noLabel }) => {
   console.log(valueSemantics)
   // TODO adapt to make use of technical ids
 
-  if (valueSemantics.resourceSchema['@type'] === '@id') {
+  // TODO: look into the semantics of the @type to determine if its an @id instead of writing `valueSemantics.resourceSchema['@type'].endsWith('Id')`
+  if (valueSemantics.resourceSchema['@type'] === '@id' || valueSemantics.resourceSchema['@type'].endsWith('Id')) {
     return <FetchUser userId={value} noLabel={noLabel} />
   } else {
     return <Paragraph>{value}</Paragraph>

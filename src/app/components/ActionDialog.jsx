@@ -31,10 +31,12 @@ const ActionDialog = ({ isShown, title, operationSchema, onSuccessCallback, onCl
     hasFooter={!success}
     width="auto"
   >
-    { !(success && data) && <GenericForm {...parametersDetail} /> }
-    { error && <Alert intent="danger" title={error.message || error} marginBottom='16px' /> }
-    { success && !data && <Alert intent="success" title='Success' marginBottom='16px' /> }
-    { success && data && <ComponentResolver semanticData={data} /> }
+    <div style={{ 'minWidth': '560px' }}>
+      { !(success && data) && <GenericForm {...parametersDetail} /> }
+      { error && <Alert intent="danger" title={error.message || error} marginBottom='16px' /> }
+      { success && !data && <Alert intent="success" title='Success' marginBottom='16px' /> }
+      { success && data && <ComponentResolver semanticData={data} /> }
+    </div>
   </Dialog>
 }
 
