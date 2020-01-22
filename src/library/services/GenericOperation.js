@@ -1,5 +1,6 @@
 import { NotFoundOperation, AuthenticationRequiredError } from '../../app/utils/Errors'
 import { buildRequest} from '../utils/requestBuilder'
+import { extractPathParameters } from '../utils/Utils' 
 import DocumentationBrowser from './DocumentationBrowser'
 
 export class GenericOperation {
@@ -127,6 +128,16 @@ export class GenericOperationBuilder {
 
   fromOperation(operation) {
     return new GenericOperation(operation, this.apiDocumentation, this.httpCaller)
+  }
+
+  fromId(id) {
+    const operation = this.apiDocumentation.findGetOperationWithPathMatching(id)
+    console.log(extractPathParameters(id, operation.url))
+
+    return {
+      operation: new GenericOperation(operation, this.apiDocumentation, this.httpCaller),
+      parameters: extractPathParameters(id, operation.url)
+    }
   }
 
 }

@@ -43,6 +43,10 @@ class HttpCaller {
       : undefined
   }
 
+  async getSemantic(url, operation) {
+    return this.semanticCall({ method: 'get', url }, operation)
+  }
+
   _getDataAndItsDescription(result, operation, resultMapper) {
     const responseSchema = operation ? operation.responses[result.status] : undefined
     const resourceSchema =

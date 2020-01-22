@@ -20,6 +20,15 @@ export const filterObjectKeys = (object, predicate) => {
   return res
 }
 
+export function mapFind (object, mapper) {
+  for (const el of object) {
+    const res = mapper(el)
+    if (res !== undefined)
+      return res
+  }
+  return undefined
+}
+
 export const onlyWhen = (values, toRender) => {
   if (
     values === undefined

@@ -47,7 +47,6 @@ class SemanticData {
         const value = this.value[key];
         if (schema.type === 'array') {
           const responseBodySchema = this.apiDocumentation?.responseBodySchema(schema.items['@id'])
-          // TODO return a SemanticData object with the array of values inside of it -> relevant ???
           return value.map(v => new SemanticData(v, schema.items, responseBodySchema, this.apiDocumentation))
         } else {
           return new SemanticData(value, schema, this.apiDocumentation?.responseBodySchema(schema['@id']), this.apiDocumentation)

@@ -1,7 +1,5 @@
 import SemanticData from './SemanticData';
 
-import { mapObject } from "../../app/utils/javascriptUtils";
-
 export class SemanticComponentBuilder {
 
   constructor(forType, component, requiredData, optionalData, toIgnoreData, errorHandler) {
@@ -47,18 +45,31 @@ export class SemanticComponentBuilder {
   }
 
   _getRequired(semanticData) {
-    const result = mapObject(this.requiredData, (key, semanticKey) => {
-      return [key, semanticData.getValue(semanticKey)]
-    });
+    const result = this._getDataWithSemantics(this.requiredData, semanticData)
     const missingData = Object.entries(result).filter(([key, value]) => value === undefined).map(([key, value]) => key);
     return [result, missingData];
   }
 
   _getOptionals(semanticData) {
-    return mapObject(this.optionalData, (key, semanticKey) => {
-      const value = semanticData.getValue(semanticKey)
-      return value !== undefined ? [key, value] : [undefined, undefined]
-    })
+    return this._getDataWithSemantics(this.optionalData, semanticData)
+  }
+
+  _getDataWithSemantics(keys, semanticData) {
+    return Object.entries(keys)
+      .map(([key, semanticKey]) => {
+        const data = semanticData.get(semanticKey)
+        if (data === undefined) { return [] }
+        
+        return [
+          [ key, data instanceof Array ? data.map(el => el.value) : data.value ],
+          [ `${key}Semantics`, data ]
+        ]
+      })
+      .filter(el => el.length === 2)
+      .reduce((acc, currentValue) => {
+        currentValue.forEach(([key, value]) => { acc[key] = value })
+        return acc
+      }, {})
   }
 
 }

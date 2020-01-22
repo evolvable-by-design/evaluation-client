@@ -1,6 +1,9 @@
 import * as JsonLDParser from './JsonLdParser';
+
+import { mapObject, mapFind } from '../../app/utils/javascriptUtils';
+
 import AuthService from './AuthenticationService';
-import { mapObject } from '../../app/utils/javascriptUtils';
+import { matchUrlPattern } from '../utils/Utils'
 
 class DocumentationBrowser {
 
@@ -50,6 +53,14 @@ class DocumentationBrowser {
     }
 
     return undefined
+  }
+
+  findGetOperationWithPathMatching(url) {
+    return this._findOperation((_, verb, path) => {
+      if (path === undefined) {
+      }
+      return matchUrlPattern(url, path) && verb === 'get'
+    })
   }
 
   _findTypeInSchema(semanticKey, schema) {
@@ -204,28 +215,26 @@ class DocumentationBrowser {
 
   _findOperation(predicate) {
     // should be optimized
-    const pathFound = Object.entries(this.documentation.paths)
-      .find(([path, operations]) => Object.values(operations)
-        .find(predicate)
-      );
+    return mapFind(Object.entries(this.documentation.paths),
+      ([path, operations]) => {
+        const maybeVerbAndOperation = Object.entries(operations)
+          .find(([verb, operation]) => predicate(operation, verb, path))
 
-    if (pathFound) {
-      const [path, operations] = pathFound;
-      const parametersOfPath = this._refine(operations['parameters']);
-      const [verb, operation] = Object.entries(operations).find(([v, op]) => predicate(op))
-      let parameters = this._mergeOptionalArrays(parametersOfPath, operation.parameters);
-      const userShouldAuthenticate = operation.security !== undefined && !AuthService.isAuthenticated()
+        if (maybeVerbAndOperation === undefined) { return undefined }
 
-      return {
-        ...this._refine(operation),
-        verb,
-        url: path,
-        parameters: this._refine(parameters),
-        userShouldAuthenticate
-      }
-    } else {
-      return undefined;
-    }
+        const [verb, operation] = maybeVerbAndOperation
+        const parametersOfPath = this._refine(operations['parameters'])
+        let parameters = this._mergeOptionalArrays(parametersOfPath, operation.parameters)
+        const userShouldAuthenticate = operation.security !== undefined && !AuthService.isAuthenticated()
+        
+        return {
+          ...this._refine(operation),
+          verb,
+          url: path,
+          parameters: this._refine(parameters),
+          userShouldAuthenticate
+        }
+    })
   }
 
   _findOperationThatReturns(target) {

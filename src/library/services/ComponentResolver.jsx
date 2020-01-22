@@ -28,8 +28,6 @@ function ComponentResolver({ semanticData }) {
 }
 
 const UglyGenericComponent = ({semanticData}) => {
-  console.log(semanticData)
-
   if (semanticData.isObject()) {
     return <ForObject semanticData={semanticData} />
   } else if (semanticData.isArray()) {
@@ -92,7 +90,7 @@ function typeNameFromSemanticUrl(s) {
 }
 
 function isLiteral(type) {
-  return [ 'boolean', 'number', 'string' ].includes(type)
+  return [ 'boolean', 'number', 'string', 'bigint' ].includes(type)
 }
 
 export default ComponentResolver;
