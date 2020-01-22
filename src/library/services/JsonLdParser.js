@@ -16,20 +16,19 @@ export const getAllReplacementsToDo = (context) => {
   return vocabularies;
 }
 
-export const findSemanticWithKeyMappings = (document) => {
+function findSemanticElWithKeyMappings(document, semanticSelector) {
   const context = findContext(document);
   const vocabularies = getAllReplacementsToDo(context);
 
   const alias = mapObject(context, (key, value) => {
-    const strToCompare = value instanceof Object ? value['@id'] : value;
+    const strToCompare = semanticSelector(value)
+    if (strToCompare === undefined) { return undefined }
 
     const vocabName = strToCompare.split(':')[0];
     const vocabUrl = vocabularies[vocabName];
-    if (vocabUrl) {
-      return [key, strToCompare.replace(`${vocabName}:`, vocabUrl)];
-    } else {
-      return undefined;
-    }
+    if (vocabUrl === undefined) { return undefined }
+
+    return [key, strToCompare.replace(`${vocabName}:`, vocabUrl)];
   });
 
   return Object.entries({...alias, ...vocabularies})
@@ -45,6 +44,12 @@ export const findSemanticWithKeyMappings = (document) => {
       return acc
     })
 }
+
+export const findSemanticWithKeyMappings = (document) =>
+  findSemanticElWithKeyMappings(document, value => value instanceof Object ? value['@id'] : value)
+
+export const findSemanticTypeWithKeyMappings = (document) =>
+  findSemanticElWithKeyMappings(document, value => value instanceof Object ? value['@type'] : undefined)
 
 export const replaceAllVocab = (document) => {
   const replacements = getAllReplacementsToDo(findContext(document));

@@ -16,6 +16,10 @@ export class GenericOperation {
     this.httpCaller = httpCaller
   }
 
+  hasParameters() {
+    return this.getParameters().length !== 0
+  }
+
   async call(values, parameters) {
     if (this.userShouldAuthenticate) {
       throw new AuthenticationRequiredError()

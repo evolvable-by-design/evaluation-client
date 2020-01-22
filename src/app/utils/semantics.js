@@ -86,6 +86,7 @@ const vocabularies = {
       tasks: vndJeeraUrl + 'tasks',
       Analytics: vndJeeraUrl + 'Analytics',
       resourceId: vndJeeraUrl + 'appResourceId',
+      UserDetails: vndJeeraUrl + 'UserDetails',
     },
     actions: {
       login: vndJeeraUrl + 'login',

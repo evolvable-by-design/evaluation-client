@@ -17,6 +17,7 @@ class DocumentationBrowser {
     )
     this.documentation = JsonLDParser.replaceAllId(refinedDoc)
     this.semanticKeyMapping = JsonLDParser.findSemanticWithKeyMappings(refinedDoc)
+    this.semanticTypeKeyMapping = JsonLDParser.findSemanticTypeWithKeyMappings(refinedDoc)
   }
 
   getServerUrl() {
@@ -36,6 +37,13 @@ class DocumentationBrowser {
 
     const operationReturningTarget = this._findOperationThatReturns(target);
     return operationReturningTarget;
+  }
+
+  findOperationListing(target) {
+    if (target === undefined)
+      return undefined
+
+    return this._findOperationThatReturnsListOf(target)
   }
 
   findOperationById(openApiId) {
@@ -196,13 +204,26 @@ class DocumentationBrowser {
         const semantic = this._findSemanticOfKeyword(key);
         if (semantic) { value['@id'] = semantic; } 
       }
+
+      if (value instanceof Object && value['@type'] === undefined) {
+        const type = this._findSemanticTypeOfKeyword(key);
+        if (type) { value['@type'] = type; }
+      }
       return [key, value]
     });
   }
 
   _findSemanticOfKeyword(keyword) {
-    return Object.keys(this.semanticKeyMapping).find(key => {
-      const keywordInMapping = this.semanticKeyMapping[key]
+    return this._findSemanticCorrespondanceOfKeyword(keyword, this.semanticKeyMapping)
+  }
+
+  _findSemanticTypeOfKeyword(keyword) {
+    return this._findSemanticCorrespondanceOfKeyword(keyword, this.semanticTypeKeyMapping)
+  }
+
+  _findSemanticCorrespondanceOfKeyword(keyword, entrySet) {
+    return Object.keys(entrySet).find(key => {
+      const keywordInMapping = entrySet[key]
       return keywordInMapping instanceof Array
         ? keywordInMapping.includes(keyword)
         : keywordInMapping === keyword
@@ -246,6 +267,26 @@ class DocumentationBrowser {
           const refinedOperation = this._refine(operation);
           const schema = this._selectContent(refinedOperation.responses[maybeKey].content).schema;
           return schema['@id'] === target || (schema.oneOf && schema.oneOf.find(s => s['@id'] === target) !== undefined)
+        }
+        return false;
+      }
+      return false;
+    });
+  }
+
+  _findOperationThatReturnsListOf(target) {
+    return this._findOperation(operation => {
+      
+      if (operation.responses) {
+        const maybeKey = Object.keys(operation.responses).find(key => key === '200' || key === '201');
+        if (maybeKey) {
+          const refinedOperation = this._refine(operation);
+          const schema = this._selectContent(refinedOperation.responses[maybeKey].content).schema;
+
+          return schema.type === 'array'&& (
+            schema.items['@id'] === target
+            || (schema.items.oneOf && schema.items.oneOf.find(s => s['@id'] === target) !== undefined)
+          )
         }
         return false;
       }

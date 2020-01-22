@@ -4,6 +4,8 @@ import { Heading, IconButton, Pane, Select, Switch, TextInput, majorScale } from
 import ajv from '../../library/services/Ajv';
 
 import { capitalize, spaceCamelCaseWord, stateSetter, onlyWhen, arrayWithoutElAtIndex, setInArray } from '../utils/javascriptUtils';
+import { isExistingResourceId } from '../utils/SemanticsUtils';
+import ResourceIdInput from './ResourceIdInput';
 
 // TODO: display an error message when required as TextInputField does
 
@@ -58,7 +60,9 @@ function InputSelector({schema, value, setValue, error, setError, required}) {
     }
   };
 
-  if (schema.type === 'boolean') {
+  if (schema['@type'] && isExistingResourceId(schema['@type'])) {
+    return <ResourceIdInput schema={schema} value={value} error={error} onChange={onChange} required={required} />
+  } else if (schema.type === 'boolean') {
     return <Switch checked={value} onChange={(e) => onChange(e.target.checked)} height={majorScale(3)}/>
   } else if (schema.type === 'string' && schema.enum !== undefined) {
     return <SelectInput schema={schema} value={value} error={error} onChange={onChange} required={required} />
