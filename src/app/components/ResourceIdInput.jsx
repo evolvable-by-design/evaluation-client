@@ -17,7 +17,7 @@ function ResourceIdInput({ schema, value, error, onChange, required }) {
     if (search === undefined || search === '') {
       return possibilities || []
     } else {
-      return possibilities.filter(p => Object.values(p.value).find(el => JSON.stringify(el).indexOf(search) != -1))
+      return possibilities.filter(p => Object.values(p.value).find(el => JSON.stringify(el).indexOf(search) !== -1))
     }
   }, [search, possibilities])
 
@@ -32,25 +32,27 @@ function ResourceIdInput({ schema, value, error, onChange, required }) {
   const selectedElement = useMemo(() => (possibilities || []).find(p => p.getValue(idSemantics) === value))
 
   return <>
-    { value && <Pane marginBottom={8}>
+    { value && <Pane marginBottom={8} marginRight={8}>
       <Heading size={400} marginBottom={8}>Selected</Heading>
       <ComponentResolver semanticData={selectedElement} />
     </Pane>}
-    <Heading size={400} marginBottom={8}>Selection...</Heading>
-    <Popover
-      position={Position.BOTTOM_LEFT}
-      content={({ close }) =>
-        <Pane maxHeight={500} minWidth={360} paddingY='8px' overflow='scroll' display="flex" flexDirection="column">
-          { filteredPossibilities.map(p =>
-            <Pane padding={8} marginBottom={8} borderBottom='1px solid #ccc' onClick={() => { onChange(p.getValue(idSemantics)); close();}}>
-              <ComponentResolver semanticData={p} />
-            </Pane>
-          ) }
-        </Pane>
-      }
-    >
-      <SearchInput placeholder="Search..." value={search} width="100%" onChange={e => setSearch(e.target.value)} />
-    </Popover>
+    <Pane marginBottom={8}>
+      <Heading size={400} marginBottom={8}>Selection...</Heading>
+      <Popover
+        position={Position.BOTTOM_LEFT}
+        content={({ close }) =>
+          <Pane maxHeight={500} minWidth={360} paddingY='8px' overflow='scroll' display="flex" flexDirection="column">
+            { filteredPossibilities.map(p =>
+              <Pane padding={8} marginBottom={8} borderBottom='1px solid #ccc' onClick={() => { onChange(p.getValue(idSemantics)); close();}}>
+                <ComponentResolver semanticData={p} />
+              </Pane>
+            ) }
+          </Pane>
+        }
+      >
+        <SearchInput placeholder="Search..." value={search} width="100%" onChange={e => setSearch(e.target.value)} />
+      </Popover>
+    </Pane>
   </>
 }
 

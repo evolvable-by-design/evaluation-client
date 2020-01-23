@@ -10,14 +10,14 @@ import Semantics from '../utils/semantics'
 import { isExistingResourceId } from '../utils/SemanticsUtils'
 
 const UserId = ({ value, valueSemantics, noLabel }) => {
-  console.log(value)
-  console.log(valueSemantics)
+  // console.log(value)
+  // console.log(valueSemantics)
   // TODO adapt to make use of technical ids
 
   if (isExistingResourceId(valueSemantics.resourceSchema['@type'])) {
     return <FetchUser userId={value} noLabel={noLabel} />
   } else {
-    return <Paragraph>{value}</Paragraph>
+    return <UserBadge username={value} noLabel />
   }
 }
 

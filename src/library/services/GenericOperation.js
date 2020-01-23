@@ -136,7 +136,6 @@ export class GenericOperationBuilder {
 
   fromId(id) {
     const operation = this.apiDocumentation.findGetOperationWithPathMatching(id)
-    console.log(extractPathParameters(id, operation.url))
 
     return {
       operation: new GenericOperation(operation, this.apiDocumentation, this.httpCaller),
