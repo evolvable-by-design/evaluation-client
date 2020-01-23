@@ -32,7 +32,7 @@ const AlreadyLoggedIn = () => {
 }
 
 const LoginComponent = () => {
-  const { redirectTo } = useParams();
+  const redirectTo = new URLSearchParams(window.location.search).get('redirectTo')
   const [loginData, setLoginData] = useState()
 
   if (loginData) {
