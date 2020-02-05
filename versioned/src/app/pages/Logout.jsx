@@ -2,13 +2,10 @@ import React from 'react';
 import { useHistory, Redirect } from 'react-router-dom';
 import { Heading, Spinner, Paragraph, Pane, majorScale } from 'evergreen-ui';
 
-import AuthenticationService from '../../library/services/AuthenticationService';
-import { useOperation } from '../../library/services/ReactGenericOperation';
-
-import Semantics from '../utils/semantics';
+import AuthenticationService from '../services/AuthenticationService';
 import FullscreenCenterContainer from '../components/FullscreenCenterContainer';
 import FullscreenError from '../components/FullscreenError';
-import { useAppContextState } from '../context/AppContext'
+import useFetch from '../hooks/useFetch';
 
 function Logout() {
   if (!AuthenticationService.isAuthenticated()) {
@@ -20,28 +17,21 @@ function Logout() {
 
 const LogoutDialog = () => {
   const history = useHistory();
-  const { genericOperationBuilder } = useAppContextState()
-
-  const logoutOperation = genericOperationBuilder.fromKey(Semantics.vnd_jeera.actions.logout)
-  const { parametersDetail, makeCall, isLoading, success, data, error } = useOperation(logoutOperation)
+  const { makeCall, isLoading, success, data, error } = useFetch(() => AuthenticationService.logout())
 
   if (isLoading) {
     return <Loading />
   } else if (error) {
     return <FullscreenError error={error}/>
   } else if (success) {
-    AuthenticationService.removeToken();
-    setTimeout(() => history.push('/'), 2000);
+    setTimeout(() => history.push('/'), 1000);
     return <Success data={data}/>
-  } else if (parametersDetail.documentation.length === 0) {
-    // ({error, triggerCall, filtersToDisplay, formToDisplay})
-    if (makeCall !== undefined) makeCall()
+  } else {
+    makeCall()
     return (<>
       <Heading width="100%" size={700} marginBottom={majorScale(2)}>We are logging you out...</Heading>
       { error && <Paragraph width="100%" size={500}>{error}</Paragraph> }
     </>)
-  } else {
-    return <Heading>Not yet supported</Heading>
   }
 }
 

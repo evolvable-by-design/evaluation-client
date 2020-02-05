@@ -1,48 +1,78 @@
-import React, { useEffect, useState } from 'react';
-import { Alert, Button, Pane, Text, Heading, majorScale } from 'evergreen-ui';  
+import React, { useEffect, useMemo, useState } from 'react';
+import { Alert, Button, Pane, Text, Heading, TextInputField, majorScale } from 'evergreen-ui';  
 
-import { useOperation } from '../../library/services/ReactGenericOperation';
-import GenericFilters from './GenericFilters';
-
-import ActionDialog from './ActionDialog'
-import { ProjectCardSemantic as ProjectCard } from './ProjectCard';
-import { useAppContextState } from '../context/AppContext';
+import CreateProjectDialog from './CreateProjectDialog'
+import ProjectCard from './ProjectCard';
 import FullscreenError from './FullscreenError';
-import Semantics from '../utils/semantics';
-import LoginRedirect from './LoginRedirect';
+import SwitchInputField from './SwitchInputField';
+import useFetch from '../hooks/useFetch';
+import AuthenticationService from '../services/AuthenticationService';
+import ProjectService from '../services/ProjectService';
 
-const requiredData = {
-  projects: Semantics.vnd_jeera.terms.projects
-}
-
-const LIST_PROJECTS_KEY = Semantics.vnd_jeera.terms.listProjects
 
 const Projects = () => {
-  const { apiDocumentation, genericOperationBuilder } = useAppContextState()
+  const [ offset, setOffset ] = useState()
+  const [ limit, setLimit ] = useState()
+  const [ isPublic, setIsPublic ] = useState()
+  const { makeCall, isLoading, data, error } = useFetch(() => ProjectService.list(offset, limit, isPublic))
+  const projects = data
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const listProjectOperation = genericOperationBuilder.fromKey(LIST_PROJECTS_KEY)
-  const { userShouldAuthenticate, parametersDetail, makeCall, isLoading, data, error } = useOperation(listProjectOperation)
-  const createOperation = data ? data.getRelation(Semantics.vnd_jeera.terms.createRelation, apiDocumentation)[1] : undefined
+  const [ showCreateProjectDialog, setShowCreateProjectDialog ] = useState(false)
+
+  const isOffsetInvalid = useMemo(() => offset !== undefined && (isNaN(offset) || (!isNaN(offset) && offset < 0)), [offset])
+  const isLimitInvalid = useMemo(() => limit !== undefined && (isNaN(limit) || (!isNaN(limit) && limit < 0)), [limit])
 
   useEffect(() => makeCall(), [])
+
   
-  const projects = data !== undefined ? data.get(requiredData.projects) : undefined
-  if (userShouldAuthenticate) {
-    return <LoginRedirect />
-  } else if (isLoading) {
+  if (isLoading) {
     return <Text>Loading...</Text>
   } else if (error) {
     return <FullscreenError error={error}/>
   } else {
     return <>
       <Heading size={900} marginBottom={majorScale(3)}>Projects</Heading>
-      <GenericFilters {...parametersDetail} />
-      { (parametersDetail)
-        && <Button appearance="primary" onClick={makeCall} marginBottom={majorScale(3)} marginRight={majorScale(1)}>Update</Button>
+      
+      <Pane width="100%" display="flex" flexDirection="row" flexWrap="wrap" alignItems="flex-start" justifyContent="flex-start">
+        <Pane display="flex" height="100%" marginRight={majorScale(3)} >
+          <Pane width={majorScale(24)}>
+            <TextInputField 
+              label='Offset'
+              isInvalid={isOffsetInvalid}
+              value={offset || ''}
+              placeholder='Offset'
+              validationMessage={ isOffsetInvalid ? 'Must be a number >= 0' : null}
+              width="100%"
+              onChange={e => setOffset(e.target.value)}
+            />
+          </Pane>
+        </Pane>
+        <Pane display="flex" height="100%" marginRight={majorScale(3)} >
+          <Pane width={majorScale(24)}>
+            <TextInputField 
+              label='Limit'
+              isInvalid={isLimitInvalid}
+              value={limit || ''}
+              placeholder='Limit'
+              validationMessage={ isLimitInvalid ? 'Must be a number >= 0' : null }
+              width="100%"
+              onChange={e => setLimit(e.target.value)}
+            />
+          </Pane>
+        </Pane>
+        <Pane display="flex" height="100%" marginRight={majorScale(3)} >
+          <SwitchInputField label='Public' checked={isPublic} onChange={e => setIsPublic(e.target.value)}/>
+        </Pane>
+      </Pane>
+
+      <Button appearance="primary" onClick={makeCall} marginBottom={majorScale(3)} marginRight={majorScale(1)}>Update</Button>
+      { !AuthenticationService.isAuthenticated() && <Alert intent="none" marginBottom={32} title="Login to see more actions."/> }
+      { AuthenticationService.isAuthenticated() && 
+          <Button appearance="primary" onClick={() => setShowCreateProjectDialog(true)} marginBottom={majorScale(3)} marginRight={majorScale(1)}>Create project</Button>
       }
-      { createOperation && <CreateProject operation={createOperation} onSuccessCallback={makeCall}/> }
-      <AuthRequired authRequired={createOperation?.userShouldAuthenticate}/>
+
+      <CreateProjectDialog isShown={showCreateProjectDialog} onSuccessCallback={makeCall} onCloseComplete={() => setShowCreateProjectDialog(false)}/>
+
       <ProjectCards projects={projects} />
     </>
   }
@@ -51,28 +81,20 @@ const Projects = () => {
 const ProjectCards = ({projects}) => {
   if (projects !== undefined) {
     return <Pane width='100%' display='flex' flexDirection='row' flexWrap='wrap'>
-      { projects.map(project => <ProjectCard key={JSON.stringify(project)} value={project} />) }
+      { projects.map(project => 
+          <ProjectCard
+            key={JSON.stringify(project)}
+            id={project.id}
+            title={project.name}
+            isPublic={project.isPublic}
+            lastUpdate={project.lastUpdatedOn}
+            collaborators={project.collaborators}
+          />) 
+      }
     </Pane>
   } else {
     return <Alert intent="danger" title="Sorry we could not find any project." />;
   }
-}
-
-const AuthRequired = ({authRequired}) =>
-  !authRequired ? null : <Alert intent="none" marginBottom={32} title="Login to see more actions."/>
-
-const CreateProject = ({operation, onSuccessCallback}) => {
-  const [isShown, setIsShown] = useState(false)
-  return <>
-    <ActionDialog
-      isShown={isShown}
-      title={operation.summary || 'Create project'}
-      operationSchema={operation}
-      onSuccessCallback={onSuccessCallback}
-      onCloseComplete={() => setIsShown(false)}
-    />
-    <Button appearance="primary" iconBefore="plus" onClick={() => setIsShown(true)} marginBottom={majorScale(3)} marginRight={majorScale(1)}>Create a new project</Button>
-  </>
 }
 
 export default Projects;

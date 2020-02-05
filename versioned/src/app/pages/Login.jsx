@@ -1,14 +1,12 @@
-import React, { useMemo, useState } from 'react';
-import { Redirect, useHistory, useParams } from 'react-router-dom';
-import { Alert, Dialog, Heading, Spinner, majorScale } from 'evergreen-ui';
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { Alert, Dialog, Heading, Pane, Spinner, TextInput, majorScale } from 'evergreen-ui';
 
-import AuthenticationService from '../../library/services/AuthenticationService';
-import { useOperation } from '../../library/services/ReactGenericOperation';
+import AuthenticationService from '../services/AuthenticationService';
 
 import FullscreenCenterContainer from '../components/FullscreenCenterContainer';
-import GenericForm from '../components/GenericForm';
-import Semantics from '../utils/semantics';
-import { useAppContextState } from '../context/AppContext';
+import WithLabel from '../components/WithLabel';
+import useFetch from '../hooks/useFetch';
 
 
 function Login() {
@@ -33,28 +31,27 @@ const AlreadyLoggedIn = () => {
 
 const LoginComponent = () => {
   const redirectTo = new URLSearchParams(window.location.search).get('redirectTo')
-  const [loginData, setLoginData] = useState()
+  const [ success, setSuccess ] = useState(false)
+  const history = useHistory();
 
-  if (loginData) {
-    AuthenticationService.updateToken(loginData.getValue(Semantics.vnd_jeera.terms.JWT))
-    return <Redirect to={redirectTo || '/'} />
+  if (success) {
+    setTimeout(() => history.push(redirectTo || '/'), 1000);
+    return <FullscreenCenterContainer>
+      <Heading width="100%" size={700} marginBottom={majorScale(2)}>You are now successfully logged in <span role='img' aria-label='byebye'>👋</span></Heading>
+    </FullscreenCenterContainer>
   } else {
-    return <LoginDialog onComplete={setLoginData} />
+    return <LoginDialog onComplete={() => setSuccess(true)} />
   }
 }
 
 const LoginDialog = ({ onComplete }) => {
-  const { genericOperationBuilder } = useAppContextState()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const loginOperation = useMemo(() => genericOperationBuilder.fromKey(Semantics.vnd_jeera.actions.login), [])
-  const { parametersDetail, makeCall, isLoading, success, data, error } = useOperation(loginOperation)
+  const [ username, setUsername ] = useState()
+  const [ password, setPassword ] = useState()
+  const { makeCall, isLoading, success, error } = useFetch(() => AuthenticationService.login(username, password))
 
   if (success) {
-    onComplete(data)
-
-    return <FullscreenCenterContainer>
-      <Heading width="100%" size={700} marginBottom={majorScale(2)}>You are now successfully logged in <span role='img' aria-label='byebye'>👋</span></Heading>
-    </FullscreenCenterContainer>
+    onComplete()
+    return <></>
   } else {
     return <FullscreenCenterContainer>
       <Dialog
@@ -66,9 +63,34 @@ const LoginDialog = ({ onComplete }) => {
         shouldCloseOnEscapePress={false}
         isConfirmLoading={isLoading}
         onConfirm={makeCall}
-        confirmLabel={isLoading ? 'Loading...' : 'Ok'}
+        confirmLabel={isLoading ? 'Loading...' : 'Login'}
+        isConfirmDisabled={username === undefined || password === undefined}
       >
-        <GenericForm {...parametersDetail} />
+        <Pane width="100%" display="flex" flexDirection="row" flexWrap="wrap" alignItems="flex-start" justifyContent="flex-start">
+
+          <Pane width="100%" >
+            <WithLabel label='Username' required>
+              <TextInput
+                value={username || ''}
+                width="100%"
+                type='text'
+                onChange={e => setUsername(e.target.value)}
+              />
+            </WithLabel>
+          </Pane>
+
+          <Pane width="100%" >
+            <WithLabel label='Password' required>
+              <TextInput
+                value={password || ''}
+                width="100%"
+                type='password'
+                onChange={e => setPassword(e.target.value)}
+              />
+            </WithLabel>
+          </Pane>
+
+        </Pane>
         { error && <Alert intent="danger" title={error.message} /> }
       </Dialog>
     </FullscreenCenterContainer>

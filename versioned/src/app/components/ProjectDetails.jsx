@@ -1,52 +1,73 @@
 import React, { useEffect, useState }  from 'react'
-import { Button, Heading, Pane, Text, majorScale, minorScale } from 'evergreen-ui'
+import { Button, Heading, Pane, Text, TextInputField, majorScale, minorScale } from 'evergreen-ui'
 
-import SemanticComponentBuilder from '../../library/services/SemanticComponentBuilder'
-import ActionDialog from './ActionDialog'
-import { useOperation } from '../../library/services/ReactGenericOperation'
-
-import { defaultSemanticComponentErrorHandler } from '../utils/Errors'
 import { capitalize, spaceCamelCaseWord } from '../utils/javascriptUtils'
-import Semantics from '../utils/semantics'
-import { useAppContextState } from '../context/AppContext'
+import AddCollaboratorDialog from './AddCollaboratorDialog'
+import ArchiveProjectDialog from './ArchiveProjectDialog'
+import DeleteProjectDialog from './DeleteProjectDialog'
 import Error from './Error'
-import { TaskCardSemantic as TaskCard } from './TaskCard'
+import TaskCard from './TaskCard'
+import TaskCreationDialog from './TaskCreationDialog'
 import TaskFocus from './TaskFocus'
-import GenericFilters from './GenericFilters'
+import UnarchiveProjectDialog from './UnarchiveProjectDialog'
 
-const ProjectDetails = ({ title, semanticData }) => {
-  const { genericOperationBuilder, apiDocumentation } = useAppContextState()
+import useFetch from '../hooks/useFetch'
+import TaskService from '../services/TaskService'
+import { useHistory } from 'react-router-dom'
+import { TaskTypes } from '../domain/Task'
 
-  // eslint-disable-next-line
-  const [ listTasksLabel, listTasksOperation ] = semanticData.getRelation(Semantics.vnd_jeera.relations.listProjectTasks)
-  const operation = genericOperationBuilder.fromOperation(listTasksOperation)
-  const { parametersDetail, makeCall, isLoading, data, error } = useOperation(operation)
-  // { values, setter, documentation }
-
-  const taskStatusTypeDoc = apiDocumentation.findTypeInOperationResponse(Semantics.vnd_jeera.terms.TaskStatus, listTasksOperation)
-  const tasks = data ? data.get(Semantics.vnd_jeera.terms.tasks) : undefined
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => makeCall(), [])
-
-  const otherOperations = semanticData.getOtherRelations()
+const ProjectDetails = ({ title, isArchived, projectId, refreshProjectFct }) => {
+  const operations = [ 'Archive', 'Unarchive', 'Add Collaborator', 'Delete', 'Create technical story', 'Create user story' ]
   const [ operationFocus, setOperationFocus ] = useState()
+  const history = useHistory()
 
   return <>
     <Pane display="flex" flexDirection="row" justifyContent="space-between" width="100%" overflow="hidden" marginBottom={majorScale(4)}>
       <Heading size={900}>{title}</Heading>
       <Pane display="flex" flexDirection="row" justifyContent="flex-end" flexWrap="wrap">
-        { otherOperations.map(operation =>
-          <Button key={`button-${operation[0]}`} appearance="default" marginRight={majorScale(2)} marginBottom={majorScale(1)} onClick={() => setOperationFocus(operation)}>{ spaceCamelCaseWord(capitalize(operation[0])) }</Button>
+        { operations
+            .filter(shouldDisplayOperation(isArchived))
+            .map(operation => 
+              <Button key={`button-${operation}`} appearance="default" marginRight={majorScale(2)} marginBottom={majorScale(1)} onClick={() => setOperationFocus(operation)}>{ spaceCamelCaseWord(capitalize(operation)) }</Button>
         ) }
+
       </Pane>
     </Pane>
-    <Tasks isLoading={isLoading} error={error} parametersDetail={parametersDetail} tasks={tasks} makeCall={makeCall} taskStatusTypeDoc={taskStatusTypeDoc} />
-    { operationFocus && <ActionDialog title={operationFocus[0]} operationSchema={operationFocus[1]} onSuccessCallback={() => makeCall()} onCloseComplete={() => setOperationFocus(undefined)}/> }
+    
+    <Tasks projectId={projectId} />
+    
+    { operationFocus === 'Archive' ? <ArchiveProjectDialog projectId={projectId} onSuccessCallback={() => refreshProjectFct()} onCloseComplete={() => setOperationFocus(undefined)} />
+      : operationFocus === 'Unarchive' ? <UnarchiveProjectDialog projectId={projectId} onSuccessCallback={() => refreshProjectFct()} onCloseComplete={() => setOperationFocus(undefined)} />
+      : operationFocus === 'Add Collaborator' ? <AddCollaboratorDialog projectId={projectId} onSuccessCallback={() => refreshProjectFct()} onCloseComplete={() => setOperationFocus(undefined)} />
+      : operationFocus === 'Delete' ? <DeleteProjectDialog projectId={projectId} onSuccessCallback={() => history.push('/')} onCloseComplete={() => setOperationFocus(undefined)} />
+      : operationFocus === 'Create user story' ? <TaskCreationDialog projectId={projectId} type={TaskTypes.UserStory} onSuccessCallback={() => refreshProjectFct()} onCloseComplete={() => setOperationFocus(undefined)} />
+      : operationFocus === 'Create technical story' ? <TaskCreationDialog projectId={projectId} type={TaskTypes.TechnicalStory} onSuccessCallback={() => refreshProjectFct()} onCloseComplete={() => setOperationFocus(undefined)} />
+      : null
+    }
+    
+     
   </>
 }
+// <ActionDialog title={operationFocus[0]} operationSchema={operationFocus[1]} onSuccessCallback={() => makeCall()} onCloseComplete={() => setOperationFocus(undefined)}/>
 
-const Tasks = ({ isLoading, error, parametersDetail, tasks, makeCall, taskStatusTypeDoc }) => {
+function shouldDisplayOperation(isArchived) {
+  return operation =>
+    operation === 'Archive' ? !isArchived
+    : operation === 'Unarchive' ? isArchived
+    : operation === 'Delete' ? isArchived
+    : true
+}
+
+const Tasks = ({ projectId }) => {
+  const [ offset, setOffset ] = useState()
+  const [ limit, setLimit ] = useState()
+  const [ createdAfter, setCreatedAfter ] = useState()
+  const { makeCall, isLoading, data, error } = useFetch(() => TaskService.list(projectId, offset, limit, createdAfter))
+  const tasks = data
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => makeCall(), [])
+
   if (isLoading) {
     return <Text>Loading...</Text>
   } else if (error) {
@@ -55,15 +76,58 @@ const Tasks = ({ isLoading, error, parametersDetail, tasks, makeCall, taskStatus
     return <>
       <div>
         <Heading>Tasks filters</Heading>
-        <GenericFilters {...parametersDetail} />
-        { parametersDetail && <Button appearance="primary" onClick={makeCall} marginBottom={majorScale(3)}>Filter</Button>}
+        
+        <Pane width="100%" display="flex" flexDirection="row" flexWrap="wrap" alignItems="flex-start" justifyContent="flex-start">
+        
+          <Pane display="flex" height="100%" marginRight={majorScale(3)} >
+            <Pane width={majorScale(24)}>
+              <TextInputField 
+                label='Offset'
+                isInvalid={isNumberInvalid(offset)}
+                value={offset || ''}
+                placeholder='Offset'
+                validationMessage={ isNumberInvalid(offset) ? 'Must be a number' : undefined }
+                width="100%"
+                onChange={e => setOffset(e.target.value)}
+              />
+            </Pane>
+          </Pane>
+
+          <Pane display="flex" height="100%" marginRight={majorScale(3)} >
+            <Pane width={majorScale(24)}>
+              <TextInputField 
+                label='Limit'
+                isInvalid={isNumberInvalid(limit)}
+                value={limit || ''}
+                placeholder='Limit'
+                validationMessage={ isNumberInvalid(limit) ? 'Must be a number' : undefined }
+                width="100%"
+                onChange={e => setLimit(e.target.value)}
+              />
+            </Pane>
+          </Pane>
+
+          <Pane display="flex" height="100%" marginRight={majorScale(3)} >
+            <Pane width={majorScale(24)}>
+              <TextInputField 
+                label='Created after'
+                value={createdAfter}
+                placeholder='Created after'
+                type='date'
+                width="100%"
+                onChange={e => setCreatedAfter(e.target.value)}
+              />
+            </Pane>
+          </Pane>
+
+        </Pane>
+
+        <Button appearance="primary" onClick={makeCall} marginBottom={majorScale(3)}>Filter</Button>
       </div>
-      {
-        tasks
-          ? <Columns labels={taskStatusTypeDoc.enum} tasks={tasks} />
-          : <Heading>Please figure out how to fetch tasks :).</Heading>
-      }
+      
+      <Columns labels={['todo', 'in progress', 'review', 'QA', 'done']} tasks={tasks || []} />
       <TaskFocus tasks={tasks} onOperationInvokationSuccess={() => makeCall()} />
+
     </>
   }
 }
@@ -75,8 +139,12 @@ const Columns = ({ labels, tasks }) => {
           <Heading marginBottom={majorScale(2)} size={400}>{label.toUpperCase()}</Heading>
           <Pane>
             { tasks
-                .filter(task => task.getValue(Semantics.vnd_jeera.terms.TaskStatus) === label)
-                .map(task => <Pane key={JSON.stringify(task)} marginBottom={majorScale(1)}><TaskCard value={task} /></Pane>)
+                .filter(task => task.status === label)
+                .map(task => 
+                  <Pane key={JSON.stringify(task)} marginBottom={majorScale(1)}>
+                    <TaskCard id={task.id} title={task.name} points={task.points} />
+                  </Pane>
+                )
             }
           </Pane>
         </Pane>
@@ -85,22 +153,8 @@ const Columns = ({ labels, tasks }) => {
   </Pane>
 }
 
-export const ProjectDetailsSemanticBuilder = new SemanticComponentBuilder(
-  Semantics.schema.terms.Project,
-  ProjectDetails,
-  {
-    id: Semantics.vnd_jeera.terms.projectId,
-    title: Semantics.schema.terms.name,
-    collaborators: Semantics.vnd_jeera.terms.collaborators,
-  },
-  {
-    isPublic: Semantics.vnd_jeera.terms.isPublic,
-    lastUpdate: Semantics.schema.terms.lastUpdate
-  },
-  undefined,
-  defaultSemanticComponentErrorHandler('project')
-)
-
-export const ProjectDetailsSemantic = ProjectDetailsSemanticBuilder.build()
+function isNumberInvalid(number) {
+  return number !== undefined && (isNaN(number) || (!isNaN(number) && number < 0))
+}
 
 export default ProjectDetails

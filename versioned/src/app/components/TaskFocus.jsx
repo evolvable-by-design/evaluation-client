@@ -2,11 +2,12 @@ import React from 'react'
 import { useHistory } from 'react-router-dom'
 import qs from 'qs'
 
-import ActionDialog from './ActionDialog'
-
 import useQuery from '../hooks/useQuery'
-import Semantics from '../utils/semantics'
-import { TaskDialogSemantic as TaskDialog } from './TaskDialog'
+import TaskService from '../services/TaskService'
+
+import ConfirmOperationDialog from './ConfirmOperationDialog'
+import TaskDialog from './TaskDialog'
+import UpdateTaskDialog from './UpdateTaskDialog'
 
 const TaskFocus = ({ tasks, onOperationInvokationSuccess }) => {
   const { taskFocus, actionFocus } = useQuery()
@@ -16,27 +17,56 @@ const TaskFocus = ({ tasks, onOperationInvokationSuccess }) => {
     return null
   }
 
-  const task = tasks.find(task => task.getValue(Semantics.vnd_jeera.terms.taskId) === taskFocus)
-  const actions = taskFocus && task ? task.getOtherRelations() : undefined
-  const action = (actions || []).find(([key, value]) => key === actionFocus)
+  const task = tasks.find(task => task.id === taskFocus)
 
-  if (action) {
-    return <ActionDialog
-      title={action[0]}
-      operationSchema={action[1]}
-      onSuccessCallback={() => onOperationInvokationSuccess()}
-      onCloseComplete={() => hideTaskActionDialog(history)}
-    />
+  if (task === undefined) {
+    hideTaskDialog(history)
+    return null
+  }
+
+  const actions = taskActions(task.projectId, task, onOperationInvokationSuccess, history)
+  const Action = actions[actionFocus]
+
+  if (Action) {
+    return <Action />
   } else if (task) {
-    return <TaskDialog value={task} />
+    return <TaskDialog title={task.name} {...task}  actions={Object.keys(actions)} />
   } else {
     return null
   }
 }
 
+function taskActions(projectId, task, onOperationInvokationSuccess, history) {
+  const commonProps = {
+    onCloseComplete: () => hideTaskActionDialog(history),
+    onSuccessCallback: () => {
+      onOperationInvokationSuccess()
+      hideTaskActionDialog(history)
+    }
+  }
+
+  const actions = {
+    Update: () => <UpdateTaskDialog task={task} isShown={true} {...commonProps} />,
+    Delete: () => <ConfirmOperationDialog operation={() => TaskService.delete(projectId, task.id)} title='Delete' {...commonProps} intent='danger' />,
+    "Move to QA": () => <ConfirmOperationDialog operation={() => TaskService.toQa(projectId, task.id)} title='Move to QA' {...commonProps} />,
+    Complete: () => <ConfirmOperationDialog operation={() => TaskService.complete(projectId, task.id)} title='Complete' {...commonProps} />,
+  }
+
+  if (task.status !== 'QA') delete actions['Complete'];
+  if (task.status === 'QA') delete actions['Move to QA'];
+
+  return actions
+}
+
 function hideTaskActionDialog(history) {
   const query = qs.parse(window.location.search.substring(1))
   delete query.actionFocus
+  history.push(`${window.location.pathname}?${qs.stringify(query)}`)
+}
+
+function hideTaskDialog(history) {
+  const query = qs.parse(window.location.search.substring(1))
+  delete query.taskFocus
   history.push(`${window.location.pathname}?${qs.stringify(query)}`)
 }
 

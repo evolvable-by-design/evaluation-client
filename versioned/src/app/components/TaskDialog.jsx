@@ -3,21 +3,13 @@ import { useHistory } from 'react-router-dom'
 import qs from 'qs'
 import { Badge, Dialog, Heading, Pane, Paragraph, Pill, majorScale } from 'evergreen-ui'
 
-import ComponentResolver from '../../library/services/ComponentResolver'
-import SemanticComponentBuilder from '../../library/services/SemanticComponentBuilder'
-
 import ActionsSelector from '../components/ActionsSelector'
 import ContainerWithLabel from '../components/ContainerWithLabel'
 import TextWithLabel from '../components/TextWithLabel'
-import { defaultSemanticComponentErrorHandler } from '../utils/Errors'
-import Semantics from '../utils/semantics'
-import { formatString } from '../utils/javascriptUtils'
 import UserId from './UserId'
 
-const TaskDialog = ({ id, assignee, assigneeSemantics, title, description, points, status, lastUpdate, semanticData }) => {
+const TaskDialog = ({ id, assignee, title, description, points, status, lastUpdate, actions }) => {
   const history = useHistory()
-  const otherData = semanticData.getOtherData()
-  const actions = semanticData.getOtherRelations()
 
   return <Dialog
     isShown={true}
@@ -38,7 +30,7 @@ const TaskDialog = ({ id, assignee, assigneeSemantics, title, description, point
         <Pane><ActionsSelector actions={actions} onSelect={value => showTaskActionDialog(value, history)} /></Pane>
 
         <ContainerWithLabel label='Assignee'>
-          <UserId value={assignee} valueSemantics={assigneeSemantics} />
+          <UserId id={assignee} />
         </ContainerWithLabel>
 
         { points && <ContainerWithLabel label='Points'>
@@ -48,37 +40,10 @@ const TaskDialog = ({ id, assignee, assigneeSemantics, title, description, point
         <TextWithLabel label='Status'>{status}</TextWithLabel>
 
         { lastUpdate && <TextWithLabel label='Last update on'>{lastUpdate}</TextWithLabel> } 
-        {
-          Object.entries(otherData).map(([key, value]) => 
-            <ContainerWithLabel label={formatString(key)} key={key}>
-              <ComponentResolver semanticData={value} />
-            </ContainerWithLabel>
-          )
-        }
       </Pane>
     </Pane>
   </Dialog>
 }
-
-export const TaskDialogSemanticBuilder = new SemanticComponentBuilder(
-  [ Semantics.vnd_jeera.terms.Task, Semantics.vnd_jeera.terms.TechnicalStory, Semantics.vnd_jeera.terms.UserStory ],
-  TaskDialog,
-  {
-    id: Semantics.vnd_jeera.terms.taskId,
-    title: Semantics.schema.terms.name,
-    assignee: Semantics.vnd_jeera.terms.assignee,
-    status: Semantics.vnd_jeera.terms.TaskStatus
-  },
-  {
-    description: Semantics.schema.terms.description,
-    points: Semantics.vnd_jeera.terms.points,
-    lastUpdate: Semantics.schema.terms.lastUpdate
-  },
-  undefined,
-  defaultSemanticComponentErrorHandler('task')
-)
-
-export const TaskDialogSemantic = TaskDialogSemanticBuilder.build()
 
 function hideTaskDialog(history) {
   const query = qs.parse(window.location.search.substring(1))

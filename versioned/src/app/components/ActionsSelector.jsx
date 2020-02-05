@@ -9,9 +9,9 @@ const ActionsSelector = ({ actions, onSelect }) =>
     content={
       <Menu>
         <Menu.Group>
-          { actions.map(([key]) => 
-            <Menu.Item key={key} onSelect={() => onSelect(key)}>
-              {firstLetterUppercase(spaceCamelCaseWord(key))}
+          { actions.map(action => 
+            <Menu.Item key={action} onSelect={() => onSelect(action)}>
+              {firstLetterUppercase(spaceCamelCaseWord(action))}
             </Menu.Item>)
           }
         </Menu.Group>
