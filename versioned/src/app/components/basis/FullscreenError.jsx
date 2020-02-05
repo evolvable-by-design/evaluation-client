@@ -1,6 +1,6 @@
 import React from 'react';
 
-import FullscreenCenterContainer from './FullscreenCenterContainer'
+import FullscreenCenterContainer from '../layout/FullscreenCenterContainer'
 import Error from './Error'
 
 const FullScreenError = ({error}) => {

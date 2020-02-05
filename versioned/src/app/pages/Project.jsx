@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
-import BaseApplicationLayout from '../components/BaseApplicationLayout'
-import ProjectDetails from '../components/ProjectDetails'
-import FullscreenLoader from '../components/FullscreenLoader'
-import FullScreenError from '../components/FullscreenError'
+import BaseApplicationLayout from '../components/layout/BaseApplicationLayout'
+import ProjectDetails from '../components/project/ProjectDetails'
+import FullscreenLoader from '../components/basis/FullscreenLoader'
+import FullScreenError from '../components/basis/FullscreenError'
 import { AuthenticationRequiredError } from '../utils/Errors'
-import LoginRedirect from '../components/LoginRedirect'
+import LoginRedirect from '../components/basis/LoginRedirect'
 import useFetch from '../hooks/useFetch'
 import ProjectService from '../services/ProjectService'
 

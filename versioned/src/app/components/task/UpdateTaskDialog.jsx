@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import { Alert, Dialog, Pane, Textarea, TextInput } from 'evergreen-ui' 
 
-import useFetch from '../hooks/useFetch'
-import { TaskTypes } from '../domain/Task'
-import TaskService from '../services/TaskService'
-import WithLabel from './WithLabel'
+import useFetch from '../../hooks/useFetch'
+import TaskService from '../../services/TaskService'
+import SelectInput from '../input/SelectInput'
+import WithLabel from '../input/WithLabel'
 
-const TaskCreationDialog = ({ projectId, onSuccessCallback, onCloseComplete, type }) => {
-  const [ name, setName ] = useState()
-  const [ description, setDescription ] = useState()
-  const [ assignee, setAssignee ] = useState()
-  const [ points, setPoints ] = useState()
-  const { makeCall, isLoading, success, data, error } = useFetch(() => TaskService.create(projectId, type, {name, description, assignee, points}))
+const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete }) => {
+  const [ name, setName ] = useState(task.name)
+  const [ description, setDescription ] = useState(task.description)
+  const [ assignee, setAssignee ] = useState(task.assignee)
+  const [ status, setStatus ] = useState(task.status)
+  const [ points, setPoints ] = useState(task.points)
+  const { makeCall, isLoading, success, data, error } = useFetch(() => TaskService.update(task.projectId, {...task, name, description, assignee, status, points}))
 
   useEffect(() => {
     if (success && data) { 
@@ -21,10 +22,11 @@ const TaskCreationDialog = ({ projectId, onSuccessCallback, onCloseComplete, typ
   }, [success, data])
 
   return <Dialog
-    isShown={true}
-    title='Create task'
+    isShown={isShown}
+    title='Update task'
     isConfirmLoading={isLoading}
-    confirmLabel="Create"
+    isConfirmDisabled={ { ...task, name, description, assignee, status, points } == task }
+    confirmLabel="Update"
     onConfirm={makeCall}
     onCloseComplete={() => { if (success) { onSuccessCallback(data) } onCloseComplete() }}
     hasFooter={!success}
@@ -36,9 +38,9 @@ const TaskCreationDialog = ({ projectId, onSuccessCallback, onCloseComplete, typ
           <Pane width="100%" display="flex" flexDirection="row" flexWrap="wrap" alignItems="flex-start" justifyContent="flex-start">
 
             <Pane width="100%" >
-              <WithLabel label='Name' required>
+              <WithLabel label='Name'>
                 <TextInput
-                  isInvalid={name && (name.length < 3 || name.length > 140)}
+                  isInvalid={name.length < 3 || name.length > 140}
                   value={name || ''}
                   type='text'
                   width="100%"
@@ -48,7 +50,7 @@ const TaskCreationDialog = ({ projectId, onSuccessCallback, onCloseComplete, typ
             </Pane>
 
             <Pane width="100%" >
-              <WithLabel label='Assignee' required>
+              <WithLabel label='Assignee'>
                 <TextInput
                   value={assignee || ''}
                   width="100%"
@@ -61,8 +63,8 @@ const TaskCreationDialog = ({ projectId, onSuccessCallback, onCloseComplete, typ
             <Pane width="100%" >
               <WithLabel label='Description'>
                 <Textarea
-                  isInvalid={description && (description.length > 2000)}
-                  validationMessage={description && description.length > 2000 ? 'Max length is 2000' : undefined}
+                  isInvalid={description.length > 2000}
+                  validationMessage={description.length > 2000 ? 'Max length is 2000' : undefined}
                   value={description || ''}
                   width="100%"
                   onChange={e => setDescription(e.target.value)}
@@ -70,12 +72,23 @@ const TaskCreationDialog = ({ projectId, onSuccessCallback, onCloseComplete, typ
               </WithLabel>
             </Pane>
 
-            { type === TaskTypes.UserStory && 
+            <Pane width="100%" >
+              <WithLabel label='Status'>
+                <SelectInput 
+                  options={Array.from(new Set([ 'todo', 'in progress', 'review', task.status]))}
+                  value={status}
+                  onChange={e => setStatus(e.target.value)}
+                  required={false}
+                />
+              </WithLabel>
+            </Pane>
+
+            { task.points && 
               <Pane width="100%" >
-                <WithLabel label='Points' required>
+                <WithLabel label='Points'>
                 <TextInput
-                  isInvalid={points && (points < 0)}
-                  validationMessage={points && points < 0 ? 'Can only be a positive number' : undefined}
+                  isInvalid={points < 0}
+                  validationMessage={points < 0 ? 'Can only be a positive number' : undefined}
                   value={points}
                   type='number'
                   width="100%"
@@ -93,4 +106,4 @@ const TaskCreationDialog = ({ projectId, onSuccessCallback, onCloseComplete, typ
   </Dialog>
 }
 
-export default TaskCreationDialog
+export default UpdateTaskDialog

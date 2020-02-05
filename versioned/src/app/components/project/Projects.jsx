@@ -3,11 +3,11 @@ import { Alert, Button, Pane, Text, Heading, TextInputField, majorScale } from '
 
 import CreateProjectDialog from './CreateProjectDialog'
 import ProjectCard from './ProjectCard';
-import FullscreenError from './FullscreenError';
-import SwitchInputField from './SwitchInputField';
-import useFetch from '../hooks/useFetch';
-import AuthenticationService from '../services/AuthenticationService';
-import ProjectService from '../services/ProjectService';
+import FullscreenError from '../basis/FullscreenError';
+import SwitchInputField from '../input/SwitchInputField';
+import useFetch from '../../hooks/useFetch';
+import AuthenticationService from '../../services/AuthenticationService';
+import ProjectService from '../../services/ProjectService';
 
 
 const Projects = () => {

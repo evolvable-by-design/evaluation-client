@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { Alert, Dialog, Pane, Textarea, TextInput } from 'evergreen-ui' 
 
-import useFetch from '../hooks/useFetch'
-import TaskService from '../services/TaskService'
-import SelectInput from './SelectInput'
-import WithLabel from './WithLabel'
+import useFetch from '../../hooks/useFetch'
+import { TaskTypes } from '../../domain/Task'
+import TaskService from '../../services/TaskService'
+import WithLabel from '../input/WithLabel'
 
-const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete }) => {
-  const [ name, setName ] = useState(task.name)
-  const [ description, setDescription ] = useState(task.description)
-  const [ assignee, setAssignee ] = useState(task.assignee)
-  const [ status, setStatus ] = useState(task.status)
-  const [ points, setPoints ] = useState(task.points)
-  const { makeCall, isLoading, success, data, error } = useFetch(() => TaskService.update(task.projectId, {...task, name, description, assignee, status, points}))
+const TaskCreationDialog = ({ projectId, onSuccessCallback, onCloseComplete, type }) => {
+  const [ name, setName ] = useState()
+  const [ description, setDescription ] = useState()
+  const [ assignee, setAssignee ] = useState()
+  const [ points, setPoints ] = useState()
+  const { makeCall, isLoading, success, data, error } = useFetch(() => TaskService.create(projectId, type, {name, description, assignee, points}))
 
   useEffect(() => {
     if (success && data) { 
@@ -22,11 +21,10 @@ const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete })
   }, [success, data])
 
   return <Dialog
-    isShown={isShown}
-    title='Update task'
+    isShown={true}
+    title='Create task'
     isConfirmLoading={isLoading}
-    isConfirmDisabled={ { ...task, name, description, assignee, status, points } == task }
-    confirmLabel="Update"
+    confirmLabel="Create"
     onConfirm={makeCall}
     onCloseComplete={() => { if (success) { onSuccessCallback(data) } onCloseComplete() }}
     hasFooter={!success}
@@ -38,9 +36,9 @@ const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete })
           <Pane width="100%" display="flex" flexDirection="row" flexWrap="wrap" alignItems="flex-start" justifyContent="flex-start">
 
             <Pane width="100%" >
-              <WithLabel label='Name'>
+              <WithLabel label='Name' required>
                 <TextInput
-                  isInvalid={name.length < 3 || name.length > 140}
+                  isInvalid={name && (name.length < 3 || name.length > 140)}
                   value={name || ''}
                   type='text'
                   width="100%"
@@ -50,7 +48,7 @@ const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete })
             </Pane>
 
             <Pane width="100%" >
-              <WithLabel label='Assignee'>
+              <WithLabel label='Assignee' required>
                 <TextInput
                   value={assignee || ''}
                   width="100%"
@@ -63,8 +61,8 @@ const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete })
             <Pane width="100%" >
               <WithLabel label='Description'>
                 <Textarea
-                  isInvalid={description.length > 2000}
-                  validationMessage={description.length > 2000 ? 'Max length is 2000' : undefined}
+                  isInvalid={description && (description.length > 2000)}
+                  validationMessage={description && description.length > 2000 ? 'Max length is 2000' : undefined}
                   value={description || ''}
                   width="100%"
                   onChange={e => setDescription(e.target.value)}
@@ -72,23 +70,12 @@ const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete })
               </WithLabel>
             </Pane>
 
-            <Pane width="100%" >
-              <WithLabel label='Status'>
-                <SelectInput 
-                  options={Array.from(new Set([ 'todo', 'in progress', 'review', task.status]))}
-                  value={status}
-                  onChange={e => setStatus(e.target.value)}
-                  required={false}
-                />
-              </WithLabel>
-            </Pane>
-
-            { task.points && 
+            { type === TaskTypes.UserStory && 
               <Pane width="100%" >
-                <WithLabel label='Points'>
+                <WithLabel label='Points' required>
                 <TextInput
-                  isInvalid={points < 0}
-                  validationMessage={points < 0 ? 'Can only be a positive number' : undefined}
+                  isInvalid={points && (points < 0)}
+                  validationMessage={points && points < 0 ? 'Can only be a positive number' : undefined}
                   value={points}
                   type='number'
                   width="100%"
@@ -106,4 +93,4 @@ const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete })
   </Dialog>
 }
 
-export default UpdateTaskDialog
+export default TaskCreationDialog

@@ -1,32 +1,33 @@
 import React, { useCallback, useState } from 'react'
 import { Dialog, Text, toaster } from 'evergreen-ui' 
 
-import ProjectService from '../services/ProjectService'
+import ProjectService from '../../services/ProjectService'
 
-const UnarchiveProjectDialog = ({ projectId, onSuccessCallback, onCloseComplete }) => {
+const DeleteProjectDialog = ({ projectId, onSuccessCallback, onCloseComplete }) => {
   const [ isLoading, setIsLoading ] = useState(false)
   const archive = useCallback(() => {
     setIsLoading(true)
-    ProjectService.unarchive(projectId)
+    ProjectService.deleteOne(projectId)
       .then(() => {
-        toaster.success('Successfully unarchived project!');
+        toaster.success('Successfully deleted project!')
         if (onSuccessCallback) { onSuccessCallback(); }
       })
-      .catch(error => toaster.danger(`An error occured while trying to unarchive project: ${error.message}`))
+      .catch(error => toaster.danger(`An error occured while trying to delete project: ${error.message}`))
       .finally(() => setIsLoading(false))
   }, [projectId])
 
   return <Dialog
     isShown={true}
+    title='Delete project'
+    confirmLabel="Delete"
+    intent="danger"
     isConfirmLoading={isLoading}
-    title='Unarchive project'
-    confirmLabel="Confirm"
     onConfirm={archive}
     onCloseComplete={onCloseComplete}
     width="auto"
   >
-    <Text>Are you sure that you want to unarchive this project?</Text>
+    <Text>Are you sure that you want to delete this project?</Text>
   </Dialog>
 }
 
-export default UnarchiveProjectDialog
+export default DeleteProjectDialog

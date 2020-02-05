@@ -4,8 +4,8 @@ import { Alert, Dialog, Heading, Pane, Spinner, TextInput, majorScale } from 'ev
 
 import AuthenticationService from '../services/AuthenticationService';
 
-import FullscreenCenterContainer from '../components/FullscreenCenterContainer';
-import WithLabel from '../components/WithLabel';
+import FullscreenCenterContainer from '../components/layout/FullscreenCenterContainer';
+import WithLabel from '../components/input/WithLabel';
 import useFetch from '../hooks/useFetch';
 
 

@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react'
 import { Spinner } from 'evergreen-ui'
 
-import useFetch from '../hooks/useFetch'
-import UserService from '../services/UserService'
+import useFetch from '../../hooks/useFetch'
+import UserService from '../../services/UserService'
 
 import UserBadge from './UserBadge'
 

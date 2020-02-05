@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Select } from 'evergreen-ui'
 
-import { onlyWhen } from '../utils/javascriptUtils'
+import { onlyWhen } from '../../utils/javascriptUtils'
 
 function SelectInput({ options, defaultValue, value, error, onChange, required }) {
   const [ touched, setTouched ] = useState(false)

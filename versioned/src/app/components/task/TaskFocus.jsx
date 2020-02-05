@@ -2,10 +2,10 @@ import React from 'react'
 import { useHistory } from 'react-router-dom'
 import qs from 'qs'
 
-import useQuery from '../hooks/useQuery'
-import TaskService from '../services/TaskService'
+import useQuery from '../../hooks/useQuery'
+import TaskService from '../../services/TaskService'
 
-import ConfirmOperationDialog from './ConfirmOperationDialog'
+import ConfirmOperationDialog from '../basis/ConfirmOperationDialog'
 import TaskDialog from './TaskDialog'
 import UpdateTaskDialog from './UpdateTaskDialog'
 

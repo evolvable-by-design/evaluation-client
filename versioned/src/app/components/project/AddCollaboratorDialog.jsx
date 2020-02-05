@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Alert, Dialog, Pane, TextInput } from 'evergreen-ui' 
 
-import useFetch from '../hooks/useFetch'
-import ProjectService from '../services/ProjectService'
-import WithLabel from './WithLabel'
-import ArrayInput from './ArrayInput'
+import useFetch from '../../hooks/useFetch'
+import ProjectService from '../../services/ProjectService'
+import WithLabel from '../input/WithLabel'
+import ArrayInput from '../input/ArrayInput'
 
 const AddCollaboratorDialog = ({ projectId, onSuccessCallback, onCloseComplete }) => {
   const [ collaborators, setCollaborators ] = useState([])

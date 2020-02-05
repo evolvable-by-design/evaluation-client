@@ -1,20 +1,20 @@
 import React, { useEffect, useState }  from 'react'
+import { useHistory } from 'react-router-dom'
 import { Button, Heading, Pane, Text, TextInputField, majorScale, minorScale } from 'evergreen-ui'
 
-import { capitalize, spaceCamelCaseWord } from '../utils/javascriptUtils'
+import { capitalize, spaceCamelCaseWord } from '../../utils/javascriptUtils'
 import AddCollaboratorDialog from './AddCollaboratorDialog'
 import ArchiveProjectDialog from './ArchiveProjectDialog'
 import DeleteProjectDialog from './DeleteProjectDialog'
-import Error from './Error'
-import TaskCard from './TaskCard'
-import TaskCreationDialog from './TaskCreationDialog'
-import TaskFocus from './TaskFocus'
+import Error from '../basis/Error'
+import TaskCard from '../task/TaskCard'
+import TaskCreationDialog from '../task/TaskCreationDialog'
+import TaskFocus from '../task/TaskFocus'
 import UnarchiveProjectDialog from './UnarchiveProjectDialog'
 
-import useFetch from '../hooks/useFetch'
-import TaskService from '../services/TaskService'
-import { useHistory } from 'react-router-dom'
-import { TaskTypes } from '../domain/Task'
+import useFetch from '../../hooks/useFetch'
+import TaskService from '../../services/TaskService'
+import { TaskTypes } from '../../domain/Task'
 
 const ProjectDetails = ({ title, isArchived, projectId, refreshProjectFct }) => {
   const operations = [ 'Archive', 'Unarchive', 'Add Collaborator', 'Delete', 'Create technical story', 'Create user story' ]

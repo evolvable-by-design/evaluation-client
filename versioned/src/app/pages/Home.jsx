@@ -1,7 +1,7 @@
 import React from 'react';
 
-import BaseApplicationLayout from '../components/BaseApplicationLayout'
-import Projects from '../components/Projects';
+import BaseApplicationLayout from '../components/layout/BaseApplicationLayout'
+import Projects from '../components/project/Projects';
 
 const Home = () => 
   <BaseApplicationLayout>

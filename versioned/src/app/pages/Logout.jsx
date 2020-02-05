@@ -3,8 +3,8 @@ import { useHistory, Redirect } from 'react-router-dom';
 import { Heading, Spinner, Paragraph, Pane, majorScale } from 'evergreen-ui';
 
 import AuthenticationService from '../services/AuthenticationService';
-import FullscreenCenterContainer from '../components/FullscreenCenterContainer';
-import FullscreenError from '../components/FullscreenError';
+import FullscreenCenterContainer from '../components/layout/FullscreenCenterContainer';
+import FullscreenError from '../components/basis/FullscreenError';
 import useFetch from '../hooks/useFetch';
 
 function Logout() {

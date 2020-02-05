@@ -1,7 +1,7 @@
 import React from 'react'
 import { Avatar, Text, Pane } from 'evergreen-ui'
 
-import { formatString } from '../utils/javascriptUtils'
+import { formatString } from '../../utils/javascriptUtils'
 
 const UserBadge = ({ username, noLabel }) =>
   <Pane display='flex' direction='row' alignItems='center'>

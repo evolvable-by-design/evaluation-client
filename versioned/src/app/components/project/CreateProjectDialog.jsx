@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Alert, Dialog, Pane, TextInput, Switch, majorScale } from 'evergreen-ui' 
 
-import useFetch from '../hooks/useFetch'
-import ProjectService from '../services/ProjectService'
+import useFetch from '../../hooks/useFetch'
+import ProjectService from '../../services/ProjectService'
 
-import WithLabel from './WithLabel'
+import WithLabel from '../input/WithLabel'
 
 const CreateProjectDialog = ({ isShown, onSuccessCallback, onCloseComplete }) => {
   const [ name, setName ] = useState()

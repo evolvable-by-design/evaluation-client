@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, Menu, Popover, Position, majorScale } from 'evergreen-ui'
 
-import { firstLetterUppercase, spaceCamelCaseWord } from '../utils/javascriptUtils'
+import { firstLetterUppercase, spaceCamelCaseWord } from '../../utils/javascriptUtils'
 
 const ActionsSelector = ({ actions, onSelect }) =>
   <Popover

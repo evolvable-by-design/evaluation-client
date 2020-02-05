@@ -1,7 +1,7 @@
 import React from 'react'
 import { Heading, Pane, majorScale } from 'evergreen-ui'
 
-import { capitalize, spaceCamelCaseWord } from '../utils/javascriptUtils'
+import { capitalize, spaceCamelCaseWord } from '../../utils/javascriptUtils'
 
 const WithLabel = ({label, required, children}) => 
   <Pane width="100%" display="flex" flexDirection="row" marginBottom={majorScale(3)} alignItems="flex-start">

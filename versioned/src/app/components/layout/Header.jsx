@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { Pane, Heading, majorScale } from 'evergreen-ui'
 
-import UserProfileBubble from './UserProfileBubble'
+import UserProfileBubble from '../user/UserProfileBubble'
 
 function Header({ width }) {
   return (

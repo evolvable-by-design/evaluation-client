@@ -3,10 +3,10 @@ import { useHistory } from 'react-router-dom'
 import qs from 'qs'
 import { Badge, Dialog, Heading, Pane, Paragraph, Pill, majorScale } from 'evergreen-ui'
 
-import ActionsSelector from '../components/ActionsSelector'
-import ContainerWithLabel from '../components/ContainerWithLabel'
-import TextWithLabel from '../components/TextWithLabel'
-import UserId from './UserId'
+import ActionsSelector from './ActionsSelector'
+import ContainerWithLabel from '../input/ContainerWithLabel'
+import TextWithLabel from '../input/TextWithLabel'
+import UserId from '../user/UserId'
 
 const TaskDialog = ({ id, assignee, title, description, points, status, lastUpdate, actions }) => {
   const history = useHistory()

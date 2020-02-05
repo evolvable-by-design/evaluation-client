@@ -1,7 +1,7 @@
 import React from 'react'
 import { IconButton, Pane } from 'evergreen-ui';
 
-import { onlyWhen, arrayWithoutElAtIndex, setInArray } from '../utils/javascriptUtils';
+import { onlyWhen, arrayWithoutElAtIndex, setInArray } from '../../utils/javascriptUtils';
 
 function ArrayInput({ values, setValues, required, minItems, maxItems, input }) {
   return <div>
