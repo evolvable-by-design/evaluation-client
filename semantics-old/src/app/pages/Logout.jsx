@@ -6,8 +6,8 @@ import AuthenticationService from '../../library/services/AuthenticationService'
 import { useOperation } from '../../library/services/ReactGenericOperation';
 
 import Semantics from '../utils/semantics';
-import FullscreenCenterContainer from '../components/layout/FullscreenCenterContainer';
-import FullscreenError from '../components/basis/FullscreenError';
+import FullscreenCenterContainer from '../components/FullscreenCenterContainer';
+import FullscreenError from '../components/FullscreenError';
 import { useAppContextState } from '../context/AppContext'
 
 function Logout() {

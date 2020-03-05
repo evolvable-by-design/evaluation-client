@@ -1,12 +1,10 @@
-import { AnalyticsSemanticBuilder } from './Analytics'
-import { ProjectCardSemanticBuilder }  from './ProjectCard'
-import { ProjectDetailsSemanticBuilder } from './ProjectDetails'
-import { TaskCardSemanticBuilder } from './TaskCard'
-import { TaskDialogSemanticBuilder } from './TaskDialog'
-import { UserBadgeSemanticBuilder } from './UserBadge'
+import { ProjectCardSemanticBuilder }  from './project/ProjectCard'
+import { ProjectDetailsSemanticBuilder } from './project/ProjectDetails'
+import { TaskCardSemanticBuilder } from './task/TaskCard'
+import { TaskDialogSemanticBuilder } from './task/TaskDialog'
+import { UserBadgeSemanticBuilder } from './user/UserBadge'
 
 const components = [
-  AnalyticsSemanticBuilder,
   ProjectCardSemanticBuilder,
   ProjectDetailsSemanticBuilder,
   TaskCardSemanticBuilder,
