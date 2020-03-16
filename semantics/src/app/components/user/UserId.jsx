@@ -12,18 +12,20 @@ import { isExistingResourceId } from '../../utils/SemanticsUtils'
 const UserId = ({ value, valueSemantics, noLabel }) => {
   // console.log(value)
   // console.log(valueSemantics)
-  // TODO adapt to make use of technical ids
+  const { genericOperationBuilder } = useAppContextState()
 
-  if (isExistingResourceId(valueSemantics.resourceSchema['@type'])) {
-    return <FetchUser userId={value} noLabel={noLabel} />
+  if (isExistingResourceId(valueSemantics.resourceSchema)) {
+    const { operation, parameters } = genericOperationBuilder.fromId(value)
+    return <FetchUser operation={operation} parameters={parameters} noLabel={noLabel} />
+  } else if (valueSemantics.type === Semantics.vnd_jeera.terms.assignee) {
+    const operation = genericOperationBuilder.fromKey(Semantics.vnd_jeera.terms.getUserDetails)
+    return <FetchUser operation={operation} parameters={{ [Semantics.vnd_jeera.terms.userId]: value}} noLabel={noLabel} />
   } else {
     return <UserBadge username={value} noLabel />
   }
 }
 
-const FetchUser = ({ userId, noLabel }) => {
-  const { genericOperationBuilder } = useAppContextState()
-  const { operation, parameters } = genericOperationBuilder.fromId(userId)
+const FetchUser = ({ operation, parameters, noLabel }) => {
   const { makeCall, isLoading, data, error, userShouldAuthenticate } = useOperation(operation, parameters)
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
