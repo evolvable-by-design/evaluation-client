@@ -7,12 +7,12 @@ import SelectInput from '../input/SelectInput'
 import WithLabel from '../input/WithLabel'
 
 const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete }) => {
-  const [ name, setName ] = useState(task.name)
+  const [ title, setTitle ] = useState(task.title)
   const [ description, setDescription ] = useState(task.description)
   const [ assignee, setAssignee ] = useState(task.assignee)
   const [ status, setStatus ] = useState(task.status)
   const [ points, setPoints ] = useState(task.points)
-  const { makeCall, isLoading, success, data, error } = useFetch(() => TaskService.update(task.projectId, {...task, name, description, assignee, status, points}))
+  const { makeCall, isLoading, success, data, error } = useFetch(() => TaskService.update(task.projectId, {...task, title, description, assignee, status, points}))
 
   useEffect(() => {
     if (success && data) { 
@@ -25,7 +25,7 @@ const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete })
     isShown={isShown}
     title='Update task'
     isConfirmLoading={isLoading}
-    isConfirmDisabled={ { ...task, name, description, assignee, status, points } == task }
+    isConfirmDisabled={ { ...task, title, description, assignee, status, points } == task }
     confirmLabel="Update"
     onConfirm={makeCall}
     onCloseComplete={() => { if (success) { onSuccessCallback(data) } onCloseComplete() }}
@@ -38,13 +38,13 @@ const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete })
           <Pane width="100%" display="flex" flexDirection="row" flexWrap="wrap" alignItems="flex-start" justifyContent="flex-start">
 
             <Pane width="100%" >
-              <WithLabel label='Name'>
+              <WithLabel label='Title'>
                 <TextInput
-                  isInvalid={name.length < 3 || name.length > 140}
-                  value={name || ''}
+                  isInvalid={title.length < 3 || title.length > 140}
+                  value={title || ''}
                   type='text'
                   width="100%"
-                  onChange={e => setName(e.target.value)}
+                  onChange={e => setTitle(e.target.value)}
                 />
               </WithLabel>
             </Pane>

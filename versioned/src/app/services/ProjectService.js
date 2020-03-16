@@ -28,7 +28,7 @@ class ProjectService {
   }
 
   async addCollaborator(projectId, users) {
-    const response = await HttpClient().post(`/project/${projectId}/invite`, { users })
+    const response = await HttpClient().post(`/project/${projectId}/addCollaborator`, { users })
     return response.status === '204'
   }
 
