@@ -40,7 +40,7 @@ const AddCollaboratorDialog = ({ projectId, onSuccessCallback, onCloseComplete }
                   setValues={setCollaborators}
                   required
                   minItems={1}
-                  maxItems={10}
+                  maxItems={5}
                   input={({value, setValue, required}) =>
                     <TextInput value={value} type='text' width="100%" onChange={e => setValue(e.target.value)} required={required} />
                   }

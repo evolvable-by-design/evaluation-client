@@ -44,7 +44,7 @@ const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete })
             <Pane width="100%" >
               <WithLabel label='Title'>
                 <TextInput
-                  isInvalid={title.length < 3 || title.length > 140}
+                  isInvalid={title.length < 4 || title.length > 80}
                   value={title || ''}
                   type='text'
                   width="100%"
@@ -67,8 +67,8 @@ const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete })
             <Pane width="100%" >
               <WithLabel label='Description'>
                 <Textarea
-                  isInvalid={description.length > 2000}
-                  validationMessage={description.length > 2000 ? 'Max length is 2000' : undefined}
+                  isInvalid={description.length > 4000}
+                  validationMessage={description.length > 4000 ? 'Max length is 4000' : undefined}
                   value={description || ''}
                   width="100%"
                   onChange={e => setDescription(e.target.value)}
@@ -91,8 +91,8 @@ const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete })
               <Pane width="100%" >
                 <WithLabel label='Points'>
                 <TextInput
-                  isInvalid={points < 0}
-                  validationMessage={points < 0 ? 'Can only be a positive number' : undefined}
+                  isInvalid={points < 0 || points > 120}
+                  validationMessage={points < 0 ? 'Can only be a positive number' : points > 120 ? 'Must be inferior to 120' : undefined}
                   value={points}
                   type='number'
                   width="100%"
@@ -108,7 +108,7 @@ const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete })
                   values={tags}
                   setValues={setTags}
                   minItems={0}
-                  maxItems={6}
+                  maxItems={10}
                   input={({value, setValue, required}) =>
                     <TextInput value={value} type='text' width="100%" onChange={e => setValue(e.target.value)} required={required} />
                   }
