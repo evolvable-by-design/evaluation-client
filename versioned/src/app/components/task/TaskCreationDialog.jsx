@@ -4,6 +4,7 @@ import { Alert, Dialog, Pane, Textarea, TextInput } from 'evergreen-ui'
 import useFetch from '../../hooks/useFetch'
 import { TaskTypes } from '../../domain/Task'
 import TaskService from '../../services/TaskService'
+import SelectInput from '../input/SelectInput'
 import WithLabel from '../input/WithLabel'
 
 const TaskCreationDialog = ({ projectId, onSuccessCallback, onCloseComplete, type }) => {
