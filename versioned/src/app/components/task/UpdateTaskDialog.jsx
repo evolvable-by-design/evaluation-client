@@ -3,6 +3,7 @@ import { Alert, Dialog, Pane, Textarea, TextInput } from 'evergreen-ui'
 
 import useFetch from '../../hooks/useFetch'
 import TaskService from '../../services/TaskService'
+import ArrayInput from '../input/ArrayInput'
 import SelectInput from '../input/SelectInput'
 import WithLabel from '../input/WithLabel'
 
@@ -12,7 +13,9 @@ const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete })
   const [ assignee, setAssignee ] = useState(task.assignee)
   const [ status, setStatus ] = useState(task.status)
   const [ points, setPoints ] = useState(task.points)
-  const { makeCall, isLoading, success, data, error } = useFetch(() => TaskService.update(task.projectId, {...task, title, description, assignee, status, points}))
+  const [ tags, setTags ] = useState(task.tags || [])
+  const [ priority, setPriority ] = useState(task.priority)
+  const { makeCall, isLoading, success, data, error } = useFetch(() => TaskService.update(task.parentProjectId, {...task, title, description, assignee, status, points, tags, priority}))
 
   useEffect(() => {
     if (success && data) { 
@@ -25,7 +28,7 @@ const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete })
     isShown={isShown}
     title='Update task'
     isConfirmLoading={isLoading}
-    isConfirmDisabled={ { ...task, title, description, assignee, status, points } == task }
+    isConfirmDisabled={ { ...task, title, description, assignee, status, points, tags, priority } == task }
     confirmLabel="Update"
     onConfirm={makeCall}
     onCloseComplete={() => { if (success) { onSuccessCallback(data) } onCloseComplete() }}
@@ -97,6 +100,31 @@ const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete })
                 </WithLabel>
               </Pane>
             }
+
+            <Pane width="100%" >
+              <WithLabel label='Tags'>
+                <ArrayInput 
+                  values={tags}
+                  setValues={setTags}
+                  minItems={0}
+                  maxItems={6}
+                  input={({value, setValue, required}) =>
+                    <TextInput value={value} type='text' width="100%" onChange={e => setValue(e.target.value)} required={required} />
+                  }
+                />
+              </WithLabel> 
+            </Pane>
+
+            <Pane width="100%" >
+              <WithLabel label='Priority'>
+                <SelectInput 
+                  options={Array.from(new Set([ 'blocking', 'critical', 'important', 'high', 'medium', 'low', 'simple' ]))}
+                  value={priority}
+                  onChange={e => setPriority(e.target.value)}
+                  required={false}
+                />
+              </WithLabel>
+            </Pane>
             
           </Pane>
         </>

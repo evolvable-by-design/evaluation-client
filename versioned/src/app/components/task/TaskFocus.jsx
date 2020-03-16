@@ -24,7 +24,7 @@ const TaskFocus = ({ tasks, onOperationInvokationSuccess }) => {
     return null
   }
 
-  const actions = taskActions(task.projectId, task, onOperationInvokationSuccess, history)
+  const actions = taskActions(task.parentProjectId, task, onOperationInvokationSuccess, history)
   const Action = actions[actionFocus]
 
   if (Action) {
