@@ -7,11 +7,11 @@ import TaskService from '../../services/TaskService'
 import WithLabel from '../input/WithLabel'
 
 const TaskCreationDialog = ({ projectId, onSuccessCallback, onCloseComplete, type }) => {
-  const [ name, setName ] = useState()
+  const [ title, setTitle ] = useState()
   const [ description, setDescription ] = useState()
   const [ assignee, setAssignee ] = useState()
   const [ points, setPoints ] = useState()
-  const { makeCall, isLoading, success, data, error } = useFetch(() => TaskService.create(projectId, type, {name, description, assignee, points}))
+  const { makeCall, isLoading, success, data, error } = useFetch(() => TaskService.create(projectId, type, {title, description, assignee, points}))
 
   useEffect(() => {
     if (success && data) { 
@@ -36,13 +36,13 @@ const TaskCreationDialog = ({ projectId, onSuccessCallback, onCloseComplete, typ
           <Pane width="100%" display="flex" flexDirection="row" flexWrap="wrap" alignItems="flex-start" justifyContent="flex-start">
 
             <Pane width="100%" >
-              <WithLabel label='Name' required>
+              <WithLabel label='Title' required>
                 <TextInput
-                  isInvalid={name && (name.length < 3 || name.length > 140)}
-                  value={name || ''}
+                  isInvalid={title && (title.length < 3 || title.length > 140)}
+                  value={title || ''}
                   type='text'
                   width="100%"
-                  onChange={e => setName(e.target.value)}
+                  onChange={e => setTitle(e.target.value)}
                 />
               </WithLabel>
             </Pane>

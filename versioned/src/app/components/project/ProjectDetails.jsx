@@ -142,7 +142,7 @@ const Columns = ({ labels, tasks }) => {
                 .filter(task => task.status === label)
                 .map(task => 
                   <Pane key={JSON.stringify(task)} marginBottom={majorScale(1)}>
-                    <TaskCard id={task.id} title={task.name} points={task.points} />
+                    <TaskCard id={task.id} title={task.title} points={task.points} />
                   </Pane>
                 )
             }

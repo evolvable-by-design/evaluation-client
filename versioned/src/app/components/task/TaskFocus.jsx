@@ -30,7 +30,7 @@ const TaskFocus = ({ tasks, onOperationInvokationSuccess }) => {
   if (Action) {
     return <Action />
   } else if (task) {
-    return <TaskDialog title={task.name} {...task}  actions={Object.keys(actions)} />
+    return <TaskDialog title={task.title} {...task}  actions={Object.keys(actions)} />
   } else {
     return null
   }
