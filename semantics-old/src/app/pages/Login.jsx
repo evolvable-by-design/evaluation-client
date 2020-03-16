@@ -1,12 +1,12 @@
-import React, { useState, useMemo } from 'react';
-import { Redirect, useHistory } from 'react-router-dom';
+import React, { useMemo, useState } from 'react';
+import { Redirect, useHistory, useParams } from 'react-router-dom';
 import { Alert, Dialog, Heading, Spinner, majorScale } from 'evergreen-ui';
 
 import AuthenticationService from '../../library/services/AuthenticationService';
 import { useOperation } from '../../library/services/ReactGenericOperation';
 
-import FullscreenCenterContainer from '../components/layout/FullscreenCenterContainer';
-import GenericForm from '../components/generic/GenericForm';
+import FullscreenCenterContainer from '../components/FullscreenCenterContainer';
+import GenericForm from '../components/GenericForm';
 import Semantics from '../utils/semantics';
 import { useAppContextState } from '../context/AppContext';
 

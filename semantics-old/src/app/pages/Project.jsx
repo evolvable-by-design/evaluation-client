@@ -2,14 +2,14 @@ import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { useAppContextState } from '../context/AppContext'
-import BaseApplicationLayout from '../components/layout/BaseApplicationLayout'
-import { ProjectDetailsSemantic } from '../components/project/ProjectDetails'
-import FullscreenLoader from '../components/basis/FullscreenLoader'
-import FullScreenError from '../components/basis/FullscreenError'
+import BaseApplicationLayout from '../components/BaseApplicationLayout'
+import { ProjectDetailsSemantic } from '../components/ProjectDetails'
+import FullscreenLoader from '../components/FullscreenLoader'
+import FullScreenError from '../components/FullscreenError'
 import Semantics from '../utils/semantics'
 import { useOperation } from '../../library/services/ReactGenericOperation'
 import { AuthenticationRequiredError } from '../utils/Errors'
-import LoginRedirect from '../components/basis/LoginRedirect'
+import LoginRedirect from '../components/LoginRedirect'
 
 const Project = () => {
   const { id } = useParams()
@@ -30,7 +30,7 @@ const Project = () => {
       isLoading ? <FullscreenLoader />
         : error && error instanceof AuthenticationRequiredError ? <LoginRedirect />
         : error ? <FullScreenError error={error.message}/>
-        : success ? <ProjectDetailsSemantic value={data} refreshProjectFct={makeCall} />
+        : success ? <ProjectDetailsSemantic value={data} />
         : <p>Something unexpected happened. Please try again later.</p>
     }
   </BaseApplicationLayout>

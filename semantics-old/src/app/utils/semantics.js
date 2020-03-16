@@ -94,16 +94,7 @@ const vocabularies = {
       getCurrentUserDetails: vndJeeraUrl + 'getCurrentUserDetails'
     },
     relations: {
-      listProjectTasks: vndJeeraUrl + 'rel/listProjectTasks',
-      inviteToCollaborate: vndJeeraUrl + 'rel/inviteToCollaborate',
-      create: vndJeeraUrl + 'rel/create',
-      listTasks: vndJeeraUrl + 'rel/listTasks',
-      archive: vndJeeraUrl + 'rel/archive',
-      unarchive: vndJeeraUrl + 'rel/unarchive',
-      delete: vndJeeraUrl + 'rel/delete',
-      completeTask: vndJeeraUrl + 'rel/completeTask',
-      toQATask: vndJeeraUrl + 'rel/toQATask',
-      update: vndJeeraUrl + 'rel/modify',
+      listProjectTasks: vndJeeraUrl + 'rel/listProjectTasks'
     }
   }
 };

@@ -93,55 +93,32 @@ class SemanticData {
   }
 
   isRelationAvailable(semanticRelation) {
-    return this.getRelation(semanticRelation).length !== 0
+    return this._findRelation(semanticRelation) !== [undefined, undefined];
   }
 
-  getRelation(semanticRelation, maxRelationReturned) {
-    const relations = this._getRelationFromSemantics(semanticRelation)
-
-    if (maxRelationReturned === 1) {
-      return relations.length > 0 ? relations[0] : undefined
-    } else if (maxRelationReturned) {
-      return relations.splice(0, 2)
-    } else {
-      return relations
-    }
+  getRelation(semanticRelation) {
+    const hypermediaControl = this._findRelation(semanticRelation);
+    const hypermediaControlKey = hypermediaControl[0];
+    return this._getRelation(hypermediaControlKey, true)
   }
 
-  getRelations(semanticRelations) {
-    return semanticRelations.map(rel => this.getRelation(rel)).reduce((acc, values) => acc.concat(values), [])
-  }
+  _getRelation(hypermediaControlKey, addToReadList) {
+    if (hypermediaControlKey !== undefined) {
+      const linksSchema = this.responseSchema.links || {};
+      const notResolvedOperation = linksSchema[hypermediaControlKey]
 
-  _getRelationFromSemantics(semanticRelation, addToReadList) {
-    return this._getRelation(
-      ([key, schema]) => schema['@relation'] === semanticRelation,
-      true
-    )
-  }
+      const links = this.value._links || []
+      const controlFromPayload = links[hypermediaControlKey]
+        || links.find(control => control['relation'] === hypermediaControlKey)
+      
+      const operation = notResolvedOperation ? this.apiDocumentation.findOperationById(notResolvedOperation.operationId) : undefined
 
-  _getRelationFromHypermediaControlKey(hypermediaControlKey, addToReadList) {
-    return this._getRelation(([key, schema]) => key === hypermediaControlKey)
-  }
+      if (operation === undefined) {
+        console.warn(`Error found in the documentation: operation with id ${hypermediaControlKey} does not exist.`)
+        return [undefined, undefined]
+      }
 
-  _getRelation(filterFct, addToReadList) {
-    const responseSchemaLinks = this.responseSchema.links || {};
-    const availableLinks = this.value._links || [];
-
-    return Object.entries(responseSchemaLinks)
-      .filter(filterFct)
-      .map(([key, schema]) => {
-        const operation = this.apiDocumentation.findOperationById(schema.operationId)
-        if (operation === undefined) {
-          console.warn(`Error found in the documentation: operation with id ${key} does not exist.`)
-        }
-        return [key, operation]
-      })
-      .filter(([key, operation]) => operation !== undefined)
-      .filter(([key, operation]) => availableLinks.includes(key) || availableLinks.find(control => control['relation'] === key))
-      .map(([key, operation]) => {
-        const controlFromPayload = availableLinks[key]
-          || availableLinks.find(control => control['relation'] === key)
-        
+      if (operation) {
         const requestBodySchema = DocumentationBrowser.requestBodySchema(operation)
         if (requestBodySchema && requestBodySchema.oneOf) {
           DocumentationBrowser.updateRequestBodySchema(
@@ -149,22 +126,47 @@ class SemanticData {
             this._findClosestSchema(requestBodySchema.oneOf, controlFromPayload)
           )
         }
+      }
 
-        const operationWithDefaultValues = this._addDefaultValuesToOperationSchema(controlFromPayload, operation)
-        
-        if (addToReadList && !this.alreadyReadRelations.includes(key)) {
-          this.alreadyReadRelations.push(key)
-        }
-  
-        return {key, operation: operationWithDefaultValues}
-      })
+      const operationWithDefaultValues = this._addDefaultValuesToOperationSchema(controlFromPayload, operation)
+
+      if (addToReadList && !this.alreadyReadRelations.includes(hypermediaControlKey)) {
+        this.alreadyReadRelations.push(hypermediaControlKey)
+      }
+
+      return [hypermediaControlKey, operationWithDefaultValues];
+    } else {
+      return [undefined, undefined];
+    }
   }
 
   getOtherRelations() {
     const others = this.value._links.map(l => l instanceof Object ? l.relation : l)
       .filter(key => !this.alreadyReadRelations.includes(key))
     
-    return others.map(key => this._getRelationFromHypermediaControlKey(key, false)).filter(val => val[0] && val[1])
+    return others.map(key => this._getRelation(key, false)).filter(val => val[0] && val[1])
+  }
+
+  _findRelation(semanticRelation) {
+    const schemaLinks = this.responseSchema.links || {};
+    const hypermediaControl = Object.entries(schemaLinks)
+      .find(([key, value]) => value['@relation'] === semanticRelation)
+
+    if (hypermediaControl === undefined)
+      return undefined;
+
+    const hypermediaControlKey = hypermediaControl[0];
+
+    const links = this.value._links || [];
+    const isInPayload = links.includes(hypermediaControlKey)
+      || links.find(control => control['relation'] === hypermediaControlKey)
+
+
+    if (hypermediaControlKey !== undefined && isInPayload) {
+      return hypermediaControl;
+    } else {
+      return [undefined, undefined];
+    }
   }
 
   _addDefaultValuesToOperationSchema(hypermediaControl, operation) {
