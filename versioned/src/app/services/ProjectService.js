@@ -33,12 +33,12 @@ class ProjectService {
   }
 
   async archive(projectId) {
-    const response = await HttpClient().post(`/project/${projectId}/archive`)
+    const response = await HttpClient().put(`/project/${projectId}/archive`)
     return response.status === '204'
   }
 
   async unarchive(projectId) {
-    const response = await HttpClient().post(`/project/${projectId}/unarchive`)
+    const response = await HttpClient().put(`/project/${projectId}/unarchive`)
     return response.status === '204'
   }
 
