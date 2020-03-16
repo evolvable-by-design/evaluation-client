@@ -23,7 +23,7 @@ const TaskCreationDialog = ({ projectId, onSuccessCallback, onCloseComplete, typ
       onSuccessCallback()
       onCloseComplete()
     }
-  }, [success, data])
+  }, [success, data, onSuccessCallback, onCloseComplete])
 
   return <Dialog
     isShown={true}

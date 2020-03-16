@@ -15,7 +15,7 @@ const AddCollaboratorDialog = ({ projectId, onSuccessCallback, onCloseComplete }
       onSuccessCallback()
       onCloseComplete()
     }
-  }, [success])
+  }, [success, onSuccessCallback, onCloseComplete])
 
   return <Dialog
     isShown={true}

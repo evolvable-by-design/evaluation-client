@@ -14,7 +14,7 @@ const UnarchiveProjectDialog = ({ projectId, onSuccessCallback, onCloseComplete 
       })
       .catch(error => toaster.danger(`An error occured while trying to unarchive project: ${error.message}`))
       .finally(() => setIsLoading(false))
-  }, [projectId])
+  }, [projectId, onSuccessCallback])
 
   return <Dialog
     isShown={true}

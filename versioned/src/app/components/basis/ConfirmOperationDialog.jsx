@@ -12,7 +12,7 @@ const ConfirmOperationDialog = ({ operation, title, onSuccessCallback, onCloseCo
       })
       .catch(error => toaster.danger(`An error occured while trying to ${title}: ${error.message}`))
       .finally(() => setIsLoading(false))
-  }, [operation, title])
+  }, [operation, title, onSuccessCallback])
 
   return <Dialog
     isShown={true}

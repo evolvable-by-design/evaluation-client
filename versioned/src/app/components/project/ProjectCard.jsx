@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom'
-import { Avatar, Badge, Card, Heading, Pane, Paragraph, majorScale } from 'evergreen-ui';
+import { Badge, Card, Heading, Pane, Paragraph, majorScale } from 'evergreen-ui';
 
 import UserId from '../user/UserId'
 

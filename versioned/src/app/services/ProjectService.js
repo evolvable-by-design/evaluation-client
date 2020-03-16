@@ -3,7 +3,7 @@ import HttpClient from './HttpClient'
 class ProjectService {
 
   async list(offset, limit, isPublic) {
-    const response = await HttpClient() .get(
+    const response = await HttpClient().get(
       `/projects?offset=${offset || 0}&limit=${limit || 3}&public=${isPublic || false}`
     )
     return response.data.projects

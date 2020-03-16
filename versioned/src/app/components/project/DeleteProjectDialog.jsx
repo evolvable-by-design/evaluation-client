@@ -14,7 +14,7 @@ const DeleteProjectDialog = ({ projectId, onSuccessCallback, onCloseComplete }) 
       })
       .catch(error => toaster.danger(`An error occured while trying to delete project: ${error.message}`))
       .finally(() => setIsLoading(false))
-  }, [projectId])
+  }, [projectId, onSuccessCallback])
 
   return <Dialog
     isShown={true}

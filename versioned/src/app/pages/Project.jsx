@@ -13,6 +13,8 @@ import ProjectService from '../services/ProjectService'
 const Project = () => {
   const { id } = useParams()
   const { makeCall, isLoading, success, data, error } = useFetch(() => ProjectService.findOne(id))
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => makeCall(), [])
 
   return <BaseApplicationLayout>

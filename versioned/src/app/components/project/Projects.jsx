@@ -22,6 +22,7 @@ const Projects = () => {
   const isOffsetInvalid = useMemo(() => offset !== undefined && (isNaN(offset) || (!isNaN(offset) && offset < 0)), [offset])
   const isLimitInvalid = useMemo(() => limit !== undefined && (isNaN(limit) || (!isNaN(limit) && limit < 0)), [limit])
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => makeCall(), [])
 
   

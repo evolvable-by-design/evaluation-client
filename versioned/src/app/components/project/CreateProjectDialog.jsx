@@ -16,7 +16,7 @@ const CreateProjectDialog = ({ isShown, onSuccessCallback, onCloseComplete }) =>
       onSuccessCallback()
       onCloseComplete()
     }
-  }, [success, data])
+  }, [success, data, onSuccessCallback, onCloseComplete])
 
   return <Dialog
     isShown={isShown}
