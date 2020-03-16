@@ -8,7 +8,7 @@ import ContainerWithLabel from '../input/ContainerWithLabel'
 import TextWithLabel from '../input/TextWithLabel'
 import UserId from '../user/UserId'
 
-const TaskDialog = ({ id, assignee, title, description, points, status, lastUpdate, actions }) => {
+const TaskDialog = ({ id, assignee, title, description, points, status, lastUpdate, creationDate, actions }) => {
   const history = useHistory()
 
   return <Dialog
@@ -40,6 +40,7 @@ const TaskDialog = ({ id, assignee, title, description, points, status, lastUpda
         <TextWithLabel label='Status'>{status}</TextWithLabel>
 
         { lastUpdate && <TextWithLabel label='Last update on'>{lastUpdate}</TextWithLabel> } 
+        { creationDate && <TextWithLabel label='Created on'>{creationDate}</TextWithLabel> }
       </Pane>
     </Pane>
   </Dialog>
