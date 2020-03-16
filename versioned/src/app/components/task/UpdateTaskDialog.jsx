@@ -12,7 +12,7 @@ const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete })
   const [ assignee, setAssignee ] = useState(task.assignee)
   const [ status, setStatus ] = useState(task.status)
   const [ points, setPoints ] = useState(task.points)
-  const { makeCall, isLoading, success, data, error } = useFetch(() => TaskService.update(task.projectId, {...task, title, description, assignee, status, points}))
+  const { makeCall, isLoading, success, data, error } = useFetch(() => TaskService.update(task.parentProjectId, {...task, title, description, assignee, status, points}))
 
   useEffect(() => {
     if (success && data) { 
