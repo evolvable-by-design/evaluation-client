@@ -11,6 +11,7 @@ const TaskCreationDialog = ({ projectId, onSuccessCallback, onCloseComplete, typ
   const [ description, setDescription ] = useState()
   const [ assignee, setAssignee ] = useState()
   const [ points, setPoints ] = useState()
+  const [ status, setStatus ] = useState()
   const { makeCall, isLoading, success, data, error } = useFetch(() => TaskService.create(projectId, type, {title, description, assignee, points}))
 
   useEffect(() => {
@@ -84,6 +85,17 @@ const TaskCreationDialog = ({ projectId, onSuccessCallback, onCloseComplete, typ
                 </WithLabel>
               </Pane>
             }
+
+            <Pane width="100%" >
+              <WithLabel label='Status'>
+                <SelectInput 
+                  options={Array.from(new Set([ 'todo', 'in progress', 'review' ]))}
+                  value={status}
+                  onChange={e => setStatus(e.target.value)}
+                  required={false}
+                />
+              </WithLabel>
+            </Pane>
             
           </Pane>
         </>
