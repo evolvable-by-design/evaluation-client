@@ -72,6 +72,8 @@ const vocabularies = {
       userId: vndJeeraUrl + 'userId',
       taskId: vndJeeraUrl + 'taskId',
       assignee: vndJeeraUrl + 'assignee',
+      priority: vndJeeraUrl + 'Priority',
+      tags: vndJeeraUrl + 'tags',
       Task: vndJeeraUrl + 'Task',
       TaskStatus: vndJeeraUrl + 'TaskStatus',
       TasksList: vndJeeraUrl + 'TasksList',

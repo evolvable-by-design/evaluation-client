@@ -12,7 +12,7 @@ import { defaultSemanticComponentErrorHandler } from '../../utils/Errors'
 import Semantics from '../../utils/semantics'
 import UserId from '../user/UserId'
 
-const TaskDialog = ({ id, assignee, assigneeSemantics, title, description, points, status, lastUpdate, actions, createdOn, semanticData }) => {
+const TaskDialog = ({ id, assignee, assigneeSemantics, title, description, points, status, lastUpdate, actions, createdOn, priority, tags, semanticData }) => {
   const history = useHistory()
 
   return <Dialog
@@ -43,6 +43,12 @@ const TaskDialog = ({ id, assignee, assigneeSemantics, title, description, point
 
         <TextWithLabel label='Status'>{status}</TextWithLabel>
 
+        { priority && <TextWithLabel label='Priority'><Badge>{priority}</Badge></TextWithLabel> }
+
+        { tags && <ContainerWithLabel label='Tags'>
+          { tags.map(tag => <Badge key={tag} color="neutral" marginRight={8}>{tag}</Badge>) }
+        </ContainerWithLabel>}
+
         { lastUpdate && <TextWithLabel label='Last update on'>{lastUpdate}</TextWithLabel> }
         { createdOn && <TextWithLabel label='Created on'>{createdOn}</TextWithLabel> }
         
@@ -65,7 +71,9 @@ export const TaskDialogSemanticBuilder = new SemanticComponentBuilder(
     description: Semantics.schema.terms.description,
     points: Semantics.vnd_jeera.terms.points,
     lastUpdate: Semantics.schema.terms.lastUpdate,
-    createdOn: Semantics.schema.terms.createdOn
+    createdOn: Semantics.schema.terms.createdOn,
+    priority: Semantics.vnd_jeera.terms.priority,
+    tags: Semantics.vnd_jeera.terms.tags,
   },
   undefined,
   defaultSemanticComponentErrorHandler('task')
