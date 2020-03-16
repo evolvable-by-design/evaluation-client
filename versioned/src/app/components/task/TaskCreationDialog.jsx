@@ -4,6 +4,7 @@ import { Alert, Dialog, Pane, Textarea, TextInput } from 'evergreen-ui'
 import useFetch from '../../hooks/useFetch'
 import { TaskTypes } from '../../domain/Task'
 import TaskService from '../../services/TaskService'
+import ArrayInput from '../input/ArrayInput'
 import SelectInput from '../input/SelectInput'
 import WithLabel from '../input/WithLabel'
 
@@ -13,7 +14,9 @@ const TaskCreationDialog = ({ projectId, onSuccessCallback, onCloseComplete, typ
   const [ assignee, setAssignee ] = useState()
   const [ points, setPoints ] = useState()
   const [ status, setStatus ] = useState()
-  const { makeCall, isLoading, success, data, error } = useFetch(() => TaskService.create(projectId, type, {title, description, assignee, points}))
+  const [ priority, setPriority ] = useState()
+  const [ tags, setTags ] = useState([])
+  const { makeCall, isLoading, success, data, error } = useFetch(() => TaskService.create(projectId, type, {title, description, assignee, points, tags, priority }))
 
   useEffect(() => {
     if (success && data) { 
@@ -93,6 +96,31 @@ const TaskCreationDialog = ({ projectId, onSuccessCallback, onCloseComplete, typ
                   options={Array.from(new Set([ 'todo', 'in progress', 'review' ]))}
                   value={status}
                   onChange={e => setStatus(e.target.value)}
+                  required={false}
+                />
+              </WithLabel>
+            </Pane>
+
+            <Pane width="100%" >
+              <WithLabel label='Tags'>
+                <ArrayInput 
+                  values={tags}
+                  setValues={setTags}
+                  minItems={0}
+                  maxItems={6}
+                  input={({value, setValue, required}) =>
+                    <TextInput value={value} type='text' width="100%" onChange={e => setValue(e.target.value)} required={required} />
+                  }
+                />
+              </WithLabel> 
+            </Pane>
+
+            <Pane width="100%" >
+              <WithLabel label='Priority'>
+                <SelectInput 
+                  options={Array.from(new Set([ 'blocking', 'critical', 'important', 'high', 'medium', 'low', 'simple' ]))}
+                  value={priority}
+                  onChange={e => setPriority(e.target.value)}
                   required={false}
                 />
               </WithLabel>

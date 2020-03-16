@@ -3,11 +3,11 @@ import { TaskTypes } from '../domain/Task'
 
 class TaskService {
 
-  static async list(projectId, offset, limit, createdAfter) {
+  static async list(projectId, offset, limit, createdBefore) {
     const params = []
     if (offset) params.push(`offset=${offset}`)
     if (limit) params.push(`limit=${limit}`)
-    if (createdAfter) params.push(`createdAfter=${createdAfter}`)
+    if (createdBefore) params.push(`createdBefore=${createdBefore}`)
 
     const url = params.reduce((url, param, i) =>
       url + (i === 0 ? '?' : '&') + param,
