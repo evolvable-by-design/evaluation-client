@@ -12,7 +12,7 @@ import { defaultSemanticComponentErrorHandler } from '../../utils/Errors'
 import Semantics from '../../utils/semantics'
 import UserId from '../user/UserId'
 
-const TaskDialog = ({ id, assignee, assigneeSemantics, title, description, points, status, lastUpdate, actions, semanticData }) => {
+const TaskDialog = ({ id, assignee, assigneeSemantics, title, description, points, status, lastUpdate, actions, createdOn, semanticData }) => {
   const history = useHistory()
 
   return <Dialog
@@ -44,6 +44,8 @@ const TaskDialog = ({ id, assignee, assigneeSemantics, title, description, point
         <TextWithLabel label='Status'>{status}</TextWithLabel>
 
         { lastUpdate && <TextWithLabel label='Last update on'>{lastUpdate}</TextWithLabel> }
+        { createdOn && <TextWithLabel label='Created on'>{createdOn}</TextWithLabel> }
+        
       </Pane>
     </Pane>
   </Dialog>
@@ -62,7 +64,8 @@ export const TaskDialogSemanticBuilder = new SemanticComponentBuilder(
   {
     description: Semantics.schema.terms.description,
     points: Semantics.vnd_jeera.terms.points,
-    lastUpdate: Semantics.schema.terms.lastUpdate
+    lastUpdate: Semantics.schema.terms.lastUpdate,
+    createdOn: Semantics.schema.terms.createdOn
   },
   undefined,
   defaultSemanticComponentErrorHandler('task')
