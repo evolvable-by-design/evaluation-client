@@ -17,9 +17,12 @@ import useFetch from '../../hooks/useFetch'
 import { useAppContextState } from '../../context/AppContext'
 import TaskService from '../../services/TaskService'
 import { TaskTypes } from '../../domain/Task'
+import useUserDetailsFetcher from '../../hooks/useUserDetailsFetcher'
 
 const ProjectDetails = ({ title, isArchived, projectId, refreshProjectFct }) => {
-  const operations = [ 'Archive', 'Unarchive', 'Add Collaborator', 'Delete', 'Create technical story', 'Create user story', 'Star' ]
+  useUserDetailsFetcher()
+  
+  const operations = [ 'Archive', 'Unarchive', 'Add Collaborator', 'Delete', 'Create technical story', 'Create user story' ]
   const [ operationFocus, setOperationFocus ] = useState()
   const history = useHistory()
   const { userProfile } = useAppContextState()
@@ -28,12 +31,14 @@ const ProjectDetails = ({ title, isArchived, projectId, refreshProjectFct }) => 
     if (userProfile === undefined) return false
 
     const starredProjects = userProfile.starredProjects
-    return starredProjects && starredProjects.includes(projectId)
-  }, [userProfile])
+    return starredProjects && starredProjects.includes(`/project/${projectId}`)
+  }, [userProfile, projectId])
+
+  operations.push(isStarred ? 'Unstar' : 'Star')
 
   return <>
     <Pane display="flex" flexDirection="row" justifyContent="space-between" width="100%" overflow="hidden" marginBottom={majorScale(4)}>
-      <Heading size={900}>{title}{isStarred && <Icon icon="star" color="info" />}</Heading>
+      <Heading size={900}>{title}{isStarred && <Icon icon="star" size={28} color="warning" marginLeft={8} />}</Heading>
       <Pane display="flex" flexDirection="row" justifyContent="flex-end" flexWrap="wrap">
         { operations
             .filter(shouldDisplayOperation(isArchived))
@@ -52,7 +57,7 @@ const ProjectDetails = ({ title, isArchived, projectId, refreshProjectFct }) => 
       : operationFocus === 'Delete' ? <DeleteProjectDialog projectId={projectId} onSuccessCallback={() => history.push('/')} onCloseComplete={() => setOperationFocus(undefined)} />
       : operationFocus === 'Create user story' ? <TaskCreationDialog projectId={projectId} type={TaskTypes.UserStory} onSuccessCallback={() => refreshProjectFct()} onCloseComplete={() => setOperationFocus(undefined)} />
       : operationFocus === 'Create technical story' ? <TaskCreationDialog projectId={projectId} type={TaskTypes.TechnicalStory} onSuccessCallback={() => refreshProjectFct()} onCloseComplete={() => setOperationFocus(undefined)} />
-      : operationFocus === 'Star' ? <StarProjectDialog projectId={projectId} isStarred={isStarred} onSuccessCallback={() => refreshProjectFct()} onCloseComplete={() => setOperationFocus(undefined)} />
+      : (operationFocus === 'Star' || operationFocus === 'Unstar') ? <StarProjectDialog projectId={projectId} isStarred={isStarred} onSuccessCallback={() => refreshProjectFct()} onCloseComplete={() => setOperationFocus(undefined)} />
       : null
     }
     

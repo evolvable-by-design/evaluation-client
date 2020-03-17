@@ -4,12 +4,10 @@ import { Avatar, IconButton, Menu, Popover, Position, Tooltip } from 'evergreen-
 
 import { useAppContextState } from '../../context/AppContext';
 import AuthenticationService from '../../services/AuthenticationService';
-import Semantics from '../../utils/semantics';
 
 const UserProfileBubble = () => {
   const history = useHistory();
-  const context = useAppContextState();
-  const { userProfile } = context;
+  const { userProfile } = useAppContextState();
 
   if (AuthenticationService.isAuthenticated()) {
     return <Popover
@@ -29,7 +27,7 @@ const UserProfileBubble = () => {
       }
     >
       <Tooltip content="Your profile and settings">
-        <Avatar name={ (userProfile && userProfile.getValue(Semantics.meb.terms.username)) || 'John Doe' }
+        <Avatar name={ (userProfile && userProfile.username) || 'John Doe' }
           size={40} marginX="auto"/>
       </Tooltip>
     </Popover>  
