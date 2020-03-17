@@ -48,6 +48,12 @@ class ProjectService {
     return response.status === '204'
   }
 
+  async star(projectId) {
+    const tecnicalId = extractProjectTechnicalId(projectId)
+    const response = await HttpClient().post(`/project/${tecnicalId}/star`)
+    return response.status === '204'
+  }
+
 }
 
 export default new ProjectService()
