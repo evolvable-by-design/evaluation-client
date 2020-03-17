@@ -8,7 +8,6 @@ import FullscreenError from './app/components/basis/FullscreenError'
 import LoginRedirect from './app/components/basis/LoginRedirect'
 import { AuthenticationRequiredError } from './app/utils/Errors'
 import AuthenticationService from './app/services/AuthenticationService'
-import UserService from './app/services/UserService'
 
 function App() {
   return (
@@ -46,21 +45,12 @@ class AppProxy extends React.Component {
     }
   }
 
-  fetchUserDetails() {
-    if (AuthenticationService.isAuthenticated()) {
-      UserService
-        .fetchCurrentUserProfile()
-        // .then(userProfile => contextDispatch({ type: 'updateUserProfile', userProfile })) TODO
-    }
-  }
-
   render() {
     if (this.state.hasError) {
       return <FullscreenError error={this.state.errorMessage} />
     } else if (this.state.requiresAuth) {
       return <LoginRedirect />
     } else {
-      this.fetchUserDetails()
       return <AppContextProvider defaultState={this.getDefaultAppContext()}>
         <AppRouter>{this.props.children}</AppRouter>
       </AppContextProvider>
