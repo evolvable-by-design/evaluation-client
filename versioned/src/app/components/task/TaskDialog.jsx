@@ -1,15 +1,23 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import qs from 'qs'
 import { Badge, Dialog, Heading, Pane, Paragraph, Pill, majorScale } from 'evergreen-ui'
 
 import ActionsSelector from './ActionsSelector'
+import AnalyticsService from '../../services/AnalyticsService'
 import ContainerWithLabel from '../input/ContainerWithLabel'
 import TextWithLabel from '../input/TextWithLabel'
+import useFetch from '../../hooks/useFetch'
 import UserId from '../user/UserId'
 
-const TaskDialog = ({ id, assignee, title, description, points, status, lastUpdate, creationDate, tags, priority, actions }) => {
+
+const TaskDialog = ({ id, assignee, title, description, points, status, tags, priority, actions }) => {
   const history = useHistory()
+
+  // lastupdate creationDate
+  const { makeCall, data: analytics } = useFetch(() => AnalyticsService.findOne(id))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => makeCall(), [])
 
   return <Dialog
     isShown={true}
@@ -45,8 +53,8 @@ const TaskDialog = ({ id, assignee, title, description, points, status, lastUpda
           { tags.map(tag => <Badge key={tag} color="neutral" marginRight={8}>{tag}</Badge>) }
         </ContainerWithLabel>}
 
-        { lastUpdate && <TextWithLabel label='Last update on'>{lastUpdate}</TextWithLabel> } 
-        { creationDate && <TextWithLabel label='Created on'>{creationDate}</TextWithLabel> }
+        { analytics?.lastUpdatedOn && <TextWithLabel label='Last update on'>{analytics.lastUpdatedOn}</TextWithLabel> } 
+        { analytics?.createdOn && <TextWithLabel label='Created on'>{analytics.createdOn}</TextWithLabel> }
       </Pane>
     </Pane>
   </Dialog>

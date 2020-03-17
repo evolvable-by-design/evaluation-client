@@ -1,4 +1,5 @@
-import HttpClient from '../services/HttpClient'
+import HttpClient from './HttpClient'
+import { extractProjectTechnicalId } from '../utils/ResourceUtils'
 import { TaskTypes } from '../domain/Task'
 
 class TaskService {
@@ -19,33 +20,39 @@ class TaskService {
   }
 
   static async create(projectId, type, task) {
+    const projectTechnicalId = extractProjectTechnicalId(projectId)
     if (type === TaskTypes.TechnicalStory) {
-      return HttpClient().post(`/project/${projectId}/tasks/technicalStory`, task)
+      return HttpClient().post(`/project/${projectTechnicalId}/tasks/technicalStory`, task)
     } else if (type === TaskTypes.UserStory) {
-      return HttpClient().post(`/project/${projectId}/tasks/userStory`, task)
+      return HttpClient().post(`/project/${projectTechnicalId}/tasks/userStory`, task)
     } else {
       return new Promise((_, rej) => rej(new Error('Incorrect task type provided')))
     }
   }
 
   static async findOne(projectId, taskId) {
-    return HttpClient().get(`/project/${projectId}/task/${taskId}`)
+    const projectTechnicalId = extractProjectTechnicalId(projectId)
+    return HttpClient().get(`/project/${projectTechnicalId}/task/${taskId}`)
   }
 
   static async update(projectId, task) {
-    return HttpClient().put(`/project/${projectId}/task/${task.id}`, task)
+    const projectTechnicalId = extractProjectTechnicalId(projectId)
+    return HttpClient().put(`/project/${projectTechnicalId}/task/${task.id}`, task)
   }
 
   static async toQa(projectId, taskId) {
-    return HttpClient().put(`/project/${projectId}/task/${taskId}/toQa`)
+    const projectTechnicalId = extractProjectTechnicalId(projectId)
+    return HttpClient().put(`/project/${projectTechnicalId}/task/${taskId}/toQa`)
   }
 
   static async complete(projectId, taskId) {
-    return HttpClient().put(`/project/${projectId}/task/${taskId}/complete`)
+    const projectTechnicalId = extractProjectTechnicalId(projectId)
+    return HttpClient().put(`/project/${projectTechnicalId}/task/${taskId}/complete`)
   }
 
   static async delete(projectId, taskId) {
-    return HttpClient().delete(`/project/${projectId}/task/${taskId}`)
+    const projectTechnicalId = extractProjectTechnicalId(projectId)
+    return HttpClient().delete(`/project/${projectTechnicalId}/task/${taskId}`)
   }
 
 }

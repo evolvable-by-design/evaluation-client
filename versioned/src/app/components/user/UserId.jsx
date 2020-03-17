@@ -2,12 +2,12 @@ import React, { useEffect } from 'react'
 import { Spinner } from 'evergreen-ui'
 
 import useFetch from '../../hooks/useFetch'
-import UserService from '../../services/UserService'
+import HttpClient from '../../services/HttpClient'
 
 import UserBadge from './UserBadge'
 
 const UserId = ({ id, noLabel }) => {
-  const { makeCall, isLoading, data: user } = useFetch(() => UserService.getUserFromId(id))
+  const { makeCall, isLoading, data: user } = useFetch(() => HttpClient().get(id).then(res => res.data))
   useEffect(makeCall, [])
 
   if (user) {
