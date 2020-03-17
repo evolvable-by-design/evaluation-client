@@ -1,4 +1,5 @@
 import HttpClient from './HttpClient'
+import { extractProjectTechnicalId } from '../utils/ResourceUtils'
 
 class ProjectService {
 
@@ -18,27 +19,38 @@ class ProjectService {
   }
 
   async findOne(id) {
-    const response = await HttpClient().get(`/project/${id}`)
+    const tecnicalId = extractProjectTechnicalId(id)
+    const response = await HttpClient().get(`/project/${tecnicalId}`)
     return response.data
   }
 
   async deleteOne(id) {
-    const response = await HttpClient().delete(`/project/${id}`)
+    const tecnicalId = extractProjectTechnicalId(id)
+    const response = await HttpClient().delete(`/project/${tecnicalId}`)
     return response.status === '204'
   }
 
   async addCollaborator(projectId, users) {
-    const response = await HttpClient().post(`/project/${projectId}/addCollaborator`, { users })
+    const tecnicalId = extractProjectTechnicalId(projectId)
+    const response = await HttpClient().post(`/project/${tecnicalId}/addCollaborator`, { users })
     return response.status === '204'
   }
 
   async archive(projectId) {
-    const response = await HttpClient().put(`/project/${projectId}/archive`)
+    const tecnicalId = extractProjectTechnicalId(projectId)
+    const response = await HttpClient().put(`/project/${tecnicalId}/archive`)
     return response.status === '204'
   }
 
   async unarchive(projectId) {
-    const response = await HttpClient().put(`/project/${projectId}/unarchive`)
+    const tecnicalId = extractProjectTechnicalId(projectId)
+    const response = await HttpClient().put(`/project/${tecnicalId}/unarchive`)
+    return response.status === '204'
+  }
+
+  async star(projectId) {
+    const tecnicalId = extractProjectTechnicalId(projectId)
+    const response = await HttpClient().post(`/project/${tecnicalId}/star`)
     return response.status === '204'
   }
 

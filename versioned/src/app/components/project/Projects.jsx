@@ -88,7 +88,6 @@ const ProjectCards = ({projects}) => {
             id={project.id}
             title={project.name}
             isPublic={project.isPublic}
-            lastUpdate={project.lastUpdatedOn}
             collaborators={project.collaborators}
           />) 
       }
