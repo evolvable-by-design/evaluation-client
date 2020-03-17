@@ -24,7 +24,7 @@ const TaskFocus = ({ tasks, onOperationInvokationSuccess }) => {
     return null
   }
 
-  const actions = taskActions(task.parentProjectId, task, onOperationInvokationSuccess, history)
+  const actions = taskActions(task, onOperationInvokationSuccess, history)
   const Action = actions[actionFocus]
 
   if (Action) {
@@ -36,7 +36,7 @@ const TaskFocus = ({ tasks, onOperationInvokationSuccess }) => {
   }
 }
 
-function taskActions(projectId, task, onOperationInvokationSuccess, history) {
+function taskActions(task, onOperationInvokationSuccess, history) {
   const commonProps = {
     onCloseComplete: () => hideTaskActionDialog(history),
     onSuccessCallback: () => {
@@ -47,9 +47,9 @@ function taskActions(projectId, task, onOperationInvokationSuccess, history) {
 
   const actions = {
     Update: () => <UpdateTaskDialog task={task} isShown={true} {...commonProps} />,
-    Delete: () => <ConfirmOperationDialog operation={() => TaskService.delete(projectId, task.id)} title='Delete' {...commonProps} intent='danger' />,
-    "Move to QA": () => <ConfirmOperationDialog operation={() => TaskService.toQa(projectId, task.id)} title='Move to QA' {...commonProps} />,
-    Complete: () => <ConfirmOperationDialog operation={() => TaskService.complete(projectId, task.id)} title='Complete' {...commonProps} />,
+    Delete: () => <ConfirmOperationDialog operation={() => TaskService.delete(task.id)} title='Delete' {...commonProps} intent='danger' />,
+    "Move to QA": () => <ConfirmOperationDialog operation={() => TaskService.toQa(task.id)} title='Move to QA' {...commonProps} />,
+    Complete: () => <ConfirmOperationDialog operation={() => TaskService.complete(task.id)} title='Complete' {...commonProps} />,
   }
 
   if (task.status !== 'QA') delete actions['Complete'];
