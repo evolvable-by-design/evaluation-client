@@ -11,7 +11,7 @@ import useFetch from '../../hooks/useFetch'
 import UserId from '../user/UserId'
 
 
-const TaskDialog = ({ id, assignee, title, description, points, status, tags, priority, actions }) => {
+const TaskDialog = ({ id, assignee, title, description, points, status, tags, priority, isArchived, actions }) => {
   const history = useHistory()
 
   // lastupdate creationDate
@@ -34,6 +34,12 @@ const TaskDialog = ({ id, assignee, title, description, points, status, tags, pr
         <Paragraph>{description || 'Empty description'}</Paragraph>
       </Pane>
       <Pane flexGrow={1} minWidth="200px" display="flex" flexDirection="column">
+
+        { isArchived &&
+          <Pane marginBottom={8}>
+            <Badge color='orange'>Archived</Badge>
+          </Pane>
+        }
 
         <Pane><ActionsSelector actions={actions} onSelect={value => showTaskActionDialog(value, history)} /></Pane>
 
