@@ -10,10 +10,10 @@ class ProjectService {
     return response.data.projects
   }
 
-  async create(name, isPublic) {
+  async create(name) {
     const response = await HttpClient().post(
       '/projects',
-      { name, isPublic }
+      { name }
     )
     return response.data
   }
