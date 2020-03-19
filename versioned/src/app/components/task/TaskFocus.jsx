@@ -50,10 +50,18 @@ function taskActions(task, onOperationInvokationSuccess, history) {
     Delete: () => <ConfirmOperationDialog operation={() => TaskService.delete(task.id)} title='Delete' {...commonProps} intent='danger' />,
     "Move to QA": () => <ConfirmOperationDialog operation={() => TaskService.toQa(task.id)} title='Move to QA' {...commonProps} />,
     Complete: () => <ConfirmOperationDialog operation={() => TaskService.complete(task.id)} title='Complete' {...commonProps} />,
+    Archive: () => <ConfirmOperationDialog operation={() => TaskService.archive(task.id)} title='Archive' {...commonProps} />,
+    Unarchive: () => <ConfirmOperationDialog operation={() => TaskService.archive(task.id)} title='Unarchive' {...commonProps} />
   }
 
   if (task.status !== 'QA') delete actions['Complete'];
   if (task.status === 'QA') delete actions['Move to QA'];
+  if (task.isArchived) {
+    delete actions['Archive']
+  } else {
+    delete actions['Unarchive']
+    delete actions['Delete']
+  }
 
   return actions
 }

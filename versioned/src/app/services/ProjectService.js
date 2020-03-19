@@ -38,13 +38,7 @@ class ProjectService {
 
   async archive(projectId) {
     const tecnicalId = extractProjectTechnicalId(projectId)
-    const response = await HttpClient().put(`/project/${tecnicalId}/archive`)
-    return response.status === '204'
-  }
-
-  async unarchive(projectId) {
-    const tecnicalId = extractProjectTechnicalId(projectId)
-    const response = await HttpClient().put(`/project/${tecnicalId}/unarchive`)
+    const response = await HttpClient().post(`/project/${tecnicalId}/archive`)
     return response.status === '204'
   }
 

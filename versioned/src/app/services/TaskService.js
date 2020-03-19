@@ -49,6 +49,10 @@ class TaskService {
     return HttpClient().delete(`/task/${taskId}`)
   }
 
+  static async archive(taskId) {
+    return HttpClient().post(`/task/${taskId}/archive`)
+  }
+
 }
 
 export default TaskService
