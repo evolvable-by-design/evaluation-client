@@ -3,17 +3,17 @@ import { extractProjectTechnicalId } from '../utils/ResourceUtils'
 
 class ProjectService {
 
-  async list(offset, limit, isPublic) {
+  async list(offset, limit) {
     const response = await HttpClient().get(
-      `/projects?offset=${offset || 0}&limit=${limit || 3}&public=${isPublic || false}`
+      `/projects?offset=${offset || 0}&limit=${limit || 3}`
     )
     return response.data.projects
   }
 
-  async create(name, isPublic) {
+  async create(name) {
     const response = await HttpClient().post(
       '/projects',
-      { name, isPublic }
+      { name }
     )
     return response.data
   }

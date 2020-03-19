@@ -8,8 +8,7 @@ import WithLabel from '../input/WithLabel'
 
 const CreateProjectDialog = ({ isShown, onSuccessCallback, onCloseComplete }) => {
   const [ name, setName ] = useState()
-  const [ isPublic, setIsPublic ] = useState(false)
-  const { makeCall, isLoading, success, data, error } = useFetch(() => ProjectService.create(name, isPublic))
+  const { makeCall, isLoading, success, data, error } = useFetch(() => ProjectService.create(name))
 
   useEffect(() => {
     if (success && data) { 
@@ -46,12 +45,6 @@ const CreateProjectDialog = ({ isShown, onSuccessCallback, onCloseComplete }) =>
             </WithLabel>
           </Pane>
 
-          <Pane width="100%" >
-            <WithLabel label='Is Public' required>
-              <Switch checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} height={majorScale(3)}/>
-            </WithLabel>
-          </Pane>
-          
         </Pane>
       }
       { error && <Alert intent="danger" title={error?.response?.data?.description || error.message || error} marginBottom='16px' /> }
