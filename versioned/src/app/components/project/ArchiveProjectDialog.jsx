@@ -4,10 +4,10 @@ import ConfirmOperationDialog from '../basis/ConfirmOperationDialog'
 
 import ProjectService from '../../services/ProjectService'
 
-const ArchiveProjectDialog = ({ projectId, onSuccessCallback, onCloseComplete }) => {
+const ArchiveProjectDialog = ({ projectId, isArchived, onSuccessCallback, onCloseComplete }) => {
   return <ConfirmOperationDialog 
     operation={() => ProjectService.archive(projectId)}
-    title='Archive project'
+    title={ isArchived ? 'Unarchive project' : 'Archive project' }
     onSuccessCallback={onSuccessCallback}
     onCloseComplete={onCloseComplete}
   />
