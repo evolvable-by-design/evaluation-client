@@ -21,7 +21,7 @@ const Project = () => {
     {
       isLoading ? <FullscreenLoader />
         : error && error instanceof AuthenticationRequiredError ? <LoginRedirect />
-        : error ? <FullScreenError error={error.message}/>
+        : error ? <FullScreenError error={error?.response?.data?.description || error.message}/>
         : success ? <ProjectDetails projectId={id} title={data.name} isArchived={data.isArchived} refreshProjectFct={makeCall} />
         : <p>Something unexpected happened. Please try again later.</p>
     }

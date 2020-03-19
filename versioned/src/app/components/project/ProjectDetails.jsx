@@ -87,7 +87,7 @@ const Tasks = ({ projectId }) => {
   if (isLoading) {
     return <Text>Loading...</Text>
   } else if (error) {
-    return <Error error={error}/>
+    return <Error error={error?.response?.data?.description || error}/>
   } else {
     return <>
       <div>

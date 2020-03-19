@@ -29,7 +29,7 @@ const Projects = () => {
   if (isLoading) {
     return <Text>Loading...</Text>
   } else if (error) {
-    return <FullscreenError error={error}/>
+    return <FullscreenError error={error?.response?.data?.description || error}/>
   } else {
     return <>
       <Heading size={900} marginBottom={majorScale(3)}>Projects</Heading>

@@ -91,7 +91,7 @@ const LoginDialog = ({ onComplete }) => {
           </Pane>
 
         </Pane>
-        { error && <Alert intent="danger" title={error.message} /> }
+        { error && <Alert intent="danger" title={error?.response?.data?.description || error.message} /> }
       </Dialog>
     </FullscreenCenterContainer>
   }
