@@ -13,8 +13,7 @@ import ProjectService from '../../services/ProjectService';
 const Projects = () => {
   const [ offset, setOffset ] = useState()
   const [ limit, setLimit ] = useState()
-  const [ isPublic, setIsPublic ] = useState()
-  const { makeCall, isLoading, data, error } = useFetch(() => ProjectService.list(offset, limit, isPublic))
+  const { makeCall, isLoading, data, error } = useFetch(() => ProjectService.list(offset, limit))
   const projects = data
 
   const [ showCreateProjectDialog, setShowCreateProjectDialog ] = useState(false)
@@ -61,9 +60,7 @@ const Projects = () => {
             />
           </Pane>
         </Pane>
-        <Pane display="flex" height="100%" marginRight={majorScale(3)} >
-          <SwitchInputField label='Public' checked={isPublic} onChange={e => setIsPublic(e.target.value)}/>
-        </Pane>
+        
       </Pane>
 
       <Button appearance="primary" onClick={makeCall} marginBottom={majorScale(3)} marginRight={majorScale(1)}>Update</Button>
@@ -87,7 +84,6 @@ const ProjectCards = ({projects}) => {
             key={JSON.stringify(project)}
             id={project.id}
             title={project.name}
-            isPublic={project.isPublic}
             collaborators={project.collaborators}
           />) 
       }
