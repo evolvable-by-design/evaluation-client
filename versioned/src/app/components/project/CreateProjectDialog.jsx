@@ -54,7 +54,7 @@ const CreateProjectDialog = ({ isShown, onSuccessCallback, onCloseComplete }) =>
           
         </Pane>
       }
-      { error && <Alert intent="danger" title={error.message || error} marginBottom='16px' /> }
+      { error && <Alert intent="danger" title={error?.response?.data?.description || error.message || error} marginBottom='16px' /> }
     </div>
   </Dialog>
 }

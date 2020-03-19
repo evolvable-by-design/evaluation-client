@@ -22,7 +22,7 @@ const LogoutDialog = () => {
   if (isLoading) {
     return <Loading />
   } else if (error) {
-    return <FullscreenError error={error}/>
+    return <FullscreenError error={error?.response?.data?.description || error}/>
   } else if (success) {
     setTimeout(() => history.push('/'), 1000);
     return <Success data={data}/>
@@ -30,7 +30,7 @@ const LogoutDialog = () => {
     makeCall()
     return (<>
       <Heading width="100%" size={700} marginBottom={majorScale(2)}>We are logging you out...</Heading>
-      { error && <Paragraph width="100%" size={500}>{error}</Paragraph> }
+      { error && <Paragraph width="100%" size={500}>{error?.response?.data?.description || error}</Paragraph> }
     </>)
   }
 }
