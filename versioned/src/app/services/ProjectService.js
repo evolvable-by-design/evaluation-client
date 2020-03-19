@@ -5,7 +5,7 @@ class ProjectService {
 
   async list(offset, limit) {
     const response = await HttpClient().get(
-      `/projects?offset=${offset || 0}&limit=${limit || 3}`
+      `/projects?offset=${offset || 0}&limit=${limit || 10}`
     )
     return response.data.projects
   }
