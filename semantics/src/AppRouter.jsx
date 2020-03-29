@@ -4,7 +4,7 @@ import { Route } from 'react-router-dom'
 import Home from './app/pages/Home'
 import Login from './app/pages/Login'
 import Logout from './app/pages/Logout'
-import Project from './app/pages/Project' 
+import Project from './app/pages/Project'
  
 const AppRouter = () =>
   <>

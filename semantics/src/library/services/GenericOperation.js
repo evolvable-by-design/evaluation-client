@@ -31,6 +31,11 @@ export class GenericOperation {
     )
   }
 
+  isMissingRequiredParameters() {
+    const [params, body] = this.computeParamsAndBody()
+    return !this.apiDocumentation.noRequiredParametersWithoutValue(this.operation, params, body)
+  }
+
   buildRequest(parameters) {
     // TODO: return details about missing params
     const [params, body] = this.computeParamsAndBody(parameters)
