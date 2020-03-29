@@ -54,7 +54,7 @@ class HttpCaller {
         ? responseSchema.content[result.headers['content-type'].split(';')[0]].schema
         : undefined
     const data = resultMapper ? resultMapper(result) : result.data
-    return new SemanticData(data, resourceSchema, responseSchema, this.apiDocumentation)
+    return new SemanticData(data, resourceSchema, responseSchema, this.apiDocumentation, this)
   }
 
   _callerInstance() {

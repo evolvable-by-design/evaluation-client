@@ -8,15 +8,17 @@
 import ajv from './Ajv'
 import DocumentationBrowser from './DocumentationBrowser';
 import { reduceObject } from '../../app/utils/javascriptUtils';
+import GenericOperation from './GenericOperation';
 
 class SemanticData {
 
-  constructor(data, resourceSchema, responseSchema, apiDocumentation) {
+  constructor(data, resourceSchema, responseSchema, apiDocumentation, httpCaller) {
     this.value = data;
     this.responseSchema = responseSchema
     this.apiDocumentation = apiDocumentation
     this.alreadyReadData = []
     this.alreadyReadRelations = []
+    this.httpCaller = httpCaller
 
     if (resourceSchema.oneOf) {
       const schema = resourceSchema.oneOf
@@ -37,34 +39,80 @@ class SemanticData {
   resetReadCounter() {  this.alreadyReadData = []; this.alreadyReadRelations = []; return this; }
 
   get(semanticKey) {
+    const maybeInnerValue = this._getInnerValue(semanticKey)
+
+    if (maybeInnerValue) return maybeInnerValue
+
+    return this._getValueFromLinks(semanticKey)
+  }
+
+  _getInnerValue(semanticKey) {
     if (this.value === undefined) return undefined;
 
     if (this.isObject()) {
-      const result = this._findPathsToValueAndSchema(semanticKey)
-      const [key, schema] = result || [undefined, undefined];
-      if (key && this.value[key] !== undefined && schema) {
-        if (!this.alreadyReadData.includes(key)) { this.alreadyReadData.push(key) }
-        const value = this.value[key];
-        if (schema.type === 'array') {
-          const responseBodySchema = this.apiDocumentation?.responseBodySchema(schema.items['@id'])
-          return value.map(v => new SemanticData(v, schema.items, responseBodySchema, this.apiDocumentation))
-        } else {
-          return new SemanticData(value, schema, this.apiDocumentation?.responseBodySchema(schema['@id']), this.apiDocumentation)
-        }
+      const [key, schema] = this._findPathsToValueAndSchema(semanticKey)|| [undefined, undefined]
+      if (key === undefined || schema === undefined) return undefined
+      
+      const value = key.includes('.') ? this.value[key.split('.')[0]][key.split('.')[1]] : this.value[key]
+      if (value === undefined) return undefined
+      
+      if (!this.alreadyReadData.includes(key)) { this.alreadyReadData.push(key) }
+
+      if (schema.type === 'array') {
+        const responseBodySchema = this.apiDocumentation?.responseBodySchema(schema.items['@id'])
+        return value.map(v => new SemanticData(v, schema.items, responseBodySchema, this.apiDocumentation, this.httpCaller))
       } else {
-        return undefined;
+        return new SemanticData(value, schema, this.apiDocumentation?.responseBodySchema(schema['@id']), this.apiDocumentation, this.httpCaller)
       }
     } else if (this.isArray()) {
       // Not sure of this yet. This may be thought a bit more.
-      return undefined;
+      return undefined
     } else {
       return this.type === semanticKey ? this : undefined;
     }
   }
 
+  async _getValueFromLinks(semanticKey) {
+    const resourcesContainingValue = this._getOperationsWithParentAffiliation()
+      .filter(result => 
+        result.operation.verb === 'get'
+        && !(new GenericOperation(result.operation, this.apiDocumentation).isMissingRequiredParameters())
+      )
+      .map(result => { 
+        const responseProperties = result.operation?.responses['200']?.content['application/json']?.schema?.properties
+        const maybePropertyMatchingSemanticKey = Object.entries(responseProperties)
+          .find(([key, schema]) => schema['@id'] === semanticKey)
+        const key = maybePropertyMatchingSemanticKey ? maybePropertyMatchingSemanticKey[0] : undefined
+
+        return {
+          ...result,
+          pathInResponse: key
+        }
+      })
+      .filter(result => result.pathInResponse !== undefined)
+
+    if (resourcesContainingValue.length === 0) {
+      return undefined
+    } else if (resourcesContainingValue.length > 1) {
+      console.warn('Found more than one link containing a value for the searched property in SemanticData._getValueFromLinks')
+      return undefined
+    } else {
+      const toInvoke = resourcesContainingValue[0]
+      const linkedResourceData = await new GenericOperation(toInvoke.operation, this.apiDocumentation, this.httpCaller).call()
+      return linkedResourceData.value[toInvoke.pathInResponse]
+    }
+  }
+
   _findPathsToValueAndSchema(semanticKey) {
     const result = Object.entries(this.resourceSchema.properties)
-        .find(([key, value]) => value['@id'] !== undefined && value['@id'] === semanticKey);
+      .flatMap(([key, value]) => {
+        if (value.type === 'object' && value['x-affiliation'] && value['x-affiliation'] === 'parent') {
+          return Object.entries(value.properties).map(([pKey, pValue]) => [`${key}.${pKey}`, pValue])
+        } else {
+          return [[key, value]]
+        }
+      })
+      .find(([key, value]) => value['@id'] !== undefined && value['@id'] === semanticKey);
 
     return result
   }
@@ -121,6 +169,10 @@ class SemanticData {
 
   _getRelationFromHypermediaControlKey(hypermediaControlKey, addToReadList) {
     return this._getRelation(([key, schema]) => key === hypermediaControlKey)
+  }
+
+  _getOperationsWithParentAffiliation() {
+    return this._getRelation(([key, schema]) => schema['x-affiliation'] === 'parent', false)
   }
 
   _getRelation(filterFct, addToReadList) {

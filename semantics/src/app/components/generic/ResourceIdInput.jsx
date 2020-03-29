@@ -10,7 +10,7 @@ import SemanticData from '../../../library/services/SemanticData'
 function ResourceIdInput({ schema, value, error, onChange, required }) {
   const idSemantics = ['@id', undefined].includes(schema['@type']) ? schema['@id'] : schema['@type']
   
-  const { genericOperationBuilder, apiDocumentation } = useAppContextState()
+  const { genericOperationBuilder, apiDocumentation, httpCaller } = useAppContextState()
   const [ possibilities, setPossibilities ] = useState()
   const [ search, setSearch ] = useState()
   const filteredPossibilities = useMemo(() => {
@@ -23,7 +23,7 @@ function ResourceIdInput({ schema, value, error, onChange, required }) {
 
   useEffect(() => {
     async function fetch() {
-      const possibilities = await fetchPossibilities(idSemantics, apiDocumentation, genericOperationBuilder)
+      const possibilities = await fetchPossibilities(idSemantics, apiDocumentation, genericOperationBuilder, httpCaller)
       setPossibilities(possibilities)
     }
     fetch()
@@ -60,7 +60,7 @@ function ResourceIdInput({ schema, value, error, onChange, required }) {
 }
 
 // TODO: move to appropriate files
-async function fetchPossibilities(idSemantics, apiDocumentation, genericOperationBuilder) {
+async function fetchPossibilities(idSemantics, apiDocumentation, genericOperationBuilder, httpCaller) {
   const resourceType = findResourceType(idSemantics)
   const operation = apiDocumentation.findOperationListing(resourceType)
   
@@ -72,7 +72,7 @@ async function fetchPossibilities(idSemantics, apiDocumentation, genericOperatio
   
   const result = await genericOperation.call()
   
-  return result.value.map(val => new SemanticData(val, result.resourceSchema.items, undefined, result.apiDocumentation))
+  return result.value.map(val => new SemanticData(val, result.resourceSchema.items, undefined, result.apiDocumentation, httpCaller))
 }
 
 function findResourceType(idSemantics) {
