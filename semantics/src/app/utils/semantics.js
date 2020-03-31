@@ -19,7 +19,8 @@ const vocabularies = {
       lastUpdatedOn: schemaUrl + 'dateModified',
       lastUpdate: schemaUrl + 'dateModified',
       createdOn: schemaUrl + 'dateCreated',
-      Error: schemaUrl + 'Error'
+      Error: schemaUrl + 'Error',
+      identifier: schemaUrl + 'identifier',
     }
   },
   lcy: {

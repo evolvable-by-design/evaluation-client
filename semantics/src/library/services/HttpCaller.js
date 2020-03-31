@@ -36,11 +36,15 @@ class HttpCaller {
   }
 
   async semanticCall(options, operation, resultMapper) {
-    const result = await this.call(options)
+    try {
+      const result = await this.call(options)
 
-    return [200, 201].includes(result.status)
-      ? this._getDataAndItsDescription(result, operation, resultMapper)
-      : undefined
+      return [200, 201].includes(result.status)
+        ? this._getDataAndItsDescription(result, operation, resultMapper)
+        : undefined
+    } catch (error) {
+      throw this._buildSemanticError(error, operation)
+    }
   }
 
   async getSemantic(url, operation) {
@@ -55,6 +59,15 @@ class HttpCaller {
         : undefined
     const data = resultMapper ? resultMapper(result) : result.data
     return new SemanticData(data, resourceSchema, responseSchema, this.apiDocumentation, this)
+  }
+
+  _buildSemanticError(error, operation) {
+    const responseSchema = operation ? operation.responses[error.response.status] || operation.responses?.default : undefined
+    const resourceSchema =
+      error.response?.data !== '' && error.response.headers['content-type'] && responseSchema
+        ? responseSchema.content[error.response.headers['content-type'].split(';')[0]].schema
+        : undefined
+    return new SemanticData(error.response?.data, resourceSchema, responseSchema, this.apiDocumentation, this)
   }
 
   _callerInstance() {

@@ -36,7 +36,7 @@ const FetchUser = ({ operation, parameters, noLabel }) => {
   } else if (isLoading) {
     return <Paragraph>Loading...</Paragraph>
   } else if (error || (!isLoading && !error && !data)) {
-    return <Badge color="red" onClick={() => alert(error)}>Error (click for more info)</Badge>
+    return <Badge color="red" onClick={() => alert(error.getValue(Semantics.schema.terms.identifier))}>Error (click for more info)</Badge>
   } else {
     return <UserBadge username={data.getValue(Semantics.meb.terms.username)} noLabel={noLabel} />
   }

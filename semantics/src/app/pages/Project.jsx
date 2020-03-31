@@ -29,7 +29,7 @@ const Project = () => {
     {
       isLoading ? <FullscreenLoader />
         : error && error instanceof AuthenticationRequiredError ? <LoginRedirect />
-        : error ? <FullScreenError error={error.message}/>
+        : error ? <FullScreenError error={error}/>
         : success ? <ProjectDetailsSemantic value={data} refreshProjectFct={makeCall} />
         : <p>Something unexpected happened. Please try again later.</p>
     }
