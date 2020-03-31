@@ -13,6 +13,7 @@ import Error from '../basis/Error'
 import { TaskCardSemantic as TaskCard } from '../task/TaskCard'
 import TaskFocus from '../task/TaskFocus'
 import GenericFilters from '../generic/GenericFilters'
+import { useAsync } from '../../hooks'
 
 const ProjectDetails = ({ title, refreshProjectFct, semanticData }) => {
   // eslint-disable-next-line
@@ -50,10 +51,9 @@ const Tasks = ({ listTasksOperation }) => {
   const { genericOperationBuilder, apiDocumentation } = useAppContextState()
   const operation = genericOperationBuilder.fromOperation(listTasksOperation)
   const { parametersDetail, makeCall, isLoading, data, error } = useOperation(operation)
-  // { values, setter, documentation }
 
   const taskStatusTypeDoc = apiDocumentation.findTypeInOperationResponse(Semantics.vnd_jeera.terms.TaskStatus, listTasksOperation)
-  const tasks = data ? data.get(Semantics.vnd_jeera.terms.tasks) : undefined
+  const [ tasks ] = useAsync(() => data ? data.get(Semantics.vnd_jeera.terms.tasks) : undefined, [data])
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => makeCall(), [])

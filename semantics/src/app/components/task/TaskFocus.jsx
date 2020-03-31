@@ -4,7 +4,7 @@ import qs from 'qs'
 
 import ActionDialog from '../generic/ActionDialog'
 
-import useQuery from '../../hooks/useQuery'
+import { useQuery } from '../../hooks'
 import Semantics from '../../utils/semantics'
 import { TaskDialogSemantic as TaskDialog } from './TaskDialog'
 

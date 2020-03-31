@@ -1,4 +1,9 @@
-import SemanticData from './SemanticData';
+import React from 'react'
+import { Spinner } from 'evergreen-ui'
+
+import SemanticData from './SemanticData'
+
+import { useAsync } from '../../app/hooks'
 
 export class SemanticComponentBuilder {
 
@@ -32,44 +37,55 @@ export class SemanticComponentBuilder {
       }
 
       props.value.resetReadCounter()
-      const [requiredData, missingData] = this._getRequired(props.value)
+
+      const [resultOfGetRequired] = useAsync(() => this._getRequired(props.value), [props.value])
+      const [requiredData, missingData] = resultOfGetRequired || [ undefined, {} ]
+      const [ optionalData ] = useAsync(() => this._getOptionals(props.value), [props.value])
+      
       if (Object.keys(missingData).length !== 0) {
         return this.errorHandler({missingData})
       }
 
-      const optionalData = this._getOptionals(props.value)
-
-      // TODO: support ignoredData + semanticData is temporary, it should disappear
-      return this.component({ ...props, ...requiredData, ...optionalData, semanticData: props.value })
+      if (!requiredData || !optionalData) {
+        return <Spinner />
+      } else {
+        // TODO: support ignoredData + semanticData is temporary, it should disappear
+        const Component = () => this.component({ ...props, ...requiredData, ...optionalData, semanticData: props.value })
+        return <Component />
+      }
     }
   }
 
-  _getRequired(semanticData) {
-    const result = this._getDataWithSemantics(this.requiredData, semanticData)
+  async _getRequired(semanticData) {
+    const result = await this._getDataWithSemantics(this.requiredData, semanticData)
     const missingData = Object.entries(result).filter(([key, value]) => value === undefined).map(([key, value]) => key);
     return [result, missingData];
   }
 
-  _getOptionals(semanticData) {
-    return this._getDataWithSemantics(this.optionalData, semanticData)
+  async _getOptionals(semanticData) {
+    return await this._getDataWithSemantics(this.optionalData, semanticData)
   }
 
-  _getDataWithSemantics(keys, semanticData) {
-    return Object.entries(keys)
-      .map(([key, semanticKey]) => {
-        const data = semanticData.get(semanticKey)
-        if (data === undefined) { return [] }
+  async _getDataWithSemantics(keys, semanticData) {
+    return Promise.all(
+      Object.entries(keys)
+        .map(([key, semanticKey]) => semanticData.get(semanticKey)
+          .then(data => {
+            if (data === undefined) { return [] }
         
-        return [
-          [ key, data instanceof Array ? data.map(el => el.value) : data.value ],
-          [ `${key}Semantics`, data ]
-        ]
-      })
-      .filter(el => el.length === 2)
-      .reduce((acc, currentValue) => {
-        currentValue.forEach(([key, value]) => { acc[key] = value })
-        return acc
-      }, {})
+            return [
+              [ key, data instanceof Array ? data.map(el => el.value) : data.value ],
+              [ `${key}Semantics`, data ]
+            ]
+          })
+        )
+      ).then(values => values
+        .filter(el => el.length === 2)
+        .reduce((acc, currentValue) => {
+          currentValue.forEach(([key, value]) => { acc[key] = value })
+          return acc
+        }, {})
+      )
   }
 
 }

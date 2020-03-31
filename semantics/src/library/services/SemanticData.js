@@ -38,12 +38,12 @@ class SemanticData {
 
   resetReadCounter() {  this.alreadyReadData = []; this.alreadyReadRelations = []; return this; }
 
-  get(semanticKey) {
+  async get(semanticKey) {
     const maybeInnerValue = this._getInnerValue(semanticKey)
 
     if (maybeInnerValue) return maybeInnerValue
 
-    return this._getValueFromLinks(semanticKey)
+    return await this._getValueFromLinks(semanticKey)
   }
 
   _getInnerValue(semanticKey) {
@@ -99,7 +99,13 @@ class SemanticData {
     } else {
       const toInvoke = resourcesContainingValue[0]
       const linkedResourceData = await new GenericOperation(toInvoke.operation, this.apiDocumentation, this.httpCaller).call()
-      return linkedResourceData.value[toInvoke.pathInResponse]
+      return new SemanticData(
+        linkedResourceData.value[toInvoke.pathInResponse],
+        linkedResourceData.resourceSchema.properties[toInvoke.pathInResponse],
+        undefined,
+        this.apiDocumentation,
+        this.httpCaller
+      )
     }
   }
 
@@ -117,8 +123,9 @@ class SemanticData {
     return result
   }
 
+  // TODO: make use of this.get() instead of this._getInnerValue()
   getValue(semanticKey) {
-    const semanticData = this.get(semanticKey);
+    const semanticData = this._getInnerValue(semanticKey);
 
     if (semanticData !== undefined && semanticData instanceof Array) {
       return semanticData.map(s => s.value);
@@ -133,7 +140,7 @@ class SemanticData {
     const alreadyReadData = this.alreadyReadData
     const result = Object.entries(this.resourceSchema.properties)
       .filter(([key]) => !this.alreadyReadData.includes(key))
-      .map(([key, property]) => [key, this.get(property['@id'])])
+      .map(([key, property]) => [key, this._getInnerValue(property['@id'])])
       .filter(([key, value]) => value !== undefined)
       .reduce(reduceObject, {})
     this.alreadyReadData = alreadyReadData

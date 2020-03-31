@@ -9,6 +9,7 @@ import { useAppContextState } from '../../context/AppContext';
 import FullscreenError from '../basis/FullscreenError';
 import Semantics from '../../utils/semantics';
 import LoginRedirect from '../basis/LoginRedirect';
+import { useAsync } from '../../hooks'
 
 const requiredData = {
   projects: Semantics.vnd_jeera.terms.projects
@@ -22,8 +23,8 @@ const Projects = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const listProjectOperation = genericOperationBuilder.fromKey(LIST_PROJECTS_KEY)
   const { userShouldAuthenticate, parametersDetail, makeCall, isLoading, data, error } = useOperation(listProjectOperation)
-  const projects = data !== undefined ? data.get(requiredData.projects) : undefined
-
+  const [ projects ] = useAsync(() => data ? data.get(requiredData.projects) : undefined, [data])
+  
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => makeCall(), [])
 
