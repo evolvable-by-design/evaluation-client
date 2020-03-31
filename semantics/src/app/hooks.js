@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import qs from 'qs'
 
+import { useAppContextDispatch, useAppContextState } from './context/AppContext'
+import Semantics from './utils/semantics'
+import AuthenticationService from '../library/services/AuthenticationService'
+
 export function useQuery() {
   return qs.parse(useLocation().search.substring(1))
 }
@@ -35,4 +39,19 @@ export function useAsync(fct, dep) {
   }, dep)
 
   return [ data, error ]
+}
+
+export function useUserDetailsFetcher() {
+  const { genericOperationBuilder } = useAppContextState()
+  const contextDispatch = useAppContextDispatch()
+
+  useEffect(() => {
+    if (genericOperationBuilder && AuthenticationService.isAuthenticated()) {
+      genericOperationBuilder
+        .fromKey(Semantics.vnd_jeera.actions.getCurrentUserDetails)
+        .call()
+        .then(userProfile => contextDispatch({ type: 'updateUserProfile', userProfile }))
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [genericOperationBuilder, contextDispatch])
 }

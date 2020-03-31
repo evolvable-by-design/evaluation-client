@@ -3,7 +3,7 @@ import { Link, useHistory } from 'react-router-dom'
 import { Avatar, IconButton, Menu, Popover, Position, Tooltip } from 'evergreen-ui'
 
 import { useAppContextState } from '../../context/AppContext';
-import AuthenticationService from '../../services/AuthenticationService';
+import AuthenticationService from '../../../library/services/AuthenticationService';
 import Semantics from '../../utils/semantics';
 
 const UserProfileBubble = () => {

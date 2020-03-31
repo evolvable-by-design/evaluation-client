@@ -98,7 +98,6 @@ class AppProxy extends React.Component {
       return <FullscreenLoader />
     } else if (this.state.apiDocumentation) {
       return <AppContextProvider defaultState={this.getDefaultAppContext()}>
-        <UserDetailsFetcher />
         <AppRouter>{this.props.children}</AppRouter>
       </AppContextProvider>
     }
@@ -109,22 +108,5 @@ class AppProxy extends React.Component {
 }
 
 const AppProxyWithRouter = withRouter(AppProxy)
-
-function UserDetailsFetcher() {
-  const { userProfile, genericOperationBuilder } = useAppContextState()
-  const contextDispatch = useAppContextDispatch()
-
-  useEffect(() => {
-    if (genericOperationBuilder && userProfile === undefined && AuthenticationService.isAuthenticated()) {
-      genericOperationBuilder
-        .fromKey(Semantics.vnd_jeera.actions.getCurrentUserDetails)
-        .call()
-        .then(userProfile => contextDispatch({ type: 'updateUserProfile', userProfile }))
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [genericOperationBuilder])
-
-  return null
-}
 
 export default App;
