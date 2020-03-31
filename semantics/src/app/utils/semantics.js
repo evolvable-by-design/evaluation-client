@@ -91,11 +91,13 @@ const vocabularies = {
       Analytics: vndJeeraUrl + 'Analytics',
       resourceId: vndJeeraUrl + 'appResourceId',
       UserDetails: vndJeeraUrl + 'UserDetails',
+      starredProjects: vndJeeraUrl + 'starredProjects',
     },
     actions: {
       login: vndJeeraUrl + 'login',
       logout: vndJeeraUrl + 'logout',
-      getCurrentUserDetails: vndJeeraUrl + 'getCurrentUserDetails'
+      getCurrentUserDetails: vndJeeraUrl + 'getCurrentUserDetails',
+      starProjectReverse: vndJeeraUrl + 'starProjectReverse',
     },
     relations: {
       listProjectTasks: vndJeeraUrl + 'rel/listProjectTasks',
@@ -108,6 +110,7 @@ const vocabularies = {
       completeTask: vndJeeraUrl + 'rel/completeTask',
       toQATask: vndJeeraUrl + 'rel/toQATask',
       update: vndJeeraUrl + 'rel/modify',
+      star: vndJeeraUrl + 'rel/starProject',
     }
   }
 };
