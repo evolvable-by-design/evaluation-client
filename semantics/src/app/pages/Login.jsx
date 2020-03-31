@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Redirect, useHistory } from 'react-router-dom';
-import { Alert, Dialog, Heading, Spinner, majorScale } from 'evergreen-ui';
+import { Alert, Button, Card, Heading, Spinner, majorScale } from 'evergreen-ui';
 
 import AuthenticationService from '../../library/services/AuthenticationService';
 import { useOperation } from '../../library/services/ReactGenericOperation';
@@ -57,20 +57,15 @@ const LoginDialog = ({ onComplete }) => {
     </FullscreenCenterContainer>
   } else {
     return <FullscreenCenterContainer>
-      <Dialog
-        isShown={true}
-        title={'Login'}
-        hasCancel={false}
-        hasClose={false}
-        shouldCloseOnOverlayClick={false}
-        shouldCloseOnEscapePress={false}
-        isConfirmLoading={isLoading}
-        onConfirm={makeCall}
-        confirmLabel={isLoading ? 'Loading...' : 'Ok'}
-      >
+      <Card elevation={2} padding={majorScale(2)}>
+        <Heading size={800} marginBottom={majorScale(3)}>Login</Heading>
         <GenericForm {...parametersDetail} />
         { error && <Alert intent="danger" title={error.message} /> }
-      </Dialog>
+        { isLoading
+            ? <Button appearance="primary" disabled><Spinner size={24}/>Loading...</Button>
+            : <Button appearance="primary" onClick={makeCall}>Login</Button>
+        }
+      </Card>
     </FullscreenCenterContainer>
   }
 }
