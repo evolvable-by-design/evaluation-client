@@ -34,7 +34,7 @@ const ActionDialog = ({ isShown, title, operationSchema, onSuccessCallback, onCl
   >
     <div style={{ 'minWidth': '560px' }}>
       { !(success && data) && <GenericForm {...parametersDetail} /> }
-      { error && <Alert intent="danger" title={error.getValue(Semantics.schema.terms.identifier) || error} marginBottom='16px' /> }
+      { error && <Alert intent="danger" title={error.getValue(Semantics.schema.terms.description) || error} marginBottom='16px' /> }
       { success && !data && <Alert intent="success" title='Success' marginBottom='16px' /> }
       { success && data && <ComponentResolver semanticData={data} /> }
     </div>

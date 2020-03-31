@@ -60,7 +60,7 @@ const LoginDialog = ({ onComplete }) => {
       <Card elevation={2} padding={majorScale(2)}>
         <Heading size={800} marginBottom={majorScale(3)}>Login</Heading>
         <GenericForm {...parametersDetail} />
-        { error && <Alert intent="danger" title={error.getValue(Semantics.schema.terms.identifier)} /> }
+        { error && <Alert intent="danger" title={error.getValue(Semantics.schema.terms.description)} /> }
         { isLoading
             ? <Button appearance="primary" disabled><Spinner size={24}/>Loading...</Button>
             : <Button appearance="primary" onClick={makeCall}>Login</Button>
