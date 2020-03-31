@@ -38,7 +38,7 @@ const LogoutDialog = () => {
     if (makeCall !== undefined) makeCall()
     return (<>
       <Heading width="100%" size={700} marginBottom={majorScale(2)}>We are logging you out...</Heading>
-      { error && <Paragraph width="100%" size={500}>{error.getValue(Semantics.schema.terms.identifier)}</Paragraph> }
+      { error && <Paragraph width="100%" size={500}>{error.getValue(Semantics.schema.terms.description)}</Paragraph> }
     </>)
   } else {
     return <Heading>Not yet supported</Heading>
