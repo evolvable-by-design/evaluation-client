@@ -6,11 +6,11 @@ function useFetch(fct) {
   const [success, setSuccess] = useState(false)
   const [data, setData] = useState()
 
-  const makeCall = useCallback(() => {
+  const makeCall = useCallback((overridingFct) => {
     const call = async () => {
       setIsLoading(true)
       try {
-        const data = await fct()
+        const data = overridingFct ? await overridingFct() : await fct()
         setData(data)
         setSuccess(true)
         setError(undefined)

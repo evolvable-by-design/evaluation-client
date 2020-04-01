@@ -13,8 +13,9 @@ import ProjectService from '../../services/ProjectService';
 const Projects = () => {
   const [ offset, setOffset ] = useState()
   const [ limit, setLimit ] = useState()
-  const { makeCall, isLoading, data, error } = useFetch(() => ProjectService.list(offset, limit))
-  const projects = data
+
+  const { makeCall, isLoading, data, error } = useFetch(() => ProjectService.list({ offset, limit }))
+  const { projects, nextPage, lastPage } = data || {}
 
   const [ showCreateProjectDialog, setShowCreateProjectDialog ] = useState(false)
 
@@ -63,7 +64,7 @@ const Projects = () => {
         
       </Pane>
 
-      <Button appearance="primary" onClick={makeCall} marginBottom={majorScale(3)} marginRight={majorScale(1)}>Update</Button>
+      <Button appearance="primary" onClick={() => makeCall(() => ProjectService.list({ offset, limit }))} marginBottom={majorScale(3)} marginRight={majorScale(1)}>Update</Button>
       { !AuthenticationService.isAuthenticated() && <Alert intent="none" marginBottom={32} title="Login to see more actions."/> }
       { AuthenticationService.isAuthenticated() && 
           <Button appearance="primary" onClick={() => setShowCreateProjectDialog(true)} marginBottom={majorScale(3)} marginRight={majorScale(1)}>Create project</Button>
@@ -72,6 +73,9 @@ const Projects = () => {
       <CreateProjectDialog isShown={showCreateProjectDialog} onSuccessCallback={makeCall} onCloseComplete={() => setShowCreateProjectDialog(false)}/>
 
       <ProjectCards projects={projects} />
+
+      { nextPage && <Button appearance="primary" onClick={() => makeCall(() => ProjectService.list({ url: nextPage }))} marginBottom={majorScale(3)} marginRight={majorScale(1)}>Next Page</Button>}
+      { lastPage && <Button appearance="primary" onClick={() => makeCall(() => ProjectService.list({ url: lastPage }))} marginBottom={majorScale(3)} marginRight={majorScale(1)}>Last Page</Button>}
     </>
   }
 };
