@@ -3,11 +3,12 @@ import { extractProjectTechnicalId } from '../utils/ResourceUtils'
 
 class ProjectService {
 
-  async list(offset, limit) {
+  async list({offset, limit, url}) {
+    console.log(url)
     const response = await HttpClient().get(
-      `/projects?offset=${offset || 0}&limit=${limit || 10}`
+      url ? url : `/projects?offset=${offset || 0}&limit=${limit || 10}`
     )
-    return response.data.projects
+    return { projects: response.data.projects, nextPage: response.headers['x-next'], lastPage: response.headers['x-last'] }
   }
 
   async create(name) {
