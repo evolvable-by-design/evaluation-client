@@ -158,7 +158,7 @@ const Columns = ({ labels, tasks }) => {
           <Heading marginBottom={majorScale(2)} size={400}>{label.toUpperCase()}</Heading>
           <Pane>
             { tasks
-                .filter(task => task.status === label)
+                .filter(task => task.details.status === label)
                 .map(task => 
                   <Pane key={JSON.stringify(task)} marginBottom={majorScale(1)}>
                     <TaskCard id={task.id} title={task.title} points={task.points} />

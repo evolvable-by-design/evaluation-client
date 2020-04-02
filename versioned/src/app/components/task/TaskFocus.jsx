@@ -32,7 +32,13 @@ const TaskFocus = ({ tasks, onOperationInvokationSuccess }) => {
   if (Action) {
     return <Action />
   } else if (task) {
-    return <TaskDialog title={task.title} {...task}  actions={Object.keys(actions)} />
+    return <TaskDialog
+      assignee={task.details.assignee}
+      status={task.details.status}
+      description={task.details.description}
+      {...task} 
+      actions={Object.keys(actions)}
+    />
   } else {
     return null
   }
@@ -57,8 +63,8 @@ function taskActions(task, onOperationInvokationSuccess, history, userProfile) {
   }
 
   if (userProfile?.role !== 'ProductOwner') delete actions['Delete']
-  if (task.status !== 'QA') delete actions['Complete'];
-  if (task.status === 'QA') delete actions['Move to QA'];
+  if (task.details.status !== 'QA') delete actions['Complete'];
+  if (task.details.status === 'QA') delete actions['Move to QA'];
   if (task.isArchived) {
     delete actions['Archive']
   } else {
