@@ -62,7 +62,7 @@ const LoginDialog = ({ onComplete }) => {
         shouldCloseOnOverlayClick={false}
         shouldCloseOnEscapePress={false}
         isConfirmLoading={isLoading}
-        onConfirm={makeCall}
+        onConfirm={() => makeCall()}
         confirmLabel={isLoading ? 'Loading...' : 'Login'}
         isConfirmDisabled={username === undefined || password === undefined}
       >

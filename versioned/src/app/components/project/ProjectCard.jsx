@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Badge, Card, Heading, Pane, Paragraph, majorScale } from 'evergreen-ui';
+import { Card, Heading, Pane, Paragraph, majorScale } from 'evergreen-ui';
 
 import AnalyticsService from '../../services/AnalyticsService';
 import UserId from '../user/UserId'

@@ -31,7 +31,7 @@ const UpdateTaskDialog = ({ task, isShown, onSuccessCallback, onCloseComplete })
     // eslint-disable-next-line eqeqeq
     isConfirmDisabled={ { ...task, title, description, assignee, status, points, tags, priority } == task }
     confirmLabel="Update"
-    onConfirm={makeCall}
+    onConfirm={() => makeCall()}
     onCloseComplete={() => { if (success) { onSuccessCallback(data) } onCloseComplete() }}
     hasFooter={!success}
     width="700px"

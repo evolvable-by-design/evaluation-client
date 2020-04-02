@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Dialog, Pane, TextInput, Switch, majorScale } from 'evergreen-ui' 
+import { Alert, Dialog, Pane, TextInput } from 'evergreen-ui' 
 
 import useFetch from '../../hooks/useFetch'
 import ProjectService from '../../services/ProjectService'
@@ -22,7 +22,7 @@ const CreateProjectDialog = ({ isShown, onSuccessCallback, onCloseComplete }) =>
     title='Create a project'
     isConfirmLoading={isLoading}
     confirmLabel="Create project"
-    onConfirm={makeCall}
+    onConfirm={() => makeCall()}
     isConfirmDisabled={name === undefined}
     onCloseComplete={() => { if (success) { onSuccessCallback(data) } onCloseComplete() }}
     hasHeader={!(success && data)}

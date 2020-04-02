@@ -137,7 +137,7 @@ const Tasks = ({ projectId }) => {
 
         </Pane>
 
-        <Button appearance="primary" onClick={makeCall} marginBottom={majorScale(3)}>Filter</Button>
+        <Button appearance="primary" onClick={() => makeCall()} marginBottom={majorScale(3)}>Filter</Button>
       </div>
       
       <Columns labels={['todo', 'in progress', 'review', 'QA', 'done']} tasks={tasks || []} />

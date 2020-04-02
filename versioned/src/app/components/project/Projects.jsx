@@ -4,7 +4,6 @@ import { Alert, Button, Pane, Text, Heading, TextInputField, majorScale } from '
 import CreateProjectDialog from './CreateProjectDialog'
 import ProjectCard from './ProjectCard';
 import FullscreenError from '../basis/FullscreenError';
-import SwitchInputField from '../input/SwitchInputField';
 import useFetch from '../../hooks/useFetch';
 import AuthenticationService from '../../services/AuthenticationService';
 import ProjectService from '../../services/ProjectService';
@@ -70,7 +69,7 @@ const Projects = () => {
           <Button appearance="primary" onClick={() => setShowCreateProjectDialog(true)} marginBottom={majorScale(3)} marginRight={majorScale(1)}>Create project</Button>
       }
 
-      <CreateProjectDialog isShown={showCreateProjectDialog} onSuccessCallback={makeCall} onCloseComplete={() => setShowCreateProjectDialog(false)}/>
+      <CreateProjectDialog isShown={showCreateProjectDialog} onSuccessCallback={() => makeCall()} onCloseComplete={() => setShowCreateProjectDialog(false)}/>
 
       <ProjectCards projects={projects} />
 
