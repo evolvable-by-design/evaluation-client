@@ -100,6 +100,7 @@ const vocabularies = {
       getCurrentUserDetails: vndJeeraUrl + 'getCurrentUserDetails',
       starProjectReverse: vndJeeraUrl + 'starProjectReverse',
       revertProjectArchiveState: vndJeeraUrl + 'revertProjectArchiveState',
+      reverseTaskArchivedState: vndJeeraUrl + 'reverseTaskArchivedState'
     },
     relations: {
       listProjectTasks: vndJeeraUrl + 'rel/listProjectTasks',
@@ -113,6 +114,7 @@ const vocabularies = {
       toQATask: vndJeeraUrl + 'rel/toQATask',
       update: vndJeeraUrl + 'rel/modify',
       star: vndJeeraUrl + 'rel/starProject',
+      reverseArchivedState: vndJeeraUrl + 'rel/reverseArchivedState',
     }
   }
 };
