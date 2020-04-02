@@ -99,6 +99,7 @@ const vocabularies = {
       logout: vndJeeraUrl + 'logout',
       getCurrentUserDetails: vndJeeraUrl + 'getCurrentUserDetails',
       starProjectReverse: vndJeeraUrl + 'starProjectReverse',
+      revertProjectArchiveState: vndJeeraUrl + 'revertProjectArchiveState',
     },
     relations: {
       listProjectTasks: vndJeeraUrl + 'rel/listProjectTasks',

@@ -15,13 +15,12 @@ import TaskFocus from '../task/TaskFocus'
 import GenericFilters from '../generic/GenericFilters'
 import { useAsync } from '../../hooks'
 
-const ProjectDetails = ({ id, title, refreshProjectFct, semanticData }) => {
+const ProjectDetails = ({ id, title, isArchived, refreshProjectFct, semanticData }) => {
   // eslint-disable-next-line
   const listTasksOperation = semanticData.getRelation(Semantics.vnd_jeera.relations.listProjectTasks, 1)?.operation
 
   const operations = [ 
     Semantics.vnd_jeera.relations.archive,
-    Semantics.vnd_jeera.relations.unarchive,
     Semantics.vnd_jeera.relations.inviteToCollaborate,
     Semantics.vnd_jeera.relations.delete,
     Semantics.vnd_jeera.relations.create,
@@ -46,9 +45,10 @@ const ProjectDetails = ({ id, title, refreshProjectFct, semanticData }) => {
       <Heading size={900}>{title}{isStarred && <Icon icon="star" color="warning" />}</Heading>
       <Pane display="flex" flexDirection="row" justifyContent="flex-end" flexWrap="wrap">
         { availableOperations.map(operation => {
-          console.log(Semantics.vnd_jeera.terms.starProjectReverse)
             if (operation?.operation['@id'] === Semantics.vnd_jeera.actions.starProjectReverse) {
               return <Button key={`button-${operation.key}`} appearance="default" marginRight={majorScale(2)} marginBottom={majorScale(1)} onClick={() => setOperationFocus(operation)}>{ isStarred ? 'Unstar' : 'Star' }</Button>
+            } else if (operation?.operation['@id'] === Semantics.vnd_jeera.actions.revertProjectArchiveState) {
+              return <Button key={`button-${operation.key}`} appearance="default" marginRight={majorScale(2)} marginBottom={majorScale(1)} onClick={() => setOperationFocus(operation)}>{ isArchived ? 'Unarchive' : 'Archive' }</Button>
             } else {
               return <Button key={`button-${operation.key}`} appearance="default" marginRight={majorScale(2)} marginBottom={majorScale(1)} onClick={() => setOperationFocus(operation)}>{ spaceCamelCaseWord(capitalize(operation.key)) }</Button>
             }
@@ -123,6 +123,7 @@ export const ProjectDetailsSemanticBuilder = new SemanticComponentBuilder(
   {
     isPublic: Semantics.vnd_jeera.terms.isPublic,
     lastUpdate: Semantics.schema.terms.lastUpdate,
+    isArchived: Semantics.vnd_jeera.terms.isArchived,
   },
   undefined,
   defaultSemanticComponentErrorHandler('project')
