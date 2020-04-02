@@ -46,9 +46,17 @@ function taskActions(task) {
     Semantics.vnd_jeera.relations.completeTask,
     Semantics.vnd_jeera.relations.toQATask,
     Semantics.vnd_jeera.relations.update,
+    Semantics.vnd_jeera.relations.reverseArchivedState,
   ]
   
-  return task.getRelations(actions)
+  const relations = task.getRelations(actions)
+  relations.forEach(rel => {
+    if (rel.operation['@id'] === Semantics.vnd_jeera.actions.reverseTaskArchivedState) {
+      rel.key = task.getValue(Semantics.vnd_jeera.terms.isArchived) ? 'Unarchive' : 'Archive'
+    }
+  })
+
+  return relations
 }
 
 function hideTaskActionDialog(history) {
