@@ -1,14 +1,18 @@
 import HttpClient from './HttpClient'
 import { extractProjectTechnicalId } from '../utils/ResourceUtils'
+import { extractLinkHeaderValues } from '../utils/HttpUtils'
 
 class ProjectService {
 
   async list({offset, limit, url}) {
-    console.log(url)
     const response = await HttpClient().get(
       url ? url : `/projects?offset=${offset || 0}&limit=${limit || 10}`
     )
-    return { projects: response.data.projects, nextPage: response.headers['x-next'], lastPage: response.headers['x-last'] }
+
+    const linkHeaderValues = extractLinkHeaderValues(response.headers['link'])
+    const nextPage = linkHeaderValues.find(entry => entry?.rel === 'http://www.w3.org/ns/hydra/core#next')?.value
+    const lastPage = linkHeaderValues.find(entry => entry?.rel === 'http://www.w3.org/ns/hydra/core#last')?.value
+    return { projects: response.data.projects, nextPage, lastPage }
   }
 
   async create(name) {
