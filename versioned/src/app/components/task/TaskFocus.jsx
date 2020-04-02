@@ -4,6 +4,7 @@ import qs from 'qs'
 
 import useQuery from '../../hooks/useQuery'
 import TaskService from '../../services/TaskService'
+import { useAppContextState } from '../../context/AppContext'
 
 import ConfirmOperationDialog from '../basis/ConfirmOperationDialog'
 import TaskDialog from './TaskDialog'
@@ -12,6 +13,7 @@ import UpdateTaskDialog from './UpdateTaskDialog'
 const TaskFocus = ({ tasks, onOperationInvokationSuccess }) => {
   const { taskFocus, actionFocus } = useQuery()
   const history = useHistory()
+  const { userProfile } = useAppContextState()
 
   if (tasks === undefined || taskFocus === undefined) {
     return null
@@ -24,7 +26,7 @@ const TaskFocus = ({ tasks, onOperationInvokationSuccess }) => {
     return null
   }
 
-  const actions = taskActions(task, onOperationInvokationSuccess, history)
+  const actions = taskActions(task, onOperationInvokationSuccess, history, userProfile)
   const Action = actions[actionFocus]
 
   if (Action) {
@@ -36,7 +38,7 @@ const TaskFocus = ({ tasks, onOperationInvokationSuccess }) => {
   }
 }
 
-function taskActions(task, onOperationInvokationSuccess, history) {
+function taskActions(task, onOperationInvokationSuccess, history, userProfile) {
   const commonProps = {
     onCloseComplete: () => hideTaskActionDialog(history),
     onSuccessCallback: () => {
@@ -54,6 +56,7 @@ function taskActions(task, onOperationInvokationSuccess, history) {
     Unarchive: () => <ConfirmOperationDialog operation={() => TaskService.archive(task.id)} title='Unarchive' {...commonProps} />
   }
 
+  if (userProfile?.role !== 'ProductOwner') delete actions['Delete']
   if (task.status !== 'QA') delete actions['Complete'];
   if (task.status === 'QA') delete actions['Move to QA'];
   if (task.isArchived) {
