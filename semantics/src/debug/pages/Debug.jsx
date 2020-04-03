@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { Button } from 'evergreen-ui'
 
 import { useAppContextState } from '../../app/context/AppContext'
 import BaseApplicationLayout from '../../app/components/layout/BaseApplicationLayout'
@@ -13,10 +14,8 @@ const Debug = () => {
 
   const { genericOperationBuilder } = useAppContextState()
 
-  const getProjectDetailsOperation = genericOperationBuilder.fromKey(Semantics.vnd_jeera.terms.getProjectDetails)
-  
-  const { makeCall, isLoading, success, data, error } =
-    useOperation(getProjectDetailsOperation, { [Semantics.vnd_jeera.terms.projectId]: '0e4a7fdb-b97e-42bf-a657-a61d88efb737'})
+  const operation = genericOperationBuilder.fromKey(Semantics.vnd_jeera.terms.listProjects)
+  const { makeCall, isLoading, success, data, error } = useOperation(operation)
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => makeCall(), [])
@@ -34,14 +33,22 @@ const Debug = () => {
 }
 
 function DebugSemanticData({ semanticData }) {
-  const [ createdOn, setCreatedOn ] = useState()
-  
-  useEffect(() => {
-    const apply = () => semanticData._getValueFromLinks(Semantics.schema.terms.createdOn).then(setCreatedOn)
-    apply()
-  }, [semanticData])
+  const lastPage = semanticData.getRelation(Semantics.hydra.terms.last, 1)
+  console.log(lastPage)
+  return <>
+    <h1>Debug</h1>
 
-  return <p>Debuging semantic data {createdOn}</p>
+    { lastPage && <LastPage operation={lastPage.operation}/> }
+  </>
+}
+
+function LastPage({operation}) {
+  const { genericOperationBuilder } = useAppContextState()
+  const op = genericOperationBuilder.fromOperation(operation)
+  const { makeCall, isLoading, success, data, error } = useOperation(op)
+  console.log(data)
+
+  return <Button onClick={makeCall}>Last</Button>
 }
 
 export default Debug
