@@ -6,6 +6,7 @@ const ovUrl = "http://open.vocab.org/terms/";
 const moUrl = "http://purl.org/ontology/mo/";
 const vndJeeraUrl = "https://github.com/loosely-coupled-API/jeera_vocabulary/blob/master/vocab.ttl#";
 const vndJeeraUrlRel = vndJeeraUrl + "rel/";
+const hydraUrl = "http://www.w3.org/ns/hydra/core#"
 
 const vocabularies = {
   schema: {
@@ -21,6 +22,13 @@ const vocabularies = {
       createdOn: schemaUrl + 'dateCreated',
       Error: schemaUrl + 'Error',
       identifier: schemaUrl + 'identifier',
+    }
+  },
+  hydra: {
+    url: hydraUrl,
+    terms: {
+      next: hydraUrl + 'next',
+      last: hydraUrl + 'last',
     }
   },
   lcy: {

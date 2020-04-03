@@ -12,13 +12,14 @@ import GenericOperation from './GenericOperation';
 
 class SemanticData {
 
-  constructor(data, resourceSchema, responseSchema, apiDocumentation, httpCaller) {
+  constructor(data, resourceSchema, responseSchema, apiDocumentation, httpCaller, originHttpResponse) {
     this.value = data;
     this.responseSchema = responseSchema
     this.apiDocumentation = apiDocumentation
     this.alreadyReadData = []
     this.alreadyReadRelations = []
     this.httpCaller = httpCaller
+    this.originHttpResponse = originHttpResponse
 
     if (resourceSchema.oneOf) {
       const schema = resourceSchema.oneOf
@@ -60,9 +61,9 @@ class SemanticData {
 
       if (schema.type === 'array') {
         const responseBodySchema = this.apiDocumentation?.responseBodySchema(schema.items['@id'])
-        return value.map(v => new SemanticData(v, schema.items, responseBodySchema, this.apiDocumentation, this.httpCaller))
+        return value.map(v => new SemanticData(v, schema.items, responseBodySchema, this.apiDocumentation, this.httpCaller, this.originHttpResponse))
       } else {
-        return new SemanticData(value, schema, this.apiDocumentation?.responseBodySchema(schema['@id']), this.apiDocumentation, this.httpCaller)
+        return new SemanticData(value, schema, this.apiDocumentation?.responseBodySchema(schema['@id']), this.apiDocumentation, this.httpCaller, this.originHttpResponse)
       }
     } else if (this.isArray()) {
       // Not sure of this yet. This may be thought a bit more.
@@ -104,7 +105,9 @@ class SemanticData {
         linkedResourceData.resourceSchema.properties[toInvoke.pathInResponse],
         undefined,
         this.apiDocumentation,
-        this.httpCaller
+        this.httpCaller,
+        this.originHttpResponse,
+        linkedResourceData.originHttpResponse
       )
     }
   }
@@ -167,22 +170,96 @@ class SemanticData {
     return semanticRelations.map(rel => this.getRelation(rel)).reduce((acc, values) => acc.concat(values), [])
   }
 
-  _getRelationFromSemantics(semanticRelation, addToReadList) {
-    return this._getRelation(
+  _getHeader(semanticKey) {
+    const headers = this._normalizeHeaders()
+    return Object.values(headers)
+      .flatMap(value => {
+        if (value instanceof Array) {
+          return value.filter(v => v?.relation === semanticKey)
+        } else if (value?.relation === semanticKey) {
+          return [ value ]
+        } else {
+          return []
+        }
+      })
+  }
+
+  _getDataFromHeaders(semanticKey) {
+    return this._getHeader(semanticKey)
+      .map(result => new SemanticData(result.value, result.documentation, undefined, this.apiDocumentation, this.httpCaller, this.originHttpResponse))
+  }
+
+  _getRelationsFromHeaders(semanticKey) {
+    return this._getHeader(semanticKey)
+      .map(result => {
+        const operationId = result?.operationId || result?.documentation?.operationId
+
+        const operation = this.apiDocumentation.findOperationById(operationId)
+        delete operation['parameters']
+        delete operation['requestBody']
+
+        return {
+          key: result.relation.slice(result.relation.lastIndexOf('#') + 1),
+          operation: {
+            ...operation,
+            url: result.value,
+          }
+        }
+      })
+  }
+
+  _normalizeHeaders() {
+    return Object.entries(this.originHttpResponse.headers)
+      .map(([header, value]) => {
+        const headerKey = Object.keys(this.responseSchema?.headers || {}).find(key => key.toLowerCase() === header.toLowerCase())
+        const headerDocumentation = headerKey ? this.responseSchema?.headers[headerKey] : undefined
+
+        if (header === 'link') { 
+          const links = value.split(',')
+            .map(entry => entry.trim())
+            .map(entry => entry.slice(1, -1))
+            .map(entry => entry.split(';')
+              .map(s => s.trim())
+              .reduce((accumulator, value, i) => {
+                if (i === 0) {
+                  accumulator['value'] = value
+                  accumulator['documentation'] = headerDocumentation
+                } else {
+                  const [key, val] = value.split('=')
+                  const correctedKey = key === 'rel' ? 'relation' : key
+                  accumulator[correctedKey] = val.slice(1, -1)
+                }
+                return accumulator
+              }, {})
+            )
+          return [ header, links ]
+        } else {
+          const relation = headerDocumentation ? headerDocumentation['@id'] : undefined
+          return [ header, { value, relation, documentation: headerDocumentation }]
+        }
+      })
+      .reduce((acc, [key, value]) => { acc[key] = value; return acc; }, {})
+  }
+
+  _getRelationFromSemantics(semanticRelation) {
+    const relationsFromHypermediaControls = this._getRelationFromHypermediaControls(
       ([key, schema]) => schema['@relation'] === semanticRelation,
       true
     )
+
+    const relationsFromHeaders = this._getRelationsFromHeaders(semanticRelation)
+    return relationsFromHypermediaControls.concat(relationsFromHeaders)
   }
 
   _getRelationFromHypermediaControlKey(hypermediaControlKey, addToReadList) {
-    return this._getRelation(([key, schema]) => key === hypermediaControlKey)
+    return this._getRelationFromHypermediaControls(([key, schema]) => key === hypermediaControlKey, addToReadList)
   }
 
   _getOperationsWithParentAffiliation() {
-    return this._getRelation(([key, schema]) => schema['x-affiliation'] === 'parent', false)
+    return this._getRelationFromHypermediaControls(([key, schema]) => schema['x-affiliation'] === 'parent', false)
   }
 
-  _getRelation(filterFct, addToReadList) {
+  _getRelationFromHypermediaControls(filterFct, addToReadList) {
     const responseSchemaLinks = this.responseSchema.links || {};
     const availableLinks = this.value._links || [];
 

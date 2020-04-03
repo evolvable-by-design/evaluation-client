@@ -58,7 +58,7 @@ class HttpCaller {
         ? responseSchema.content[result.headers['content-type'].split(';')[0]].schema
         : undefined
     const data = resultMapper ? resultMapper(result) : result.data
-    return new SemanticData(data, resourceSchema, responseSchema, this.apiDocumentation, this)
+    return new SemanticData(data, resourceSchema, responseSchema, this.apiDocumentation, this, result)
   }
 
   _buildSemanticError(error, operation) {
@@ -67,7 +67,7 @@ class HttpCaller {
       error.response?.data !== '' && error.response.headers['content-type'] && responseSchema
         ? responseSchema.content[error.response.headers['content-type'].split(';')[0]].schema
         : undefined
-    return new SemanticData(error.response?.data, resourceSchema, responseSchema, this.apiDocumentation, this)
+    return new SemanticData(error.response?.data, resourceSchema, responseSchema, this.apiDocumentation, this, error.response)
   }
 
   _callerInstance() {
