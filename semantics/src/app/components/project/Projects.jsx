@@ -23,7 +23,10 @@ const Projects = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const listProjectOperation = genericOperationBuilder.fromKey(LIST_PROJECTS_KEY)
   const { userShouldAuthenticate, parametersDetail, makeCall, isLoading, data, error } = useOperation(listProjectOperation)
-  const [ projects ] = useAsync(() => data ? data.get(requiredData.projects) : undefined, [data])
+  const [semanticData, setData] = useState()
+  
+  const [ projects ] = useAsync(() => semanticData ? semanticData.get(requiredData.projects) : undefined, [semanticData])
+  useEffect(() => setData(data), [data])
   
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => makeCall(), [])
@@ -51,9 +54,35 @@ const Projects = () => {
       { createOperation && <CreateProjectDialog operation={createOperation} onSuccessCallback={makeCall} /> }
 
       <ProjectCards projects={projects} />
+
+      { projects && <ProjectsNavigation label="Next" to={Semantics.hydra.terms.next} projects={semanticData} setProjects={setData} />}
+      { projects && <ProjectsNavigation label="Last" to={Semantics.hydra.terms.last} projects={semanticData} setProjects={setData} />}
     </>
   }
 };
+
+const ProjectsNavigation = ({label, to, projects, setProjects}) => {
+  const page = projects.getRelation(to, 1)
+  const { genericOperationBuilder } = useAppContextState()
+  const operation = page ? genericOperationBuilder.fromOperation(page?.operation) : undefined
+
+  if (operation) {
+    return <ProjectsNavigationWithOperation label={label} operation={operation} setProjects={setProjects} />
+  } else {
+    return null
+  }
+}
+
+const ProjectsNavigationWithOperation = ({label, operation, setProjects}) => {
+  const { makeCall, data } = useOperation(operation)
+  useEffect(() => {
+    if (data) {
+      setProjects(data)
+    }
+  }, [data])
+
+  return <Button appearance="primary" onClick={makeCall} marginRight={majorScale(1)}>{label}</Button>
+}
 
 const ProjectCards = ({projects}) => {
   if (projects !== undefined) {
