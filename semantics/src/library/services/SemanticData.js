@@ -217,17 +217,16 @@ class SemanticData {
         if (header === 'link') { 
           const links = value.split(',')
             .map(entry => entry.trim())
-            .map(entry => entry.slice(1, -1))
             .map(entry => entry.split(';')
               .map(s => s.trim())
               .reduce((accumulator, value, i) => {
                 if (i === 0) {
-                  accumulator['value'] = value
+                  accumulator['value'] = value.slice(1, -1)
                   accumulator['documentation'] = headerDocumentation
                 } else {
                   const [key, val] = value.split('=')
-                  const correctedKey = key === 'rel' ? 'relation' : key
-                  accumulator[correctedKey] = val.slice(1, -1)
+                  const correctedKey = key.trim() === 'rel' ? 'relation' : key.trim()
+                  accumulator[correctedKey] = val.trim()
                 }
                 return accumulator
               }, {})

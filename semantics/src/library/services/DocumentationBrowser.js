@@ -306,7 +306,7 @@ class DocumentationBrowser {
     if (!ref.startsWith('#')) {
       throw new Error('Unhandled kind of reference:' + ref);
     }
-
+    
     const fragments = ref.substring(2).split('/');
     const object = fragments.reduce((res, fragment) => res[fragment], this.documentation);
     if (!object['@id']) {
